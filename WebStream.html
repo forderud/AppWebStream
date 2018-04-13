@@ -1,0 +1,90 @@
+<html>
+<head>
+    <title>AppWebStreaming</title>
+</head>
+<body>
+    <video id="movie" autoplay>Video not shown</video>
+
+<script>
+var video = document.getElementById("movie");
+video.addEventListener('error',function(e){
+    console.error("Video tag error: "+e);
+});
+video.addEventListener('play',function(e){
+    console.log("Resuming video playback");
+    // jump to last frame to catch up with stream
+    if (video.buffered.length > 0)
+        video.currentTime = video.buffered.end(0);
+});
+
+if (window.MediaSource) {
+    var mediaSource = new MediaSource();
+    video.src = URL.createObjectURL(mediaSource);
+    mediaSource.addEventListener('sourceopen', sourceOpen);
+} else {
+    console.error("Media Source Extensions API not supported.")
+}
+
+function sourceOpen(e) {
+    console.log("sourceOpen: "+this.readyState); // open
+    URL.revokeObjectURL(video.src);
+    var url = "movie.mp4";
+    var mime = 'video/mp4; codecs="avc1.64001F"';
+    var mediaSource = e.target;
+    var sourceBuffer = mediaSource.addSourceBuffer(mime);
+    sourceBuffer.mode = "sequence";
+    sourceBuffer.addEventListener('error', function (e) {
+        console.error("sourceBuffer error: "+mediaSource.readyState+", "+e);
+    });
+    sourceBuffer.addEventListener('abort', function (e) {
+        console.error("sourceBuffer abort: "+mediaSource.readyState+", "+e);
+    });
+
+    var queue = [];
+    function AppendToQueue (data) {
+        queue.push(data);
+        
+        // check if SourceBuffer is ready to receive data
+        if (!sourceBuffer.updating) {
+            // concatenate queued elements into a single array
+            var totalSize = 0;
+            for (var i = 0; i < queue.length; ++i)
+                totalSize += queue[i].byteLength ;
+            var concatArray = new Uint8Array(totalSize);
+            var curPos = 0;
+            for (var i = 0; i < queue.length; ++i) {
+                concatArray.set(queue[i], curPos);
+                curPos += queue[i].byteLength ;
+            }
+        
+            sourceBuffer.appendBuffer(concatArray);
+            queue = [];
+        }
+    }
+
+    sourceBuffer.addEventListener('updateend', function (e) {
+        //console.log("sourceBuffer updateend");
+    });
+
+    console.log("streaming URL: "+url);
+    fetch(url).then(function(res) {
+        var reader = res.body.getReader();
+        
+        function pump() {
+            return reader.read().then(({done, value}) => {
+                if (done)
+                    return;
+                
+                AppendToQueue(value);
+                return pump();
+            })
+        }
+        // call recursive function to stream received data
+        return pump();
+    }).catch(function(e) {
+        console.error("fetch error: "+e);
+    });
+}
+</script>
+</body>
+</html>
