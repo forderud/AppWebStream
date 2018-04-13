@@ -1,5 +1,5 @@
 # AppWebStream
-[Windows Media Foundation](https://msdn.microsoft.com/en-us/library/ms694197.aspx)-based sample code for streaming an application window to a web browser. The video is encoded H.264 stream inside a fragmented MPEG4 container. The byte-stream is modified as described in https://stackoverflow.com/questions/49429954/mfcreatefmpeg4mediasink-does-not-generate-mse-compatible-mp4 to make it Media Source Extensions (MSE) compatible, so that it can be received by any modern web browser with minimal client-side buffering.
+[Windows Media Foundation](https://msdn.microsoft.com/en-us/library/ms694197.aspx)-based sample code for streaming an application window to a web browser. The video is encoded as a H.264 stream inside a fragmented MPEG4 container. The byte-stream is modified as described in https://stackoverflow.com/questions/49429954/mfcreatefmpeg4mediasink-does-not-generate-mse-compatible-mp4 to make it Media Source Extensions (MSE) compatible, so that it can be received by any modern web browser with minimal client-side buffering.
 
 ### Getting started
 ![screenshot](screenshot.png)
