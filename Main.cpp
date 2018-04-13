@@ -130,15 +130,21 @@ int main (int argc, char *argv[]) {
     std::cout << "Starting web server to stream window " << std::hex << win_handle << ". Please connect with a web browser on port " <<port << " to receive the stream" << std::endl;
     auto ws = CreateLocalInstance<WebStream>();
     ws->SetPortAndWindowHandle(port, win_handle);
-    VideoEncoder encoder(dims, 25, ws);
+    const unsigned int FPS = 25;
+    VideoEncoder encoder(dims, FPS, ws);
 
     // encode & transmit frames
     HRESULT hr = S_OK;
+    auto prev_time = std::chrono::high_resolution_clock::now();
     while (SUCCEEDED(hr)) {
         hr = EncodeFrame(encoder, wnd_dc);
 
-        // synchronize to 25fps
-        Sleep(1000/25);
+        // synchronize framerate
+        auto cur_time = std::chrono::high_resolution_clock::now();
+        auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(cur_time - prev_time);
+        if (duration_ms.count() < 1000/FPS)
+            Sleep(static_cast<DWORD>(1000/FPS - duration_ms.count()));
+        prev_time = cur_time;
     }
 
     return 0;
