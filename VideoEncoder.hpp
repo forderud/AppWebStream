@@ -87,10 +87,10 @@ public:
             CComPtr<ICodecAPI> codec;
             COM_CHECK(m_sink_writer->GetServiceForStream(m_stream_index, GUID_NULL, IID_ICodecAPI, (void**)&codec));
             CComVariant quality;
-            COM_CHECK(codec->GetValue(&CODECAPI_AVEncCommonQuality, &quality));
+            codec->GetValue(&CODECAPI_AVEncCommonQuality, &quality); // not supported by Intel encoder (mfx_mft_h264ve_64.dll)
             CComVariant low_latency;
             COM_CHECK(codec->GetValue(&CODECAPI_AVLowLatencyMode, &low_latency));
-            assert(low_latency.boolVal != FALSE);
+            //assert(low_latency.boolVal != FALSE);
             // CODECAPI_AVEncAdaptiveMode not implemented
         }
 
