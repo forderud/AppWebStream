@@ -90,7 +90,7 @@ public:
             codec->GetValue(&CODECAPI_AVEncCommonQuality, &quality); // not supported by Intel encoder (mfx_mft_h264ve_64.dll)
             CComVariant low_latency;
             COM_CHECK(codec->GetValue(&CODECAPI_AVLowLatencyMode, &low_latency));
-            assert(low_latency.boolVal != FALSE);
+            //assert(low_latency.boolVal != FALSE);
             // CODECAPI_AVEncAdaptiveMode not implemented
         }
 
