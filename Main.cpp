@@ -135,16 +135,11 @@ int main (int argc, char *argv[]) {
 
     // encode & transmit frames
     HRESULT hr = S_OK;
-    auto prev_time = std::chrono::high_resolution_clock::now();
     while (SUCCEEDED(hr)) {
         hr = EncodeFrame(encoder, wnd_dc);
 
         // synchronize framerate
-        auto cur_time = std::chrono::high_resolution_clock::now();
-        auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(cur_time - prev_time);
-        if (duration_ms.count() < 1000/FPS)
-            Sleep(static_cast<DWORD>(1000/FPS - duration_ms.count()));
-        prev_time = cur_time;
+        Sleep(1000/FPS);
     }
 
     return 0;
