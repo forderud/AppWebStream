@@ -5,6 +5,15 @@
 #include <array>
 #include <cassert>
 
+/** 32bit color value. */
+struct R8G8B8A8 {
+    unsigned char r;
+    unsigned char g;
+    unsigned char b;
+    unsigned char a;
+};
+
+#ifndef ENABLE_FFMPEG
 #include <Windows.h>
 #include <mfapi.h>
 #include <mfidl.h>
@@ -23,18 +32,12 @@
 #pragma comment(lib, "Strmiids.lib")
 
 
-/** 32bit color value. */
-struct R8G8B8A8 {
-    unsigned char r;
-    unsigned char g;
-    unsigned char b;
-    unsigned char a;
-};
-
 _COM_SMARTPTR_TYPEDEF(IMFSinkWriter,  __uuidof(IMFSinkWriter));
 _COM_SMARTPTR_TYPEDEF(IMFMediaBuffer, __uuidof(IMFMediaBuffer));
 _COM_SMARTPTR_TYPEDEF(IMFSample,      __uuidof(IMFSample));
 _COM_SMARTPTR_TYPEDEF(IMFMediaType,   __uuidof(IMFMediaType));
+#else
+#endif
 
 
 /** Converts unicode string to ASCII */
@@ -76,7 +79,7 @@ protected:
     const unsigned short m_height;
 };
 
-
+#ifndef ENABLE_FFMPEG
 /** Media-Foundation-based H.264 video encoder. */
 class VideoEncoderMF : public VideoEncoder {
 public:
@@ -258,3 +261,7 @@ private:
     IMFMediaBufferPtr        m_buffer;
     unsigned long            m_stream_index = 0;
 };
+
+#else
+
+#endif
