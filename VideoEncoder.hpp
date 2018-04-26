@@ -50,8 +50,6 @@ static inline std::string ToAscii (const std::wstring& w_str) {
 #pragma warning(pop)
 }
 
-
-/** Class for encoding image frames into a H.264 video. */
 class VideoEncoder {
 public:
     /** Grow size to become a multiple of the MEPG macroblock size (typ. 8). */
@@ -62,9 +60,29 @@ public:
             return size + block_size - (size % block_size);
     }
 
+    VideoEncoder (std::array<unsigned short, 2> dimensions) : m_width(dimensions[0]), m_height(dimensions[1]) {
+    }
+
+    std::array<unsigned short, 2> Dims() const {
+        return {m_width, m_height};
+    }
+
+    virtual R8G8B8A8* WriteFrameBegin () = 0;
+    virtual HRESULT   WriteFrame (R8G8B8A8* src_data, bool swap_rb) = 0;
+    virtual HRESULT   WriteFrameEnd () = 0;
+
+protected:
+    const unsigned short m_width;
+    const unsigned short m_height;
+};
+
+
+/** Media-Foundation-based H.264 video encoder. */
+class VideoEncoderMF : public VideoEncoder {
+public:
     /** Stream-based video encoding. 
         The underlying MFCreateFMPEG4MediaSink system call require Windows 8 or newer. */
-    VideoEncoder (std::array<unsigned short, 2> dimensions, unsigned int fps, IMFByteStream * stream) : VideoEncoder(dimensions, fps) {
+    VideoEncoderMF (std::array<unsigned short, 2> dimensions, unsigned int fps, IMFByteStream * stream) : VideoEncoderMF(dimensions, fps) {
         const unsigned int bit_rate = static_cast<unsigned int>(0.78f*fps*Align(m_width)*Align(m_height)); // yields 40Mb/s for 1920x1080@25fps (max blu-ray quality)
 
         CComPtr<IMFAttributes> attribs;
@@ -97,12 +115,12 @@ public:
         COM_CHECK(m_sink_writer->BeginWriting());
     }
 
-    VideoEncoder (std::array<unsigned short, 2> dimensions, unsigned int fps) : m_width(dimensions[0]), m_height(dimensions[1]) {
+    VideoEncoderMF (std::array<unsigned short, 2> dimensions, unsigned int fps) : VideoEncoder(dimensions) {
         COM_CHECK(MFStartup(MF_VERSION));
         COM_CHECK(MFFrameRateToAverageTimePerFrame(fps, 1, const_cast<unsigned long long*>(&m_frame_duration)));
     }
 
-    ~VideoEncoder () noexcept {
+    ~VideoEncoderMF () noexcept {
         HRESULT hr = m_sink_writer->Finalize(); // fails on prior I/O errors
         hr; // discard error
         // delete objects before shutdown-call
@@ -117,6 +135,75 @@ public:
         COM_CHECK(MFShutdown());
     }
 
+    R8G8B8A8* WriteFrameBegin () override {
+        const DWORD frame_size = 4*Align(m_width)*Align(m_height);
+
+        // Create a new memory buffer.
+        if (!m_buffer)
+            COM_CHECK(MFCreateMemoryBuffer(frame_size, &m_buffer));
+
+        // Lock buffer to get data pointer
+        R8G8B8A8 * buffer_ptr = nullptr;
+        COM_CHECK(m_buffer->Lock(reinterpret_cast<BYTE**>(&buffer_ptr), NULL, NULL));
+        return buffer_ptr;
+    }
+
+    HRESULT WriteFrame (R8G8B8A8* src_data, bool swap_rb) override {
+        R8G8B8A8 * buffer_ptr = WriteFrameBegin();
+
+        for (unsigned int j = 0; j < m_height; j++) {
+            R8G8B8A8 * src_row = &src_data[j*m_width];
+            R8G8B8A8 * dst_row = &buffer_ptr[j*Align(m_width)];
+            if (swap_rb) {
+                for (unsigned int i = 0; i < m_width; i++)
+                    dst_row[i] = SwapRGBAtoBGRA(src_row[i]);
+            } else {
+                // copy scanline as-is
+                memcpy(dst_row, src_row, 4*m_width);
+            }
+
+            // clear padding at end of scanline
+            size_t hor_padding = Align(m_width) - m_width;
+            if (hor_padding)
+                std::memset(&dst_row[m_width], 0, 4*hor_padding);
+        }
+
+        // clear padding after last scanline
+        size_t vert_padding = Align(m_height) - m_height;
+        if (vert_padding)
+            std::memset(&buffer_ptr[m_height*Align(m_width)], 0, 4*Align(m_width)*vert_padding);
+
+        return WriteFrameEnd();
+    }
+
+    HRESULT WriteFrameEnd () override {
+        const DWORD frame_size = 4*Align(m_width)*Align(m_height);
+
+        COM_CHECK(m_buffer->Unlock());
+
+        // Set the data length of the buffer.
+        COM_CHECK(m_buffer->SetCurrentLength(frame_size));
+
+        // Create a media sample and add the buffer to the sample.
+        IMFSamplePtr sample;
+        COM_CHECK(MFCreateSample(&sample));
+        COM_CHECK(sample->AddBuffer(m_buffer));
+
+        // Set the time stamp and the duration.
+        COM_CHECK(sample->SetSampleTime(m_time_stamp));
+        COM_CHECK(sample->SetSampleDuration(m_frame_duration));
+
+        // send sample to Sink Writer.
+        HRESULT hr = m_sink_writer->WriteSample(m_stream_index, sample); // fails on I/O error
+        if (FAILED(hr))
+            return hr;
+
+        // increment time
+        m_time_stamp += m_frame_duration;
+        return S_OK;
+    }
+
+private:
     IMFMediaTypePtr MediaTypeInput (unsigned int fps) {
         // configure input format. Frame size is aligned to avoid crash
         IMFMediaTypePtr mediaTypeIn;
@@ -146,79 +233,6 @@ public:
         return mediaTypeOut;
     }
 
-    R8G8B8A8* WriteFrameBegin () {
-        const DWORD frame_size = 4*Align(m_width)*Align(m_height);
-
-        // Create a new memory buffer.
-        if (!m_buffer)
-            COM_CHECK(MFCreateMemoryBuffer(frame_size, &m_buffer));
-
-        // Lock buffer to get data pointer
-        R8G8B8A8 * buffer_ptr = nullptr;
-        COM_CHECK(m_buffer->Lock(reinterpret_cast<BYTE**>(&buffer_ptr), NULL, NULL));
-        return buffer_ptr;
-    }
-
-    HRESULT WriteFrame (R8G8B8A8* src_data, bool swap_rb) {
-        R8G8B8A8 * buffer_ptr = WriteFrameBegin();
-
-        for (unsigned int j = 0; j < m_height; j++) {
-            R8G8B8A8 * src_row = &src_data[j*m_width];
-            R8G8B8A8 * dst_row = &buffer_ptr[j*Align(m_width)];
-            if (swap_rb) {
-                for (unsigned int i = 0; i < m_width; i++)
-                    dst_row[i] = SwapRGBAtoBGRA(src_row[i]);
-            } else {
-                // copy scanline as-is
-                memcpy(dst_row, src_row, 4*m_width);
-            }
-
-            // clear padding at end of scanline
-            size_t hor_padding = Align(m_width) - m_width;
-            if (hor_padding)
-                std::memset(&dst_row[m_width], 0, 4*hor_padding);
-        }
-
-        // clear padding after last scanline
-        size_t vert_padding = Align(m_height) - m_height;
-        if (vert_padding)
-            std::memset(&buffer_ptr[m_height*Align(m_width)], 0, 4*Align(m_width)*vert_padding);
-
-        return WriteFrameEnd();
-    }
-
-    HRESULT WriteFrameEnd () {
-        const DWORD frame_size = 4*Align(m_width)*Align(m_height);
-
-        COM_CHECK(m_buffer->Unlock());
-
-        // Set the data length of the buffer.
-        COM_CHECK(m_buffer->SetCurrentLength(frame_size));
-
-        // Create a media sample and add the buffer to the sample.
-        IMFSamplePtr sample;
-        COM_CHECK(MFCreateSample(&sample));
-        COM_CHECK(sample->AddBuffer(m_buffer));
-
-        // Set the time stamp and the duration.
-        COM_CHECK(sample->SetSampleTime(m_time_stamp));
-        COM_CHECK(sample->SetSampleDuration(m_frame_duration));
-
-        // send sample to Sink Writer.
-        HRESULT hr = m_sink_writer->WriteSample(m_stream_index, sample); // fails on I/O error
-        if (FAILED(hr))
-            return hr;
-
-        // increment time
-        m_time_stamp += m_frame_duration;
-        return S_OK;
-    }
-
-    std::array<unsigned short, 2> Dims() const {
-        return {m_width, m_height};
-    }
-
-private:
     static R8G8B8A8 SwapRGBAtoBGRA (R8G8B8A8 in) {
         return{ in.b, in.g, in.r, in.a };
     }
@@ -236,8 +250,6 @@ private:
         }
     }
 
-    const unsigned short     m_width,
-                             m_height;
     const unsigned long long m_frame_duration = 0;
     long long                m_time_stamp = 0;
 

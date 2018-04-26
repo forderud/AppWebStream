@@ -131,7 +131,7 @@ int main (int argc, char *argv[]) {
     auto ws = CreateLocalInstance<WebStream>();
     ws->SetPortAndWindowHandle(port, win_handle);
     const unsigned int FPS = 25;
-    VideoEncoder encoder(dims, FPS, ws);
+    VideoEncoderMF encoder(dims, FPS, ws);
 
     // encode & transmit frames
     HRESULT hr = S_OK;
