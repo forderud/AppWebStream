@@ -4,9 +4,18 @@
 #include <vector>
 #include <array>
 #include <cassert>
-
 #include <Windows.h>
 #include <mfapi.h>
+
+/** 32bit color value. */
+struct R8G8B8A8 {
+    unsigned char r;
+    unsigned char g;
+    unsigned char b;
+    unsigned char a;
+};
+
+#ifndef ENABLE_FFMPEG
 #include <mfidl.h>
 #include <Mfreadwrite.h>
 #include <Ks.h>
@@ -23,18 +32,28 @@
 #pragma comment(lib, "Strmiids.lib")
 
 
-/** 32bit color value. */
-struct R8G8B8A8 {
-    unsigned char r;
-    unsigned char g;
-    unsigned char b;
-    unsigned char a;
-};
-
 _COM_SMARTPTR_TYPEDEF(IMFSinkWriter,  __uuidof(IMFSinkWriter));
 _COM_SMARTPTR_TYPEDEF(IMFMediaBuffer, __uuidof(IMFMediaBuffer));
 _COM_SMARTPTR_TYPEDEF(IMFSample,      __uuidof(IMFSample));
 _COM_SMARTPTR_TYPEDEF(IMFMediaType,   __uuidof(IMFMediaType));
+#else
+
+#pragma comment(lib, "avcodec.lib")
+#pragma comment(lib, "avformat.lib")
+#pragma comment(lib, "avutil.lib")
+
+#include <cassert>
+#include <stdexcept>
+#include <fstream>
+#include <tuple>
+#include <vector>
+
+extern "C" {
+#include <libavutil/opt.h>
+#include <libavformat/avformat.h>
+}
+
+#endif
 
 
 /** Converts unicode string to ASCII */
@@ -50,8 +69,6 @@ static inline std::string ToAscii (const std::wstring& w_str) {
 #pragma warning(pop)
 }
 
-
-/** Class for encoding image frames into a H.264 video. */
 class VideoEncoder {
 public:
     /** Grow size to become a multiple of the MEPG macroblock size (typ. 8). */
@@ -62,9 +79,32 @@ public:
             return size + block_size - (size % block_size);
     }
 
+    VideoEncoder (std::array<unsigned short, 2> dimensions) : m_width(dimensions[0]), m_height(dimensions[1]) {
+    }
+
+    std::array<unsigned short, 2> Dims() const {
+        return {m_width, m_height};
+    }
+
+    virtual HRESULT   WriteFrame (R8G8B8A8* src_data, bool swap_rb) {
+        throw std::logic_error("not implemented");
+    }
+
+    virtual R8G8B8A8* WriteFrameBegin () = 0;
+    virtual HRESULT   WriteFrameEnd () = 0;
+
+protected:
+    const unsigned short m_width;
+    const unsigned short m_height;
+};
+
+#ifndef ENABLE_FFMPEG
+/** Media-Foundation-based H.264 video encoder. */
+class VideoEncoderMF : public VideoEncoder {
+public:
     /** Stream-based video encoding. 
         The underlying MFCreateFMPEG4MediaSink system call require Windows 8 or newer. */
-    VideoEncoder (std::array<unsigned short, 2> dimensions, unsigned int fps, IMFByteStream * stream) : VideoEncoder(dimensions, fps) {
+    VideoEncoderMF (std::array<unsigned short, 2> dimensions, unsigned int fps, IMFByteStream * stream) : VideoEncoderMF(dimensions, fps) {
         const unsigned int bit_rate = static_cast<unsigned int>(0.78f*fps*Align(m_width)*Align(m_height)); // yields 40Mb/s for 1920x1080@25fps (max blu-ray quality)
 
         CComPtr<IMFAttributes> attribs;
@@ -97,12 +137,12 @@ public:
         COM_CHECK(m_sink_writer->BeginWriting());
     }
 
-    VideoEncoder (std::array<unsigned short, 2> dimensions, unsigned int fps) : m_width(dimensions[0]), m_height(dimensions[1]) {
+    VideoEncoderMF (std::array<unsigned short, 2> dimensions, unsigned int fps) : VideoEncoder(dimensions) {
         COM_CHECK(MFStartup(MF_VERSION));
         COM_CHECK(MFFrameRateToAverageTimePerFrame(fps, 1, const_cast<unsigned long long*>(&m_frame_duration)));
     }
 
-    ~VideoEncoder () noexcept {
+    ~VideoEncoderMF () noexcept {
         HRESULT hr = m_sink_writer->Finalize(); // fails on prior I/O errors
         hr; // discard error
         // delete objects before shutdown-call
@@ -117,6 +157,75 @@ public:
         COM_CHECK(MFShutdown());
     }
 
+    R8G8B8A8* WriteFrameBegin () override {
+        const DWORD frame_size = 4*Align(m_width)*Align(m_height);
+
+        // Create a new memory buffer.
+        if (!m_buffer)
+            COM_CHECK(MFCreateMemoryBuffer(frame_size, &m_buffer));
+
+        // Lock buffer to get data pointer
+        R8G8B8A8 * buffer_ptr = nullptr;
+        COM_CHECK(m_buffer->Lock(reinterpret_cast<BYTE**>(&buffer_ptr), NULL, NULL));
+        return buffer_ptr;
+    }
+
+    HRESULT WriteFrame (R8G8B8A8* src_data, bool swap_rb) override {
+        R8G8B8A8 * buffer_ptr = WriteFrameBegin();
+
+        for (unsigned int j = 0; j < m_height; j++) {
+            R8G8B8A8 * src_row = &src_data[j*m_width];
+            R8G8B8A8 * dst_row = &buffer_ptr[j*Align(m_width)];
+            if (swap_rb) {
+                for (unsigned int i = 0; i < m_width; i++)
+                    dst_row[i] = SwapRGBAtoBGRA(src_row[i]);
+            } else {
+                // copy scanline as-is
+                memcpy(dst_row, src_row, 4*m_width);
+            }
+
+            // clear padding at end of scanline
+            size_t hor_padding = Align(m_width) - m_width;
+            if (hor_padding)
+                std::memset(&dst_row[m_width], 0, 4*hor_padding);
+        }
+
+        // clear padding after last scanline
+        size_t vert_padding = Align(m_height) - m_height;
+        if (vert_padding)
+            std::memset(&buffer_ptr[m_height*Align(m_width)], 0, 4*Align(m_width)*vert_padding);
+
+        return WriteFrameEnd();
+    }
+
+    HRESULT WriteFrameEnd () override {
+        const DWORD frame_size = 4*Align(m_width)*Align(m_height);
+
+        COM_CHECK(m_buffer->Unlock());
+
+        // Set the data length of the buffer.
+        COM_CHECK(m_buffer->SetCurrentLength(frame_size));
+
+        // Create a media sample and add the buffer to the sample.
+        IMFSamplePtr sample;
+        COM_CHECK(MFCreateSample(&sample));
+        COM_CHECK(sample->AddBuffer(m_buffer));
+
+        // Set the time stamp and the duration.
+        COM_CHECK(sample->SetSampleTime(m_time_stamp));
+        COM_CHECK(sample->SetSampleDuration(m_frame_duration));
+
+        // send sample to Sink Writer.
+        HRESULT hr = m_sink_writer->WriteSample(m_stream_index, sample); // fails on I/O error
+        if (FAILED(hr))
+            return hr;
+
+        // increment time
+        m_time_stamp += m_frame_duration;
+        return S_OK;
+    }
+
+private:
     IMFMediaTypePtr MediaTypeInput (unsigned int fps) {
         // configure input format. Frame size is aligned to avoid crash
         IMFMediaTypePtr mediaTypeIn;
@@ -146,79 +255,6 @@ public:
         return mediaTypeOut;
     }
 
-    R8G8B8A8* WriteFrameBegin () {
-        const DWORD frame_size = 4*Align(m_width)*Align(m_height);
-
-        // Create a new memory buffer.
-        if (!m_buffer)
-            COM_CHECK(MFCreateMemoryBuffer(frame_size, &m_buffer));
-
-        // Lock buffer to get data pointer
-        R8G8B8A8 * buffer_ptr = nullptr;
-        COM_CHECK(m_buffer->Lock(reinterpret_cast<BYTE**>(&buffer_ptr), NULL, NULL));
-        return buffer_ptr;
-    }
-
-    HRESULT WriteFrame (R8G8B8A8* src_data, bool swap_rb) {
-        R8G8B8A8 * buffer_ptr = WriteFrameBegin();
-
-        for (unsigned int j = 0; j < m_height; j++) {
-            R8G8B8A8 * src_row = &src_data[j*m_width];
-            R8G8B8A8 * dst_row = &buffer_ptr[j*Align(m_width)];
-            if (swap_rb) {
-                for (unsigned int i = 0; i < m_width; i++)
-                    dst_row[i] = SwapRGBAtoBGRA(src_row[i]);
-            } else {
-                // copy scanline as-is
-                memcpy(dst_row, src_row, 4*m_width);
-            }
-
-            // clear padding at end of scanline
-            size_t hor_padding = Align(m_width) - m_width;
-            if (hor_padding)
-                std::memset(&dst_row[m_width], 0, 4*hor_padding);
-        }
-
-        // clear padding after last scanline
-        size_t vert_padding = Align(m_height) - m_height;
-        if (vert_padding)
-            std::memset(&buffer_ptr[m_height*Align(m_width)], 0, 4*Align(m_width)*vert_padding);
-
-        return WriteFrameEnd();
-    }
-
-    HRESULT WriteFrameEnd () {
-        const DWORD frame_size = 4*Align(m_width)*Align(m_height);
-
-        COM_CHECK(m_buffer->Unlock());
-
-        // Set the data length of the buffer.
-        COM_CHECK(m_buffer->SetCurrentLength(frame_size));
-
-        // Create a media sample and add the buffer to the sample.
-        IMFSamplePtr sample;
-        COM_CHECK(MFCreateSample(&sample));
-        COM_CHECK(sample->AddBuffer(m_buffer));
-
-        // Set the time stamp and the duration.
-        COM_CHECK(sample->SetSampleTime(m_time_stamp));
-        COM_CHECK(sample->SetSampleDuration(m_frame_duration));
-
-        // send sample to Sink Writer.
-        HRESULT hr = m_sink_writer->WriteSample(m_stream_index, sample); // fails on I/O error
-        if (FAILED(hr))
-            return hr;
-
-        // increment time
-        m_time_stamp += m_frame_duration;
-        return S_OK;
-    }
-
-    std::array<unsigned short, 2> Dims() const {
-        return {m_width, m_height};
-    }
-
-private:
     static R8G8B8A8 SwapRGBAtoBGRA (R8G8B8A8 in) {
         return{ in.b, in.g, in.r, in.a };
     }
@@ -236,8 +272,6 @@ private:
         }
     }
 
-    const unsigned short     m_width,
-                             m_height;
     const unsigned long long m_frame_duration = 0;
     long long                m_time_stamp = 0;
 
@@ -246,3 +280,249 @@ private:
     IMFMediaBufferPtr        m_buffer;
     unsigned long            m_stream_index = 0;
 };
+
+#else
+
+
+class VideoEncoderFF : public VideoEncoder {
+public:
+    /** Stream writing callback. */
+    static int WritePackage (void *opaque, uint8_t *buf, int buf_size) {
+        IMFByteStream * stream = reinterpret_cast<IMFByteStream*>(opaque);
+        ULONG bytes_written = 0;
+        if (FAILED(stream->Write(buf, buf_size, &bytes_written)))
+            return -1;
+
+        return buf_size;
+    }
+
+    VideoEncoderFF (std::array<unsigned short, 2> dimensions, unsigned int fps, IMFByteStream * socket) : VideoEncoder(dimensions), m_fps(fps) {
+        av_register_all();
+
+        /* allocate the output media context */
+        avformat_alloc_output_context2(&out_ctx, nullptr, "mp4", nullptr);
+        if (!out_ctx)
+            throw std::runtime_error("avformat_alloc_output_context2 failure");
+
+        // Add the video streams using the default format codecs and initialize the codecs
+        AVCodec * video_codec = nullptr;
+        std::tie(video_codec, stream, enc) = add_stream(out_ctx->oformat->video_codec, out_ctx);
+
+        AVDictionary *opt = nullptr;
+        av_dict_set(&opt, "movflags", "empty_moov+default_base_moof+frag_keyframe", 0); // fragmented MP4
+
+                                                                                        // open the video codecs and allocate the necessary encode buffers
+        frame = open_video(video_codec, opt, enc, stream->codecpar);
+
+#ifndef NDEBUG
+        // write info to console
+        av_dump_format(out_ctx, 0, nullptr, 1);
+#endif
+
+        m_rgb_buf.resize(Align(m_width)*Align(m_height));
+
+        m_out_buf.resize(16*1024*1024); // 16MB
+        out_ctx->pb = avio_alloc_context(m_out_buf.data(), static_cast<int>(m_out_buf.size()), 1/*writable*/, socket, nullptr/*read*/, WritePackage, nullptr/*seek*/);
+        //out_ctx->flags |= AVFMT_FLAG_CUSTOM_IO;
+
+        // Write the stream header, if any
+        int ret = avformat_write_header(out_ctx, &opt);
+        if (ret < 0)
+            throw std::runtime_error("avformat_write_header failed");
+    }
+
+    ~VideoEncoderFF() {
+        // flush encoder to mark end of stream
+        WriteFrameImpl(false);
+
+        // write file ending (discard error codes)
+        av_write_trailer(out_ctx);
+
+        avcodec_close(enc);
+        avcodec_free_context(&enc);
+
+        av_frame_free(&frame);
+
+        avio_context_free(&out_ctx->pb);
+        avformat_free_context(out_ctx);
+    }
+
+    R8G8B8A8* WriteFrameBegin () override {
+        return m_rgb_buf.data();
+    }
+
+    HRESULT   WriteFrameEnd () override {
+        return WriteFrameImpl(true);
+    }
+
+    HRESULT WriteFrameImpl (bool has_frame) {
+        if (has_frame) {
+            if (av_frame_make_writable(frame) < 0)
+                exit(1);
+
+            assert(enc->pix_fmt == AV_PIX_FMT_YUV420P);
+
+            // RGB to YUV conversion
+            for (int y = 0; y < m_height; y++) {
+                for (int x = 0; x < m_width; x++) {
+                    // flip upside down
+                    R8G8B8A8 rgb = m_rgb_buf[(m_height-1-y)*enc->width + x];
+                    // convert to YUV
+                    unsigned char Y=0, U=0, V=0;
+                    YUVfromRGB(rgb, Y, U, V);
+                    // write Y value
+                    frame->data[0][y*frame->linesize[0] + x] = Y;
+                    // write subsambled Cb,Cr values
+                    if (((x % 2) == 0) && ((y % 2) == 0)) {
+                        frame->data[1][y/2*frame->linesize[1] + x/2] = V/4;
+                        frame->data[2][y/2*frame->linesize[2] + x/2] = U/4;
+                    } else {
+                        frame->data[1][y/2*frame->linesize[1] + x/2] += V/4;
+                        frame->data[2][y/2*frame->linesize[2] + x/2] += U/4;
+                    }
+                }
+            }
+
+            frame->pts = next_pts;
+            next_pts++; // increment next pts
+        }
+
+        // encode frame
+        int ret = avcodec_send_frame(enc, has_frame ? frame : nullptr);
+        if (ret < 0)
+            throw std::runtime_error("Error encoding video frame");
+
+        AVPacket pkt = {};
+        av_init_packet(&pkt);
+
+        // process packages
+        for (;;) {
+            ret = avcodec_receive_packet(enc, &pkt);
+            if (ret == AVERROR(EAGAIN))
+                break; // not yet available
+            else if (!has_frame && (ret == AVERROR_EOF))
+                break; // end of stream
+            else if (ret < 0)
+                throw std::runtime_error("avcodec_receive_packet failed");
+
+            // rescale output packet timestamp values from codec to stream timebase
+            av_packet_rescale_ts(&pkt, enc->time_base, stream->time_base);
+            pkt.stream_index = stream->index;
+
+            // write compressed frame to stream
+            ret = av_interleaved_write_frame(out_ctx, &pkt);
+            if (ret < 0)
+                return E_FAIL;
+        }
+
+        return S_OK;
+    }
+
+private:
+    /* Add an output stream. */
+    std::tuple<AVCodec*,AVStream*, AVCodecContext*> add_stream (AVCodecID codec_id, /*in/out*/AVFormatContext *out_ctx) {
+        // find the encoder
+        AVCodec *codec = avcodec_find_encoder(codec_id);
+        if (!codec) {
+            const char * name = avcodec_get_name(codec_id);
+            throw std::runtime_error("Could not find encoder for");
+        }
+        assert(codec->type == AVMEDIA_TYPE_VIDEO);
+
+        AVStream * stream = avformat_new_stream(out_ctx, NULL);
+        if (!stream)
+            throw std::runtime_error("Could not allocate stream");
+
+        stream->id = out_ctx->nb_streams-1;
+
+        // setup context
+        AVCodecContext *enc = avcodec_alloc_context3(codec);
+        if (!enc)
+            throw std::runtime_error("Could not alloc an encoding context");
+        {
+            enc->codec_id = codec_id;
+            enc->bit_rate = 4*1024*1024; // 4Mb/s
+            // Resolution must be a multiple of two
+            enc->width    = Align(m_width);
+            enc->height   = Align(m_height);
+            /* timebase: This is the fundamental unit of time (in seconds) in terms
+            * of which frame timestamps are represented. For fixed-fps content,
+            * timebase should be 1/framerate and timestamp increments should be
+            * identical to 1. */
+            enc->time_base = { 1, static_cast<int>(m_fps) };
+
+            enc->gop_size = 0; // only intra-frames (reduces latency)
+            enc->pix_fmt  = AV_PIX_FMT_YUV420P; // default pix_fmt
+
+            int res = av_opt_set(enc->priv_data, "tune", "zerolatency", 0);
+            if (res < 0)
+                throw std::runtime_error("zerolatency tuning failed");
+
+            // Some formats want stream headers to be separate
+            if (out_ctx->oformat->flags & AVFMT_GLOBALHEADER)
+                enc->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+        }
+
+        stream->time_base = enc->time_base;
+        return std::tie(codec, stream, enc);
+    }
+
+    static AVFrame *alloc_frame (enum AVPixelFormat pix_fmt, int width, int height) {
+        AVFrame* picture = av_frame_alloc();
+        assert(picture);
+
+        picture->format = pix_fmt;
+        picture->width  = width;
+        picture->height = height;
+
+        // allocate the buffers for the frame data
+        int ret = av_frame_get_buffer(picture, 32);
+        if (ret < 0)
+            throw std::runtime_error("Could not allocate frame data");
+
+        return picture;
+    }
+
+    static AVFrame* open_video (const AVCodec *codec, const AVDictionary *opt_arg, /*in/out*/AVCodecContext *c, /*in/out*/AVCodecParameters *codecpar) {
+        AVDictionary *opt = nullptr;
+        av_dict_copy(&opt, opt_arg, 0);
+
+        /* open the codec */
+        int ret = avcodec_open2(c, codec, &opt);
+        av_dict_free(&opt);
+        if (ret < 0)
+            throw std::runtime_error("Could not open video codec");
+
+        /* allocate and init a re-usable frame */
+        AVFrame* frame = alloc_frame(c->pix_fmt, c->width, c->height);
+        if (!frame)
+            throw std::runtime_error("Could not allocate video frame");
+
+        assert(c->pix_fmt == AV_PIX_FMT_YUV420P);
+
+        // copy the stream parameters to the muxer
+        ret = avcodec_parameters_from_context(codecpar, c);
+        if (ret < 0)
+            throw std::runtime_error("Could not copy the stream parameters");
+
+        return frame;
+    }
+
+    static void YUVfromRGB (const R8G8B8A8 rgb, unsigned char& Y, unsigned char& U, unsigned char& V) {
+        Y = static_cast<unsigned char>( 0.257f*rgb.r + 0.504f*rgb.g + 0.098f*rgb.b +  16);
+        U = static_cast<unsigned char>(-0.148f*rgb.r - 0.291f*rgb.g + 0.439f*rgb.b + 128);
+        V = static_cast<unsigned char>( 0.439f*rgb.r - 0.368f*rgb.g - 0.071f*rgb.b + 128);
+    }
+
+    unsigned int       m_fps = 0;
+    int64_t         next_pts = 0; // pts of the next frame that will be generated
+    AVFormatContext *out_ctx = nullptr;
+    AVStream         *stream = nullptr;
+    AVCodecContext      *enc = nullptr;
+    AVFrame           *frame = nullptr;
+
+    std::vector<R8G8B8A8>      m_rgb_buf;
+    std::vector<unsigned char> m_out_buf;
+};
+
+#endif

@@ -123,7 +123,9 @@ HRESULT STDMETHODCALLTYPE WebStream::EndRead(/*in*/IMFAsyncResult* /*result*/, /
 }
 
 HRESULT WebStream::WriteImpl(/*in*/const BYTE* pb, /*in*/ULONG cb) {
+#ifndef ENABLE_FFMPEG
     std::tie(pb,cb) = m_impl->m_stream_editor.ModifyMovieFragment(pb, cb);
+#endif
 
     int byte_count = send(m_impl->m_stream_client->Socket(), reinterpret_cast<const char*>(pb), cb, 0);
     if (byte_count == SOCKET_ERROR) {
@@ -161,8 +163,10 @@ HRESULT STDMETHODCALLTYPE WebStream::BeginWrite(/*in*/const BYTE* pb, /*in*/ULON
      m_tmp_bytes_written = cb;
 
     CComPtr<IMFAsyncResult> async_res;
+#ifndef ENABLE_FFMPEG
     if (FAILED(MFCreateAsyncResult(nullptr, callback, unkState, &async_res)))
         throw std::runtime_error("MFCreateAsyncResult failed");
+#endif
     
     hr = callback->Invoke(async_res); // will trigger EndWrite
     return hr;
