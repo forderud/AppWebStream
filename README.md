@@ -7,7 +7,7 @@ The streaming is primarily tested on and works best with Google Chrome. It also 
 ![screenshot](screenshot.png)
 * Open project in VS2015
 * Build project
-* Start `WebAppStream.exe [window handle] [port]`. You can use Spy++ (included with Visual Studio) to determine window handles.
+* Start `WebAppStream.exe port [window handle]`. You can use Spy++ (included with Visual Studio) to determine window handles.
 * Open `localhost:[port]` in web browser, or on another computer.
 
 To build with FFMPG, you first need to download & unzip FFMPEG binaries to a folder pointed to by the `FFMPEG_ROOT` environment variable. Then, set the `ENABLE_FFMPEG` preprocessor define before building.
