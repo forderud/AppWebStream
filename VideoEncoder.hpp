@@ -86,12 +86,40 @@ public:
         return {m_width, m_height};
     }
 
-    virtual HRESULT   WriteFrame (R8G8B8A8* src_data, bool swap_rb) {
-        throw std::logic_error("not implemented");
-    }
-
     virtual R8G8B8A8* WriteFrameBegin () = 0;
     virtual HRESULT   WriteFrameEnd () = 0;
+
+    HRESULT WriteFrame (R8G8B8A8* src_data, bool swap_rb) {
+        R8G8B8A8 * buffer_ptr = WriteFrameBegin();
+
+        for (unsigned int j = 0; j < m_height; j++) {
+            R8G8B8A8 * src_row = &src_data[j*m_width];
+            R8G8B8A8 * dst_row = &buffer_ptr[j*Align(m_width)];
+            if (swap_rb) {
+                for (unsigned int i = 0; i < m_width; i++)
+                    dst_row[i] = SwapRGBAtoBGRA(src_row[i]);
+            } else {
+                // copy scanline as-is
+                memcpy(dst_row, src_row, 4*m_width);
+            }
+
+            // clear padding at end of scanline
+            size_t hor_padding = Align(m_width) - m_width;
+            if (hor_padding)
+                std::memset(&dst_row[m_width], 0, 4*hor_padding);
+        }
+
+        // clear padding after last scanline
+        size_t vert_padding = Align(m_height) - m_height;
+        if (vert_padding)
+            std::memset(&buffer_ptr[m_height*Align(m_width)], 0, 4*Align(m_width)*vert_padding);
+
+        return WriteFrameEnd();
+    }
+
+    static R8G8B8A8 SwapRGBAtoBGRA (R8G8B8A8 in) {
+        return{ in.b, in.g, in.r, in.a };
+    }
 
 protected:
     const unsigned short m_width;
@@ -170,34 +198,6 @@ public:
         return buffer_ptr;
     }
 
-    HRESULT WriteFrame (R8G8B8A8* src_data, bool swap_rb) override {
-        R8G8B8A8 * buffer_ptr = WriteFrameBegin();
-
-        for (unsigned int j = 0; j < m_height; j++) {
-            R8G8B8A8 * src_row = &src_data[j*m_width];
-            R8G8B8A8 * dst_row = &buffer_ptr[j*Align(m_width)];
-            if (swap_rb) {
-                for (unsigned int i = 0; i < m_width; i++)
-                    dst_row[i] = SwapRGBAtoBGRA(src_row[i]);
-            } else {
-                // copy scanline as-is
-                memcpy(dst_row, src_row, 4*m_width);
-            }
-
-            // clear padding at end of scanline
-            size_t hor_padding = Align(m_width) - m_width;
-            if (hor_padding)
-                std::memset(&dst_row[m_width], 0, 4*hor_padding);
-        }
-
-        // clear padding after last scanline
-        size_t vert_padding = Align(m_height) - m_height;
-        if (vert_padding)
-            std::memset(&buffer_ptr[m_height*Align(m_width)], 0, 4*Align(m_width)*vert_padding);
-
-        return WriteFrameEnd();
-    }
-
     HRESULT WriteFrameEnd () override {
         const DWORD frame_size = 4*Align(m_width)*Align(m_height);
 
@@ -253,10 +253,6 @@ private:
         COM_CHECK(MFSetAttributeRatio(mediaTypeOut, MF_MT_FRAME_RATE, fps, 1));
         COM_CHECK(MFSetAttributeRatio(mediaTypeOut, MF_MT_PIXEL_ASPECT_RATIO, 1, 1));
         return mediaTypeOut;
-    }
-
-    static R8G8B8A8 SwapRGBAtoBGRA (R8G8B8A8 in) {
-        return{ in.b, in.g, in.r, in.a };
     }
 
     static void COM_CHECK (HRESULT hr) {
