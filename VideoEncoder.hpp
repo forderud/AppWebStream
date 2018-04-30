@@ -297,7 +297,9 @@ public:
     }
 
     VideoEncoderFF (std::array<unsigned short, 2> dimensions, unsigned int fps, IMFByteStream * socket) : VideoEncoder(dimensions), m_fps(fps) {
+#if LIBAVFORMAT_VERSION_MAJOR < 58
         av_register_all();
+#endif
 
         /* allocate the output media context */
         avformat_alloc_output_context2(&out_ctx, nullptr, "mp4", nullptr);
