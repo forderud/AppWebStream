@@ -111,21 +111,21 @@ static HRESULT EncodeFrame (VideoEncoder & encoder, window_dc & wnd_dc) {
 
 int main (int argc, char *argv[]) {
     std::cout << "WebAppStream: Sample application for streaming a window to a web browser." << std::endl;
-    if (argc < 3) {
-        std::cout << "Usage  : WebAppStream.exe [window handle] [port]\n";
-        std::cout << "Example: WebAppStream.exe 00CF05DA 8080\n";
+    if (argc < 2) {
+        std::cout << "Usage  : WebAppStream.exe port [window handle]\n";
+        std::cout << "Example: WebAppStream.exe 8080\n";
         std::cout << "Use Spy++ (included with Visual Studio) to determine window handles.\n" << std::flush;
         return 1;
     }
 
     // parse arguments
-    HWND win_handle = {};
-    {
+    HWND win_handle = nullptr;
+    if (argc > 2) {
         std::stringstream ss;
-        ss << std::hex << argv[1];
+        ss << std::hex << argv[2];
         ss >> reinterpret_cast<size_t&>(win_handle);
     }
-    char* port = argv[2];
+    char* port = argv[1];
 
     // check window handle
     window_dc wnd_dc(win_handle);
