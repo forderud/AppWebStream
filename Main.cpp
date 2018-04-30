@@ -8,8 +8,14 @@
 struct window_dc {
     window_dc(HWND h) : wnd(h) {
         dc = GetDC(wnd);
-        if (!GetClientRect(h, &rect))
-            throw std::runtime_error("GetClientRect failed");
+        if (wnd) {
+            if (!GetClientRect(h, &rect))
+                throw std::runtime_error("GetClientRect failed");
+        } else {
+            // primary monitor resolution
+            rect.right  = GetSystemMetrics(SM_CXSCREEN);
+            rect.bottom = GetSystemMetrics(SM_CYSCREEN);
+        }
     }
     ~window_dc() {
         ReleaseDC(wnd, dc);
