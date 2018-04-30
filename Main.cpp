@@ -39,15 +39,17 @@ struct offscreen_bmp {
             throw std::runtime_error("CreateCompatibleBitmap Failed");
 
         // make bitmap current for dc
-        SelectObject(dc, bmp);
+        prev = SelectObject(dc, bmp);
     }
     ~offscreen_bmp() {
+        SelectObject(dc, prev);
         DeleteObject(bmp);
         DeleteDC(dc);
     }
 
     HDC     dc;
     HBITMAP bmp;
+    HGDIOBJ prev = nullptr;
 };
 
 
