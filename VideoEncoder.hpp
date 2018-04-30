@@ -122,8 +122,8 @@ public:
     }
 
 protected:
-    const unsigned short m_width;
-    const unsigned short m_height;
+    const unsigned short m_width;  ///< horizontal img. resolution (excluding padding)
+    const unsigned short m_height; ///< vertical img. resolution (excluding padding)
 };
 
 #ifndef ENABLE_FFMPEG
