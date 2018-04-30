@@ -8,7 +8,8 @@
 struct window_dc {
     window_dc(HWND h) : wnd(h) {
         dc = GetDC(wnd);
-        GetClientRect(h, &rect);
+        if (!GetClientRect(h, &rect))
+            throw std::runtime_error("GetClientRect failed");
     }
     ~window_dc() {
         ReleaseDC(wnd, dc);
@@ -22,8 +23,8 @@ struct window_dc {
     }
 
     HWND wnd;
-    HDC  dc;
-    RECT rect;
+    HDC  dc   = nullptr;
+    RECT rect = {};
 };
 
 
