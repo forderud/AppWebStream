@@ -82,6 +82,8 @@ public:
     VideoEncoder (std::array<unsigned short, 2> dimensions) : m_width(dimensions[0]), m_height(dimensions[1]) {
     }
 
+    virtual ~VideoEncoder() = default;
+
     std::array<unsigned short, 2> Dims() const {
         return {m_width, m_height};
     }
