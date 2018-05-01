@@ -133,6 +133,26 @@ protected:
 /** Media-Foundation-based H.264 video encoder. */
 class VideoEncoderMF : public VideoEncoder {
 public:
+    /** File-based video encoding. */
+    VideoEncoderMF (std::array<unsigned short, 2> dimensions, unsigned int fps, const wchar_t * filename) : VideoEncoderMF(dimensions, fps) {
+        const unsigned int bit_rate = static_cast<unsigned int>(0.78f*fps*Align(m_width)*Align(m_height)); // yields 40Mb/s for 1920x1080@25fps (max blu-ray quality)
+
+        CComPtr<IMFAttributes> attribs;
+        COM_CHECK(MFCreateAttributes(&attribs, 0));
+        COM_CHECK(attribs->SetGUID(MF_TRANSCODE_CONTAINERTYPE, MFTranscodeContainerType_MPEG4));
+        COM_CHECK(attribs->SetUINT32(MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS, TRUE));
+
+        // create sink writer with specified output format
+        COM_CHECK(MFCreateSinkWriterFromURL(filename, nullptr, attribs, &m_sink_writer));
+        IMFMediaTypePtr mediaTypeOut = MediaTypeutput(fps, bit_rate);
+        COM_CHECK(m_sink_writer->AddStream(mediaTypeOut, &m_stream_index));
+
+        // connect input to output
+        IMFMediaTypePtr mediaTypeIn = MediaTypeInput(fps);
+        COM_CHECK(m_sink_writer->SetInputMediaType(m_stream_index, mediaTypeIn, nullptr));
+        COM_CHECK(m_sink_writer->BeginWriting());
+    }
+
     /** Stream-based video encoding. 
         The underlying MFCreateFMPEG4MediaSink system call require Windows 8 or newer. */
     VideoEncoderMF (std::array<unsigned short, 2> dimensions, unsigned int fps, IMFByteStream * stream) : VideoEncoderMF(dimensions, fps) {
@@ -295,7 +315,7 @@ public:
         return buf_size;
     }
 
-    VideoEncoderFF (std::array<unsigned short, 2> dimensions, unsigned int fps, IMFByteStream * socket) : VideoEncoder(dimensions), m_fps(fps) {
+    VideoEncoderFF (std::array<unsigned short, 2> dimensions, unsigned int fps) : VideoEncoder(dimensions), m_fps(fps) {
 #if LIBAVFORMAT_VERSION_MAJOR < 58
         av_register_all();
 #endif
@@ -305,6 +325,29 @@ public:
         if (!out_ctx)
             throw std::runtime_error("avformat_alloc_output_context2 failure");
 
+        m_rgb_buf.resize(Align(m_width)*Align(m_height));
+    }
+
+    VideoEncoderFF (std::array<unsigned short, 2> dimensions, unsigned int fps, const wchar_t * _filename) : VideoEncoderFF(dimensions, fps) {
+        // Add the video streams using the default format codecs and initialize the codecs
+        AVCodec * video_codec = nullptr;
+        std::tie(video_codec, stream, enc) = add_stream(out_ctx->oformat->video_codec, out_ctx);
+
+        // open the video codecs and allocate the necessary encode buffers
+        frame = open_video(video_codec, nullptr, enc, stream->codecpar);
+
+        // open the output file
+        assert(!(out_ctx->oformat->flags & AVFMT_NOFILE));
+        auto filename = ToAscii(_filename);
+        int ret = avio_open(&out_ctx->pb, filename.c_str(), AVIO_FLAG_WRITE);
+        if (ret < 0) {
+            throw std::runtime_error("avio_open failure");
+        }
+
+        WriteHeader(nullptr);
+    }
+
+    VideoEncoderFF (std::array<unsigned short, 2> dimensions, unsigned int fps, IMFByteStream * socket) : VideoEncoderFF(dimensions, fps) {
         // Add the video streams using the default format codecs and initialize the codecs
         AVCodec * video_codec = nullptr;
         std::tie(video_codec, stream, enc) = add_stream(out_ctx->oformat->video_codec, out_ctx);
@@ -315,21 +358,11 @@ public:
         // open the video codecs and allocate the necessary encode buffers
         frame = open_video(video_codec, opt, enc, stream->codecpar);
 
-#ifndef NDEBUG
-        // write info to console
-        av_dump_format(out_ctx, 0, nullptr, 1);
-#endif
-
-        m_rgb_buf.resize(Align(m_width)*Align(m_height));
-
         m_out_buf.resize(16*1024*1024); // 16MB
         out_ctx->pb = avio_alloc_context(m_out_buf.data(), static_cast<int>(m_out_buf.size()), 1/*writable*/, socket, nullptr/*read*/, WritePackage, nullptr/*seek*/);
         //out_ctx->flags |= AVFMT_FLAG_CUSTOM_IO;
 
-        // Write the stream header, if any
-        int ret = avformat_write_header(out_ctx, &opt);
-        if (ret < 0)
-            throw std::runtime_error("avformat_write_header failed");
+        WriteHeader(opt);
     }
 
     ~VideoEncoderFF() {
@@ -346,6 +379,18 @@ public:
 
         avio_context_free(&out_ctx->pb);
         avformat_free_context(out_ctx);
+    }
+
+    void WriteHeader (AVDictionary *opt) {
+#ifndef NDEBUG
+        // write info to console
+        av_dump_format(out_ctx, 0, nullptr, 1);
+#endif
+
+        // Write the stream header, if any
+        int ret = avformat_write_header(out_ctx, &opt);
+        if (ret < 0)
+            throw std::runtime_error("avformat_write_header failed");
     }
 
     R8G8B8A8* WriteFrameBegin () override {
