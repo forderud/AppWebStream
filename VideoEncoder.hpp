@@ -82,7 +82,7 @@ public:
     VideoEncoder (std::array<unsigned short, 2> dimensions) : m_width(dimensions[0]), m_height(dimensions[1]) {
     }
 
-    virtual ~VideoEncoder() = default;
+    virtual ~VideoEncoder () = default;
 
     std::array<unsigned short, 2> Dims() const {
         return {m_width, m_height};
@@ -127,6 +127,7 @@ protected:
     const unsigned short m_width;  ///< horizontal img. resolution (excluding padding)
     const unsigned short m_height; ///< vertical img. resolution (excluding padding)
 };
+
 
 #ifndef ENABLE_FFMPEG
 /** Media-Foundation-based H.264 video encoder. */
@@ -281,7 +282,7 @@ private:
 
 #else
 
-
+/** FFMPEG-based H.264 video encoder. */
 class VideoEncoderFF : public VideoEncoder {
 public:
     /** Stream writing callback. */
@@ -311,7 +312,7 @@ public:
         AVDictionary *opt = nullptr;
         av_dict_set(&opt, "movflags", "empty_moov+default_base_moof+frag_keyframe", 0); // fragmented MP4
 
-                                                                                        // open the video codecs and allocate the necessary encode buffers
+        // open the video codecs and allocate the necessary encode buffers
         frame = open_video(video_codec, opt, enc, stream->codecpar);
 
 #ifndef NDEBUG
@@ -508,6 +509,8 @@ private:
         return frame;
     }
 
+    /** "Homemade" RGB to YUV conversion. Please replace with more authoritative alternative if/when possible.
+        REF: http://www.fourcc.org/fccyvrgb.php */
     static void YUVfromRGB (const R8G8B8A8 rgb, unsigned char& Y, unsigned char& U, unsigned char& V) {
         Y = static_cast<unsigned char>( 0.257f*rgb.r + 0.504f*rgb.g + 0.098f*rgb.b +  16);
         U = static_cast<unsigned char>(-0.148f*rgb.r - 0.291f*rgb.g + 0.439f*rgb.b + 128);
