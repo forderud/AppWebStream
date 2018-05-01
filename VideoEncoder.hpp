@@ -133,7 +133,7 @@ public:
     /** Stream-based video encoding. 
         The underlying MFCreateFMPEG4MediaSink system call require Windows 8 or newer. */
     VideoEncoderMF (std::array<unsigned short, 2> dimensions, unsigned int fps, IMFByteStream * stream) : VideoEncoderMF(dimensions, fps) {
-        const unsigned int bit_rate = static_cast<unsigned int>(0.78f*fps*Align(m_width)*Align(m_height)); // yields 40Mb/s for 1920x1080@25fps (max blu-ray quality)
+        const unsigned int bit_rate = static_cast<unsigned int>(0.78f*fps*m_width*m_height); // yields 40Mb/s for 1920x1080@25fps
 
         CComPtr<IMFAttributes> attribs;
         COM_CHECK(MFCreateAttributes(&attribs, 0));
@@ -439,7 +439,7 @@ private:
             throw std::runtime_error("Could not alloc an encoding context");
         {
             enc->codec_id = codec_id;
-            enc->bit_rate = 4*1024*1024; // 4Mb/s
+            enc->bit_rate = static_cast<unsigned int>(0.78f*m_fps*m_width*m_height); // yields 40Mb/s for 1920x1080@25fps
             // Resolution must be a multiple of two
             enc->width    = Align(m_width);
             enc->height   = Align(m_height);
