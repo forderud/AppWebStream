@@ -352,6 +352,8 @@ public:
         AVCodec * video_codec = nullptr;
         std::tie(video_codec, stream, enc) = add_stream(out_ctx->oformat->video_codec, out_ctx);
 
+        // REF: https://ffmpeg.org/ffmpeg-formats.html#Options-8 (-movflags arguments)
+        // REF: https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/movenc.c
         AVDictionary *opt = nullptr;
         av_dict_set(&opt, "movflags", "empty_moov+default_base_moof+frag_keyframe", 0); // fragmented MP4
 
