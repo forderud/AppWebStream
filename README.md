@@ -17,6 +17,6 @@ To build with FFMPG, you first need to download & unzip FFMPEG binaries to a fol
 * The byte-stream is manually modified as described in https://stackoverflow.com/questions/49429954/mfcreatefmpeg4mediasink-does-not-generate-mse-compatible-mp4 to make it Media Source Extensions (MSE) compatible.
 
 ### Browser support
-* Works best with Google Chrome (stopped working in either Chrome 65 or 66).
+* Works best with Google Chrome (stopped working in Chrome 66).
 * Works partly with Microsoft Edge, but with high latency (https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/17410767/)
 * Mozilla Firefox & Safary doesn't work yet due to insufficient of [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) support
