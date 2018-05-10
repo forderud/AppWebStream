@@ -355,7 +355,7 @@ public:
         // REF: https://ffmpeg.org/ffmpeg-formats.html#Options-8 (-movflags arguments)
         // REF: https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/movenc.c
         AVDictionary *opt = nullptr;
-        av_dict_set(&opt, "movflags", "empty_moov+default_base_moof+frag_keyframe", 0); // fragmented MP4
+        av_dict_set(&opt, "movflags", "empty_moov+default_base_moof+frag_every_frame", 0); // fragmented MP4
 
         // open the video codecs and allocate the necessary encode buffers
         frame = open_video(video_codec, opt, enc, stream->codecpar);
@@ -499,7 +499,7 @@ private:
             * identical to 1. */
             enc->time_base = { 1, static_cast<int>(m_fps) };
 
-            enc->gop_size = 0; // only intra-frames (reduces latency)
+            enc->gop_size = 12; // group of pictures size
             enc->pix_fmt  = AV_PIX_FMT_YUV420P; // default pix_fmt
 
             int res = av_opt_set(enc->priv_data, "tune", "zerolatency", 0);
