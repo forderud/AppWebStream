@@ -19,6 +19,6 @@ To build with FFMPG, you first need to download & unzip FFMPEG binaries to a fol
 The FFMPEG-based encoder is not affected by any of the issues above.
 
 ### Browser support
-* Works best with Google Chrome (stopped working in Chrome 66, https://bugs.chromium.org/p/chromium/issues/detail?id=840950).
+* Works best with Google Chrome.
 * Works partly with Microsoft Edge, but with high latency (https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/17410767/)
 * Mozilla Firefox & Safary doesn't work yet due to insufficient of [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) support
