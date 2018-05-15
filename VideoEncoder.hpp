@@ -6,6 +6,7 @@
 #include <cassert>
 #include <Windows.h>
 #include <mfapi.h>
+#include <atlbase.h>
 
 /** 32bit color value. */
 struct R8G8B8A8 {
@@ -23,7 +24,6 @@ struct R8G8B8A8 {
 #include <Dshow.h>
 #include <mferror.h>
 #include <comdef.h>  // COM smart-ptr with "Ptr" suffix
-#include <atlbase.h>
 
 #pragma comment(lib, "mf.lib")
 #pragma comment(lib, "mfreadwrite.lib")
@@ -361,6 +361,7 @@ public:
         frame = open_video(video_codec, opt, enc, stream->codecpar);
 
         m_out_buf.resize(16*1024*1024); // 16MB
+        m_socket = socket; // prevent socket from being destroyed before this object
         out_ctx->pb = avio_alloc_context(m_out_buf.data(), static_cast<int>(m_out_buf.size()), 1/*writable*/, socket, nullptr/*read*/, WritePackage, nullptr/*seek*/);
         //out_ctx->flags |= AVFMT_FLAG_CUSTOM_IO;
 
@@ -573,6 +574,7 @@ private:
 
     std::vector<R8G8B8A8>      m_rgb_buf;
     std::vector<unsigned char> m_out_buf;
+    CComPtr<IMFByteStream>     m_socket;
 };
 
 #endif
