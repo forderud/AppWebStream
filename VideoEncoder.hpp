@@ -95,8 +95,10 @@ public:
         R8G8B8A8 * buffer_ptr = WriteFrameBegin();
 
         for (unsigned int j = 0; j < m_height; j++) {
-            R8G8B8A8 * src_row = &src_data[j*m_width];
+            // flip upside down
+            R8G8B8A8 * src_row = &src_data[(m_height-1-j)*m_width];
             R8G8B8A8 * dst_row = &buffer_ptr[j*Align(m_width)];
+
             if (swap_rb) {
                 for (unsigned int i = 0; i < m_width; i++)
                     dst_row[i] = SwapRGBAtoBGRA(src_row[i]);
