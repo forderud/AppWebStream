@@ -95,8 +95,11 @@ public:
         R8G8B8A8 * buffer_ptr = WriteFrameBegin();
 
         for (unsigned int j = 0; j < m_height; j++) {
-            // flip upside down
-            R8G8B8A8 * src_row = &src_data[(m_height-1-j)*m_width];
+#ifndef ENABLE_FFMPEG
+            R8G8B8A8 * src_row = &src_data[(m_height-1-j)*m_width]; // flip upside down
+#else
+            R8G8B8A8 * src_row = &src_data[j*m_width];
+#endif
             R8G8B8A8 * dst_row = &buffer_ptr[j*Align(m_width)];
 
             if (swap_rb) {
@@ -416,8 +419,7 @@ public:
             // RGB to YUV conversion
             for (int y = 0; y < m_height; y++) {
                 for (int x = 0; x < m_width; x++) {
-                    // flip upside down
-                    R8G8B8A8 rgb = m_rgb_buf[(m_height-1-y)*enc->width + x];
+                    R8G8B8A8 rgb = m_rgb_buf[y*enc->width + x];
                     // convert to YUV
                     unsigned char Y=0, U=0, V=0;
                     YUVfromRGB(rgb, Y, U, V);
