@@ -188,6 +188,12 @@ public:
             COM_CHECK(codec->GetValue(&CODECAPI_AVLowLatencyMode, &low_latency));
             //assert(low_latency.boolVal != FALSE);
             // CODECAPI_AVEncAdaptiveMode not implemented
+
+            // query group-of-pictures (GoP) size
+            CComVariant gop_size;
+            COM_CHECK(codec->GetValue(&CODECAPI_AVEncMPVGOPSize, &gop_size));
+            //gop_size = (unsigned int)1; // VT_UI4 type
+            //COM_CHECK(codec->SetValue(&CODECAPI_AVEncMPVGOPSize, &gop_size));
         }
 
         COM_CHECK(m_sink_writer->BeginWriting());
