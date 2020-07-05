@@ -208,12 +208,12 @@ public:
         HRESULT hr = m_sink_writer->Finalize(); // fails on prior I/O errors
         hr; // discard error
         // delete objects before shutdown-call
-        m_buffer = nullptr;
-        m_sink_writer = nullptr;
+        m_buffer.Release();
+        m_sink_writer.Release();
 
         if (m_media_sink) {
             COM_CHECK(m_media_sink->Shutdown());
-            m_media_sink = nullptr;
+            m_media_sink.Release();
         }
 
         COM_CHECK(MFShutdown());
