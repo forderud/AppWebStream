@@ -95,10 +95,10 @@ public:
         R8G8B8A8 * buffer_ptr = WriteFrameBegin();
 
         for (unsigned int j = 0; j < m_height; j++) {
-#ifndef ENABLE_FFMPEG
-            R8G8B8A8 * src_row = &src_data[(m_height-1-j)*m_width]; // flip upside down
-#else
+#ifdef ENABLE_FFMPEG
             R8G8B8A8 * src_row = &src_data[j*m_width];
+#else
+            R8G8B8A8 * src_row = &src_data[(m_height-1-j)*m_width]; // flip upside down
 #endif
             R8G8B8A8 * dst_row = &buffer_ptr[j*Align(m_width)];
 
