@@ -25,7 +25,7 @@ public:
 
         // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/MovieFragmentBox.java
         auto moof_size = GetAtomSize(buf);
-        if (CheckAtomType(buf, "moof")) // movie fragment
+        if (!IsAtomType(buf, "moof")) // movie fragment
             return std::tie(buf,size); // not a "moof" atom (skip processing)
 
         // copy to temporary buffer before modifying & extending atoms
@@ -37,7 +37,7 @@ public:
         // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/MovieFragmentHeaderBox.java
         BYTE * mfhd_ptr = moof_ptr + HEADER_SIZE;
         auto mfhd_size = GetAtomSize(mfhd_ptr);
-        if (CheckAtomType(mfhd_ptr, "mfhd")) // movie fragment header
+        if (!IsAtomType(mfhd_ptr, "mfhd")) // movie fragment header
             throw std::runtime_error("not a \"mfhd\" atom");
         auto seq_nr = DeSerialize<uint32_t>(mfhd_ptr+HEADER_SIZE+4); // increases by one per fragment
         seq_nr;
@@ -45,7 +45,7 @@ public:
         // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/TrackFragmentBox.java
         BYTE * traf_ptr = mfhd_ptr + mfhd_size; // jump to next atom (don't inspect mfhd fields)
         auto traf_size = GetAtomSize(traf_ptr);
-        if (CheckAtomType(traf_ptr, "traf")) // track fragment
+        if (!IsAtomType(traf_ptr, "traf")) // track fragment
             throw std::runtime_error("not a \"traf\" atom");
         BYTE* tfhd_ptr = traf_ptr + HEADER_SIZE;
 
@@ -90,10 +90,9 @@ private:
             memset(dest+num/*dst*/, 0/*val*/, source-dest/*size*/);
     }
 
-    /** Check is an MPEG4 atom is of a given type.
-    Returns zero for match. */
-    static int CheckAtomType (const BYTE* atom_ptr, const char type[4]) {
-        return memcmp(atom_ptr+4, type, 4); // atom type is stored at offset 4-7
+    /** Check is an MPEG4 atom is of a given type. */
+    static bool IsAtomType (const BYTE* atom_ptr, const char type[4]) {
+        return memcmp(atom_ptr+4, type, 4) == 0; // atom type is stored at offset 4-7
     }
 
     /** Get the size of an MPEG4 atom. */
@@ -124,7 +123,7 @@ private:
         // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/TrackFragmentHeaderBox.java
         auto tfhd_size = GetAtomSize(tfhd_ptr);
         {
-            if (CheckAtomType(tfhd_ptr, "tfhd")) // track fragment header
+            if (!IsAtomType(tfhd_ptr, "tfhd")) // track fragment header
                 return 0; // not a "tfhd" atom
 
             // process tfhd content
@@ -173,7 +172,7 @@ private:
             BYTE * trun_ptr = ptr + TFDT_SIZE;
             auto trun_size = GetAtomSize(trun_ptr);
             trun_size;
-            if (CheckAtomType(trun_ptr, "trun")) // track run box
+            if (!IsAtomType(trun_ptr, "trun")) // track run box
                 throw std::runtime_error("not a \"trun\" atom");
             BYTE * payload = trun_ptr + HEADER_SIZE;
             assert(payload[0] == 1);   // check version
