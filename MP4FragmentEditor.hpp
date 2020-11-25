@@ -106,7 +106,7 @@ private:
             memset(dest+num/*dst*/, 0/*val*/, source-dest/*size*/);
     }
 
-    /** Check is an MPEG4 atom is of a given type. */
+    /** Check if an MPEG4 atom is of a given type. */
     static bool IsAtomType (const BYTE* atom_ptr, const char type[4]) {
         return memcmp(atom_ptr+4, type, 4) == 0; // atom type is stored at offset 4-7
     }
