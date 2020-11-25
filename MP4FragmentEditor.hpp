@@ -31,7 +31,7 @@ public:
         uint32_t moof_size = GetAtomSize(buf);
         if (!IsAtomType(buf, "moof")) {// movie fragment
             if (IsAtomType(buf, "moov"))
-                ProcessMovie(const_cast<BYTE*>(buf), moof_size);
+                ProcessMovieInplace(const_cast<BYTE*>(buf), moof_size);
             
             return std::tie(buf, size); // not a "moof" atom (skip further processing)
         }
@@ -209,7 +209,7 @@ private:
 
     /** Adjust time-scale in Movie (moov) Movie Header (mvhd) and Media Header (mdhd) atoms.
         REF: https://developer.apple.com/library/archive/documentation/QuickTime/QTFF/QTFFChap2/qtff2.html */
-    void ProcessMovie(BYTE* moov_ptr, ULONG buf_size) {
+    void ProcessMovieInplace (BYTE* moov_ptr, ULONG buf_size) {
         assert(IsAtomType(moov_ptr, "moov"));
         BYTE* ptr = moov_ptr + S_HEADER_SIZE;
 
