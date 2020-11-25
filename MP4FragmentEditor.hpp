@@ -24,7 +24,7 @@ public:
             return std::tie(buf,size); // too small to contain a moof (skip processing)
 
         // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/MovieFragmentBox.java
-        auto moof_size = GetAtomSize(buf);
+        uint32_t moof_size = GetAtomSize(buf);
         if (!IsAtomType(buf, "moof")) // movie fragment
             return std::tie(buf,size); // not a "moof" atom (skip processing)
 
@@ -36,7 +36,7 @@ public:
 
         // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/MovieFragmentHeaderBox.java
         BYTE * mfhd_ptr = moof_ptr + HEADER_SIZE;
-        auto mfhd_size = GetAtomSize(mfhd_ptr);
+        uint32_t mfhd_size = GetAtomSize(mfhd_ptr);
         if (!IsAtomType(mfhd_ptr, "mfhd")) // movie fragment header
             throw std::runtime_error("not a \"mfhd\" atom");
         auto seq_nr = DeSerialize<uint32_t>(mfhd_ptr+HEADER_SIZE+4); // increases by one per fragment
@@ -44,7 +44,7 @@ public:
 
         // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/TrackFragmentBox.java
         BYTE * traf_ptr = mfhd_ptr + mfhd_size; // jump to next atom (don't inspect mfhd fields)
-        auto traf_size = GetAtomSize(traf_ptr);
+        uint32_t traf_size = GetAtomSize(traf_ptr);
         if (!IsAtomType(traf_ptr, "traf")) // track fragment
             throw std::runtime_error("not a \"traf\" atom");
         BYTE* tfhd_ptr = traf_ptr + HEADER_SIZE;
@@ -121,7 +121,7 @@ private:
             return 0; // too small to contain tfhd & trun atoms
 
         // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/TrackFragmentHeaderBox.java
-        auto tfhd_size = GetAtomSize(tfhd_ptr);
+        uint32_t tfhd_size = GetAtomSize(tfhd_ptr);
         {
             if (!IsAtomType(tfhd_ptr, "tfhd")) // track fragment header
                 return 0; // not a "tfhd" atom
@@ -170,7 +170,7 @@ private:
         {
             // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/TrackRunBox.java
             BYTE * trun_ptr = ptr + TFDT_SIZE;
-            auto trun_size = GetAtomSize(trun_ptr);
+            uint32_t trun_size = GetAtomSize(trun_ptr);
             trun_size;
             if (!IsAtomType(trun_ptr, "trun")) // track run box
                 throw std::runtime_error("not a \"trun\" atom");
