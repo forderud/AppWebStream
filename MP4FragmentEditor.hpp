@@ -31,13 +31,14 @@ public:
         assert(atom_size <= size);
 
         if (IsAtomType(buf, "moof")) {// movie fragment
+            assert(atom_size == size);
             return ModifyMovieFragment(buf, atom_size);
         }
 
         if (IsAtomType(buf, "moov"))
             ModifyMovieInplace(const_cast<BYTE*>(buf), atom_size);
 
-        return std::tie(buf, size); // not a "moof" atom (skip further processing)
+        return std::tie(buf, size);
     }
 
 private:
