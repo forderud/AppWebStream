@@ -22,19 +22,28 @@ public:
 
     /** Intended to be called from IMFByteStream::BeginWrite and IMFByteStream::Write before forwarding the data to a socket.
         Will modify the "moof" atom if present.
-        returns a (ptr, size) tuple pointing to a potentially the modified buffer. */
-    std::tuple<const BYTE*,ULONG> ModifyMovieFragment (const BYTE* buf, ULONG size) {
+        returns a (ptr, size) tuple pointing to a potentially modified buffer. */
+    std::tuple<const BYTE*, ULONG> EditStream (const BYTE* buf, ULONG size) {
         if (size < 5*S_HEADER_SIZE)
             return std::tie(buf,size); // too small to contain a moof (skip processing)
 
-        // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/MovieFragmentBox.java
-        uint32_t moof_size = GetAtomSize(buf);
-        if (!IsAtomType(buf, "moof")) {// movie fragment
-            if (IsAtomType(buf, "moov"))
-                ProcessMovieInplace(const_cast<BYTE*>(buf), moof_size);
-            
-            return std::tie(buf, size); // not a "moof" atom (skip further processing)
+        uint32_t atom_size = GetAtomSize(buf);
+        assert(atom_size <= size);
+
+        if (IsAtomType(buf, "moof")) {// movie fragment
+            return ModifyMovieFragment(buf, atom_size);
         }
+
+        if (IsAtomType(buf, "moov"))
+            ModifyMovieInplace(const_cast<BYTE*>(buf), atom_size);
+
+        return std::tie(buf, size); // not a "moof" atom (skip further processing)
+    }
+
+private:
+    /** REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/MovieFragmentBox.java */
+    std::tuple<const BYTE*,ULONG> ModifyMovieFragment (const BYTE* buf, const ULONG size) {
+        assert(GetAtomSize(buf) == size);
 
         // copy to temporary buffer before modifying & extending atoms
         m_write_buf.resize(size-8+20);
@@ -58,16 +67,15 @@ public:
         BYTE* tfhd_ptr = traf_ptr + S_HEADER_SIZE;
 
         unsigned long pos_idx = static_cast<unsigned long>(tfhd_ptr - moof_ptr);
-        int rel_size = ProcessTrackFrameChildren(m_write_buf.data()+pos_idx, moof_size, size-pos_idx);
+        int rel_size = ProcessTrackFrameChildren(m_write_buf.data()+pos_idx, size, size-pos_idx);
         if (rel_size) {
             // size have changed - update size of parent atoms
-            Serialize<uint32_t>(moof_ptr, moof_size+rel_size);
+            Serialize<uint32_t>(moof_ptr, size+rel_size);
             Serialize<uint32_t>(traf_ptr, traf_size+rel_size);
         }
         return std::make_tuple(moof_ptr, size + rel_size);
     }
 
-private:
     /** Deserialize & conververt from big-endian. */
     template <typename T>
     static T DeSerialize (const BYTE * buf) {
@@ -209,7 +217,9 @@ private:
 
     /** Adjust time-scale in Movie (moov) Movie Header (mvhd) and Media Header (mdhd) atoms.
         REF: https://developer.apple.com/library/archive/documentation/QuickTime/QTFF/QTFFChap2/qtff2.html */
-    void ProcessMovieInplace (BYTE* moov_ptr, ULONG buf_size) {
+    void ModifyMovieInplace(BYTE* moov_ptr, ULONG buf_size) {
+        assert(GetAtomSize(moov_ptr) == buf_size);
+
         assert(IsAtomType(moov_ptr, "moov"));
         BYTE* ptr = moov_ptr + S_HEADER_SIZE;
 

@@ -124,7 +124,7 @@ HRESULT STDMETHODCALLTYPE WebStream::EndRead(/*in*/IMFAsyncResult* /*result*/, /
 
 HRESULT WebStream::WriteImpl(/*in*/const BYTE* pb, /*in*/ULONG cb) {
 #ifndef ENABLE_FFMPEG
-    std::tie(pb,cb) = m_impl->m_stream_editor.ModifyMovieFragment(pb, cb);
+    std::tie(pb,cb) = m_impl->m_stream_editor.EditStream(pb, cb);
 #endif
 
     int byte_count = send(m_impl->m_stream_client->Socket(), reinterpret_cast<const char*>(pb), cb, 0);
