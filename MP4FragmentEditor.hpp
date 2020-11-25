@@ -25,8 +25,12 @@ public:
 
         // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/MovieFragmentBox.java
         uint32_t moof_size = GetAtomSize(buf);
-        if (!IsAtomType(buf, "moof")) // movie fragment
-            return std::tie(buf,size); // not a "moof" atom (skip processing)
+        if (!IsAtomType(buf, "moof")) {// movie fragment
+            if (IsAtomType(buf, "moov"))
+                ProcessMovie(const_cast<BYTE*>(buf), moof_size);
+            
+            return std::tie(buf, size); // not a "moof" atom (skip further processing)
+        }
 
         // copy to temporary buffer before modifying & extending atoms
         m_write_buf.resize(size-8+20);
@@ -197,6 +201,46 @@ private:
         }
 
         return TFDT_SIZE - BASE_DATA_OFFSET_SIZE; // tfdt added, tfhd shrunk
+    }
+
+    /** Adjust time-scale in Movie (moov) Movie Header (mvhd) and Media Header (mdhd) atoms.
+        REF: https://developer.apple.com/library/archive/documentation/QuickTime/QTFF/QTFFChap2/qtff2.html */
+    void ProcessMovie(BYTE* moov_ptr, ULONG buf_size) {
+        assert(IsAtomType(moov_ptr, "moov"));
+        BYTE* ptr = moov_ptr + S_HEADER_SIZE;
+
+        {
+            // Movie Header Atom
+            assert(IsAtomType(ptr, "mvhd"));
+            uint32_t mvhd_size = GetAtomSize(ptr);
+            auto time_scale = DeSerialize<uint32_t>(ptr + 20);
+            ptr += mvhd_size;
+        }
+        {
+            assert(IsAtomType(ptr, "trak"));
+            //uint32_t trak_size = GetAtomSize(ptr);
+            ptr += S_HEADER_SIZE; // container atom
+
+            {
+                assert(IsAtomType(ptr, "tkhd"));
+                uint32_t tkhd_size = GetAtomSize(ptr);
+                ptr += tkhd_size;
+            }
+
+            assert(IsAtomType(ptr, "mdia"));
+            //uint32_t mdia_size = GetAtomSize(ptr);
+            ptr += S_HEADER_SIZE;
+
+            {
+                // Media Header Atom
+                assert(IsAtomType(ptr, "mdhd"));
+                uint32_t mdhd_size = GetAtomSize(ptr);
+
+                auto time_scale = DeSerialize<uint32_t>(ptr + 20);
+                //Serialize<uint32_t>(ptr + 20, time_scale * 25);
+                ptr += mdhd_size;
+            }
+        }
     }
 
 private:
