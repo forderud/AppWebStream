@@ -16,7 +16,7 @@ public:
     WebStream();
     /*NOT virtual*/ ~WebStream();
 
-    void SetPortAndWindowHandle(const char * port_str, HWND wnd);
+    void SetPortAndWindowHandle(const char * port_str, HWND wnd, unsigned int time_scale_multiplier);
 
     HRESULT STDMETHODCALLTYPE GetCapabilities(/*out*/DWORD *capabilities) override;
 
@@ -56,7 +56,7 @@ private:
     HRESULT WriteImpl(/*in*/const BYTE* pb, /*in*/ULONG cb);
 
     mutable std::mutex m_mutex;
-    unsigned long  m_tmp_bytes_written = 0;
+    unsigned long      m_tmp_bytes_written = 0;
 
     struct impl;
     std::unique_ptr<impl> m_impl;

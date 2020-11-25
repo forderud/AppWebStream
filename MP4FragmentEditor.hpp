@@ -16,6 +16,10 @@ Expected atom hiearchy:
 class MP4FragmentEditor {
         static constexpr unsigned long S_HEADER_SIZE = 8;
 public:
+    MP4FragmentEditor(unsigned int time_scale_multiplier) : m_time_scale_multiplier(time_scale_multiplier) {
+        assert(m_time_scale_multiplier >= 1);
+    }
+
     /** Intended to be called from IMFByteStream::BeginWrite and IMFByteStream::Write before forwarding the data to a socket.
         Will modify the "moof" atom if present.
         returns a (ptr, size) tuple pointing to a potentially the modified buffer. */
@@ -237,13 +241,14 @@ private:
                 uint32_t mdhd_size = GetAtomSize(ptr);
 
                 auto time_scale = DeSerialize<uint32_t>(ptr + 20);
-                //Serialize<uint32_t>(ptr + 20, time_scale * 25);
+                Serialize<uint32_t>(ptr + 20, time_scale * m_time_scale_multiplier);
                 ptr += mdhd_size;
             }
         }
     }
 
 private:
+    unsigned int      m_time_scale_multiplier = 1;
     uint64_t          m_cur_time = 0;
     std::vector<BYTE> m_write_buf; ///< write buffer (used when modifying moof atoms)
 };

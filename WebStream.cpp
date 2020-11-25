@@ -7,7 +7,7 @@
 
 
 struct WebStream::impl : public StreamSockSetter {
-    impl(const char * port_str, HWND wnd) : m_server(port_str), m_block_ctor(true), m_wnd(wnd) {
+    impl(const char * port_str, HWND wnd, unsigned int time_scale_multiplier) : m_server(port_str), m_block_ctor(true), m_wnd(wnd), m_stream_editor(time_scale_multiplier) {
         // start server thread
         m_thread = std::thread(&WebStream::impl::WaitForClients, this);
 
@@ -80,8 +80,8 @@ WebStream::WebStream() {
 WebStream::~WebStream() {
 }
 
-void WebStream::SetPortAndWindowHandle(const char * port_str, HWND wnd) {
-    m_impl = std::make_unique<impl>(port_str, wnd);
+void WebStream::SetPortAndWindowHandle(const char * port_str, HWND wnd, unsigned int time_scale_multiplier) {
+    m_impl = std::make_unique<impl>(port_str, wnd, time_scale_multiplier);
 }
 
 HRESULT STDMETHODCALLTYPE WebStream::GetCapabilities(/*out*/DWORD *capabilities) {
