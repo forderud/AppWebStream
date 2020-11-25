@@ -139,18 +139,19 @@ int main (int argc, char *argv[]) {
         return -1;
     }
 
+    const unsigned int FPS = 25;
+
     // create H.264/MPEG4 encoder
     std::cout << "Starting web server to stream window " << std::hex << win_handle << ". Please connect with a web browser on port " <<port << " to receive the stream" << std::endl;
     auto ws = CreateLocalInstance<WebStream>();
-    ws->SetPortAndWindowHandle(port, win_handle, 1); // blocking call
-    std::cout << "Connecting to client..." << std::endl;
-
-    const unsigned int FPS = 25;
 #ifdef ENABLE_FFMPEG
+    ws->SetPortAndWindowHandle(port, win_handle, 1); // blocking call
     VideoEncoderFF encoder(dims, FPS, ws);
 #else
-    VideoEncoderMF encoder(dims, FPS, ws);
+    ws->SetPortAndWindowHandle(port, win_handle, FPS); // blocking call
+    VideoEncoderMF encoder(dims, 1, ws);
 #endif
+    std::cout << "Connecting to client..." << std::endl;
 
     // encode & transmit frames
     HRESULT hr = S_OK;
