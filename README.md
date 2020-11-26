@@ -20,4 +20,4 @@ The FFMPEG-based encoder is not affected by any of the issues above.
 
 ### Browser support
 * Confirmed to work with Google Chrome, Microsoft Edge and Firefox.
-* Safary doesn't work yet due to insufficient of [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) support
+* Safary doesn't work properly yet. The movie is streamed, but not show on screen.
