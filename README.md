@@ -1,8 +1,6 @@
 # AppWebStream
 [Windows Media Foundation](https://msdn.microsoft.com/en-us/library/ms694197.aspx) and [FFMPEG](http://ffmpeg.org/) sample code for streaming an application window to a web browser. The video is encoded as a H.264 stream inside a fragmented MPEG4 container that is Media Source Extensions (MSE) compatible, so that it can be received by modern web browsers with minimal client-side buffering.
 
-The streaming is primarily tested on and works best with Google Chrome.
-
 ### Getting started
 ![screenshot](screenshot.png)
 * Open project in VS2015
