@@ -14,7 +14,8 @@ Expected atom hiearchy:
   - [tfdt] track fragment decode timebox (will be added)
   - [trun] track run (will be modified) */
 class MP4FragmentEditor {
-        static constexpr unsigned long S_HEADER_SIZE = 8;
+    static constexpr unsigned long S_HEADER_SIZE = 8;
+
 public:
     MP4FragmentEditor(unsigned int time_scale_multiplier) : m_time_scale_multiplier(time_scale_multiplier) {
         assert(m_time_scale_multiplier >= 1);
@@ -77,46 +78,6 @@ private:
             Serialize<uint32_t>(traf_ptr, traf_size+rel_size);
         }
         return std::make_tuple(moof_ptr, size + rel_size);
-    }
-
-    /** Deserialize & conververt from big-endian. */
-    template <typename T>
-    static T DeSerialize (const BYTE * buf) {
-        T val = {};
-        for (size_t i = 0; i < sizeof(T); ++i)
-            reinterpret_cast<BYTE*>(&val)[i] = buf[sizeof(T)-1-i];
-
-        return val;
-    }
-
-    /** Serialize & conververt to big-endian. */
-    template <typename T>
-    static void Serialize (BYTE * buf, T val) {
-        for (size_t i = 0; i < sizeof(T); ++i)
-            buf[i] = reinterpret_cast<BYTE*>(&val)[sizeof(T)-1-i];
-    }
-
-    /** Mofified version of "memmove" that clears the abandoned bytes, as well as intermediate data.
-    WARNING: Only use for contiguous/overlapping moves, or else it will clear more than excpected. */
-    static void MemMove (BYTE * dest, const BYTE * source, size_t num) {
-        // move memory block
-        memmove(dest, source, num);
-
-        // clear abandoned byte range
-        if (dest > source)
-            memset(const_cast<BYTE*>(source)/*dst*/, 0/*val*/, dest-source/*size*/);
-        else
-            memset(dest+num/*dst*/, 0/*val*/, source-dest/*size*/);
-    }
-
-    /** Check if an MPEG4 atom is of a given type. */
-    static bool IsAtomType (const BYTE* atom_ptr, const char type[4]) {
-        return memcmp(atom_ptr+4, type, 4) == 0; // atom type is stored at offset 4-7
-    }
-
-    /** Get the size of an MPEG4 atom. */
-    static uint32_t GetAtomSize (const BYTE* atom_ptr) {
-        return DeSerialize<uint32_t>(atom_ptr);
     }
 
 
@@ -218,6 +179,7 @@ private:
         return TFDT_SIZE - BASE_DATA_OFFSET_SIZE; // tfdt added, tfhd shrunk
     }
 
+
     /** Adjust time-scale in Movie (moov) Movie Header (mvhd) and Media Header (mdhd) atoms.
         REF: https://developer.apple.com/library/archive/documentation/QuickTime/QTFF/QTFFChap2/qtff2.html */
     void ModifyMovieInplace(BYTE* moov_ptr, ULONG buf_size) {
@@ -258,6 +220,47 @@ private:
                 ptr += mdhd_size;
             }
         }
+    }
+
+
+    /** Deserialize & conververt from big-endian. */
+    template <typename T>
+    static T DeSerialize (const BYTE * buf) {
+        T val = {};
+        for (size_t i = 0; i < sizeof(T); ++i)
+            reinterpret_cast<BYTE*>(&val)[i] = buf[sizeof(T)-1-i];
+
+        return val;
+    }
+
+    /** Serialize & conververt to big-endian. */
+    template <typename T>
+    static void Serialize (BYTE * buf, T val) {
+        for (size_t i = 0; i < sizeof(T); ++i)
+            buf[i] = reinterpret_cast<BYTE*>(&val)[sizeof(T)-1-i];
+    }
+
+    /** Mofified version of "memmove" that clears the abandoned bytes, as well as intermediate data.
+    WARNING: Only use for contiguous/overlapping moves, or else it will clear more than excpected. */
+    static void MemMove (BYTE * dest, const BYTE * source, size_t num) {
+        // move memory block
+        memmove(dest, source, num);
+
+        // clear abandoned byte range
+        if (dest > source)
+            memset(const_cast<BYTE*>(source)/*dst*/, 0/*val*/, dest-source/*size*/);
+        else
+            memset(dest+num/*dst*/, 0/*val*/, source-dest/*size*/);
+    }
+
+    /** Check if an MPEG4 atom is of a given type. */
+    static bool IsAtomType (const BYTE* atom_ptr, const char type[4]) {
+        return memcmp(atom_ptr+4, type, 4) == 0; // atom type is stored at offset 4-7
+    }
+
+    /** Get the size of an MPEG4 atom. */
+    static uint32_t GetAtomSize (const BYTE* atom_ptr) {
+        return DeSerialize<uint32_t>(atom_ptr);
     }
 
 private:
