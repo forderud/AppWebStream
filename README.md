@@ -15,7 +15,7 @@ To build with FFMPG, you first need to download & unzip FFMPEG binaries to a fol
 ### Media Foundation issues
 * The MPEG4 container needs to be manually modified as described in https://stackoverflow.com/questions/49429954/mfcreatefmpeg4mediasink-does-not-generate-mse-compatible-mp4 to reduce latency and make it Media Source Extensions (MSE) compatible.
 
-The FFMPEG-based encoder is not affected by any of the issues above.
+The FFMPEG-based encoder is not affected by this issue.
 
 ### Browser support
 * Confirmed to work with Google Chrome, Microsoft Edge and Firefox.
