@@ -139,7 +139,7 @@ int main (int argc, char *argv[]) {
         return -1;
     }
 
-    const unsigned int FPS = 25;
+    const unsigned int FPS = 50;
 
     // create H.264/MPEG4 encoder
     std::cout << "Starting web server to stream window " << std::hex << win_handle << ". Please connect with a web browser on port " <<port << " to receive the stream" << std::endl;
