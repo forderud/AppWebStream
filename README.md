@@ -19,4 +19,4 @@ The FFMPEG-based encoder is not affected by this issue.
 
 ### Browser support
 * Confirmed to work with Google Chrome, Microsoft Edge and Firefox.
-* Safary doesn't work properly yet. The movie is streamed, but not show on screen.
+* Safary doesn't work properly yet. The movie is streamed, but not show on screen. Don't understand why.
