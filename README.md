@@ -13,8 +13,7 @@ The streaming is primarily tested on and works best with Google Chrome.
 To build with FFMPG, you first need to download & unzip FFMPEG binaries to a folder pointed to by the `FFMPEG_ROOT` environment variable. Then, set the `ENABLE_FFMPEG` preprocessor define before building.
 
 ### Media Foundation issues
-* The MPEG4 fragments are transmitted 8 frames at a time over the network. Can be verified by inspecting the `sample_count` variable in `MP4FragmentEditor::ProcessTrackFrameChildren`. This leads to a 8 frame latency both at the server- and client-side. For a 25fps stream, this yields a minimum latency of 2 * 8frames * 40ms/frame = 640ms.
-* The MPEG4 container needs to be manually modified as described in https://stackoverflow.com/questions/49429954/mfcreatefmpeg4mediasink-does-not-generate-mse-compatible-mp4 to make it Media Source Extensions (MSE) compatible.
+* The MPEG4 container needs to be manually modified as described in https://stackoverflow.com/questions/49429954/mfcreatefmpeg4mediasink-does-not-generate-mse-compatible-mp4 to reduce latency and make it Media Source Extensions (MSE) compatible.
 
 The FFMPEG-based encoder is not affected by any of the issues above.
 
