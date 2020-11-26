@@ -91,14 +91,14 @@ public:
     virtual R8G8B8A8* WriteFrameBegin () = 0;
     virtual HRESULT   WriteFrameEnd () = 0;
 
-    HRESULT WriteFrame (R8G8B8A8* src_data, bool swap_rb) {
+    HRESULT WriteFrame (const R8G8B8A8* src_data, bool swap_rb) {
         R8G8B8A8 * buffer_ptr = WriteFrameBegin();
 
         for (unsigned int j = 0; j < m_height; j++) {
 #ifdef ENABLE_FFMPEG
-            R8G8B8A8 * src_row = &src_data[j*m_width];
+            const R8G8B8A8 * src_row = &src_data[j*m_width];
 #else
-            R8G8B8A8 * src_row = &src_data[(m_height-1-j)*m_width]; // flip upside down
+            const R8G8B8A8 * src_row = &src_data[(m_height-1-j)*m_width]; // flip upside down
 #endif
             R8G8B8A8 * dst_row = &buffer_ptr[j*Align(m_width)];
 
