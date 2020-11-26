@@ -184,6 +184,7 @@ private:
         REF: https://developer.apple.com/library/archive/documentation/QuickTime/QTFF/QTFFChap2/qtff2.html */
     void ModifyMovieInplace(BYTE* moov_ptr, ULONG buf_size) {
         assert(GetAtomSize(moov_ptr) == buf_size);
+        buf_size;
 
         assert(IsAtomType(moov_ptr, "moov"));
         BYTE* ptr = moov_ptr + S_HEADER_SIZE;
@@ -192,7 +193,7 @@ private:
             // Movie Header Atom
             assert(IsAtomType(ptr, "mvhd"));
             uint32_t mvhd_size = GetAtomSize(ptr);
-            auto time_scale = DeSerialize<uint32_t>(ptr + 20);
+            //auto time_scale = DeSerialize<uint32_t>(ptr + 20);
             ptr += mvhd_size;
         }
         {
