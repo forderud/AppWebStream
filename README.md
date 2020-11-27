@@ -3,7 +3,7 @@
 
 ### Getting started
 ![screenshot](screenshot.png)
-* Open project in VS2015
+* Open project in Visual Studio
 * Build project
 * Start `WebAppStream.exe port [window handle]`. You can use Spy++ (included with Visual Studio) to determine window handles.
 * Open `http://localhost:port` in web browser, or on another computer. The stream can also be opened as `http://localhost:port/movie.mp4` in VLC media player.
