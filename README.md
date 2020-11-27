@@ -11,7 +11,8 @@
 To build with FFMPG, you first need to download & unzip FFMPEG binaries to a folder pointed to by the `FFMPEG_ROOT` environment variable. Then, set the `ENABLE_FFMPEG` preprocessor define before building.
 
 ### Media Foundation issues
-* The MPEG4 container needs to be manually modified as described in https://stackoverflow.com/questions/49429954/mfcreatefmpeg4mediasink-does-not-generate-mse-compatible-mp4 to reduce latency and make it Media Source Extensions (MSE) compatible.
+* 1 frame latency (1st frame in, no output, 2nd frame in, 1st frame out, ...)
+* The MPEG4 container is manually modified as suggested in https://stackoverflow.com/questions/49429954/mfcreatefmpeg4mediasink-does-not-generate-mse-compatible-mp4 to reduce latency and make it Media Source Extensions (MSE) compatible.
 
 The FFMPEG-based encoder is not affected by this issue.
 
