@@ -12,7 +12,7 @@ To build with FFMPG, you first need to download & unzip FFMPEG binaries to a fol
 
 Outstanding tasks:
 * Authentication is currently missing.
-* The handcrafted HTTP communication should be replaced by a HTTP library.
+* The handcrafted HTTP communication should be replaced by a "proper" HTTP library.
 
 ### Media Foundation issues
 * 1 frame latency (1st frame in, no output, 2nd frame in, 1st frame out, ...)
