@@ -254,6 +254,8 @@ public:
         if (FAILED(hr))
             return hr;
 
+        m_sink_writer->NotifyEndOfSegment(m_stream_index);
+
         // increment time
         m_time_stamp += m_frame_duration;
         return S_OK;
