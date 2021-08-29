@@ -17,8 +17,7 @@ class MP4FragmentEditor {
     static constexpr unsigned long S_HEADER_SIZE = 8;
 
 public:
-    MP4FragmentEditor(unsigned int time_scale_multiplier) : m_time_scale_multiplier(time_scale_multiplier) {
-        assert(m_time_scale_multiplier >= 1);
+    MP4FragmentEditor() {
     }
 
     /** Intended to be called from IMFByteStream::BeginWrite and IMFByteStream::Write before forwarding the data to a socket.
@@ -35,10 +34,6 @@ public:
             // Movie Fragment (moof)
             assert(atom_size == size);
             return ModifyMovieFragment(buf, atom_size);
-        } else if (IsAtomType(buf, "moov")) {
-            // Movie (moov)
-            assert(atom_size == size);
-            ModifyMovieInplace(const_cast<BYTE*>(buf), atom_size);
         }
 
         return std::tie(buf, size);
@@ -179,51 +174,6 @@ private:
         return TFDT_SIZE - BASE_DATA_OFFSET_SIZE; // tfdt added, tfhd shrunk
     }
 
-
-    /** Adjust time-scale in Movie (moov) Movie Header (mvhd) and Media Header (mdhd) atoms.
-        REF: https://developer.apple.com/library/archive/documentation/QuickTime/QTFF/QTFFChap2/qtff2.html */
-    void ModifyMovieInplace(BYTE* moov_ptr, ULONG buf_size) {
-        assert(GetAtomSize(moov_ptr) == buf_size);
-        buf_size;
-
-        assert(IsAtomType(moov_ptr, "moov"));
-        BYTE* ptr = moov_ptr + S_HEADER_SIZE;
-
-        {
-            // Movie Header Atom
-            assert(IsAtomType(ptr, "mvhd"));
-            uint32_t mvhd_size = GetAtomSize(ptr);
-            //auto time_scale = DeSerialize<uint32_t>(ptr + 20);
-            ptr += mvhd_size;
-        }
-        {
-            assert(IsAtomType(ptr, "trak"));
-            //uint32_t trak_size = GetAtomSize(ptr);
-            ptr += S_HEADER_SIZE; // container atom
-
-            {
-                assert(IsAtomType(ptr, "tkhd"));
-                uint32_t tkhd_size = GetAtomSize(ptr);
-                ptr += tkhd_size;
-            }
-
-            assert(IsAtomType(ptr, "mdia"));
-            //uint32_t mdia_size = GetAtomSize(ptr);
-            ptr += S_HEADER_SIZE;
-
-            {
-                // Media Header Atom
-                assert(IsAtomType(ptr, "mdhd"));
-                uint32_t mdhd_size = GetAtomSize(ptr);
-
-                auto time_scale = DeSerialize<uint32_t>(ptr + 20);
-                Serialize<uint32_t>(ptr + 20, time_scale * m_time_scale_multiplier);
-                ptr += mdhd_size;
-            }
-        }
-    }
-
-
     /** Deserialize & conververt from big-endian. */
     template <typename T>
     static T DeSerialize (const BYTE * buf) {
@@ -265,7 +215,6 @@ private:
     }
 
 private:
-    unsigned int      m_time_scale_multiplier = 1;
     uint64_t          m_cur_time = 0;
     std::vector<BYTE> m_write_buf; ///< write buffer (used when modifying moof atoms)
 };

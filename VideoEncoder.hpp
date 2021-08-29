@@ -254,6 +254,9 @@ public:
         if (FAILED(hr))
             return hr;
 
+        // transmit frame immediately
+        COM_CHECK(m_sink_writer->NotifyEndOfSegment(m_stream_index));
+
         // increment time
         m_time_stamp += m_frame_duration;
         return S_OK;

@@ -16,7 +16,7 @@ public:
     WebStream();
     /*NOT virtual*/ ~WebStream();
 
-    void SetPortAndWindowHandle(const char * port_str, HWND wnd, unsigned int time_scale_multiplier);
+    void SetPortAndWindowHandle(const char * port_str, HWND wnd);
 
     HRESULT STDMETHODCALLTYPE GetCapabilities(/*out*/DWORD *capabilities) override;
 
