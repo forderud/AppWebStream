@@ -15,7 +15,7 @@ Outstanding tasks:
 * The handcrafted HTTP communication should be replaced by a "proper" HTTP library.
 
 ### Media Foundation issues
-* 1 frame latency (1st frame in, no output, 2nd frame in, 1st frame out, ...)
+* 0-1 frame latency (1st frame in, no output, 2nd frame in, 1st frame out, 3rd frame in, 2nd frame out, 4th frame in, 3rd frame out, 4th frame out, ...)
 * The MPEG4 container is manually modified as suggested in https://stackoverflow.com/questions/49429954/mfcreatefmpeg4mediasink-does-not-generate-mse-compatible-mp4 to reduce latency and make it Media Source Extensions (MSE) compatible.
 
 The FFMPEG-based encoder is not affected by this issue.
