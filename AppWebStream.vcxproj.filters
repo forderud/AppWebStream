@@ -3,6 +3,7 @@
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="WebStream.cpp" />
+    <ClCompile Include="yuv_rgb.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MP4FragmentEditor.hpp" />
@@ -10,6 +11,7 @@
     <ClInclude Include="WebSocket.hpp" />
     <ClInclude Include="WebStream.hpp" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="yuv_rgb.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="WebStream.html" />
