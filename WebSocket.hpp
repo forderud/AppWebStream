@@ -34,6 +34,12 @@ public:
 class ClientSock final {
 public:
     explicit ClientSock(SOCKET cs) : m_sock(cs) {
+        // disable Nagle algorithm, so that data is sent immediately
+        // REF: https://docs.microsoft.com/en-us/windows/win32/winsock/ipproto-tcp-socket-options
+        const DWORD no_delay = 1;
+        int res = setsockopt(m_sock, IPPROTO_TCP, TCP_NODELAY, (const char*)&no_delay, sizeof(no_delay));
+        if (res != 0)
+            throw std::runtime_error("setsockopt(TCP_NODELAY) failed");
     }
 
     // non-assignable
