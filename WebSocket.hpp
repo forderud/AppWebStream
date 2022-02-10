@@ -34,6 +34,23 @@ public:
 class ClientSock final {
 public:
     explicit ClientSock(SOCKET cs) : m_sock(cs) {
+        {
+            // check TCP send buffer size
+            int buf_size_len = sizeof(int);
+            int buf_size = 0; // 64k on my Win10 computer
+            int res = getsockopt(m_sock, SOL_SOCKET, SO_SNDBUF, (char*)&buf_size, &buf_size_len);
+            if (res != 0)
+                throw std::runtime_error("getsockopt(SO_SNDBUF) failed");
+        }
+        {
+            // set TCP send buffer size to 0 to reduce transmission latency
+            // REF: https://docs.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-setsockopt
+            int buf_size = 0;
+            int res = setsockopt(m_sock, SOL_SOCKET, SO_SNDBUF, (const char*)&buf_size, sizeof(buf_size));
+            if (res != 0)
+                throw std::runtime_error("setsockopt(SO_SNDBUF) failed");
+        }
+
     }
 
     // non-assignable
