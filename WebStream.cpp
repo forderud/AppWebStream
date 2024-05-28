@@ -84,41 +84,41 @@ void WebStream::SetPortAndWindowHandle(const char * port_str, HWND wnd) {
     m_impl = std::make_unique<impl>(port_str, wnd);
 }
 
-HRESULT STDMETHODCALLTYPE WebStream::GetCapabilities(/*out*/DWORD *capabilities) {
+HRESULT WebStream::GetCapabilities(/*out*/DWORD *capabilities) {
     *capabilities = MFBYTESTREAM_IS_WRITABLE | MFBYTESTREAM_IS_REMOTE;
     return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE WebStream::GetLength(/*out*/QWORD* /*length*/) {
+HRESULT WebStream::GetLength(/*out*/QWORD* /*length*/) {
     return E_NOTIMPL;
 }
 
-HRESULT STDMETHODCALLTYPE WebStream::SetLength(/*in*/QWORD /*length*/) {
+HRESULT WebStream::SetLength(/*in*/QWORD /*length*/) {
     return E_NOTIMPL;
 }
 
-HRESULT STDMETHODCALLTYPE WebStream::GetCurrentPosition(/*out*/QWORD* position) {
+HRESULT WebStream::GetCurrentPosition(/*out*/QWORD* position) {
     *position = m_impl->m_cur_pos;
     return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE WebStream::SetCurrentPosition(/*in*/QWORD /*position*/) {
+HRESULT WebStream::SetCurrentPosition(/*in*/QWORD /*position*/) {
     return E_NOTIMPL;
 }
 
-HRESULT STDMETHODCALLTYPE WebStream::IsEndOfStream(/*out*/BOOL* /*endOfStream*/) {
+HRESULT WebStream::IsEndOfStream(/*out*/BOOL* /*endOfStream*/) {
     return E_NOTIMPL;
 }
 
-HRESULT STDMETHODCALLTYPE WebStream::Read(/*out*/BYTE* /*pb*/, /*in*/ULONG /*cb*/, /*out*/ULONG* /*bRead*/) {
+HRESULT WebStream::Read(/*out*/BYTE* /*pb*/, /*in*/ULONG /*cb*/, /*out*/ULONG* /*bRead*/) {
     return E_NOTIMPL;
 }
 
-HRESULT STDMETHODCALLTYPE WebStream::BeginRead(/*out*/BYTE* /*pb*/, /*in*/ULONG /*cb*/, /*in*/IMFAsyncCallback* /*callback*/, /*in*/IUnknown* /*unkState*/) {
+HRESULT WebStream::BeginRead(/*out*/BYTE* /*pb*/, /*in*/ULONG /*cb*/, /*in*/IMFAsyncCallback* /*callback*/, /*in*/IUnknown* /*unkState*/) {
     return E_NOTIMPL;
 }
 
-HRESULT STDMETHODCALLTYPE WebStream::EndRead(/*in*/IMFAsyncResult* /*result*/, /*out*/ULONG* /*cbRead*/) {
+HRESULT WebStream::EndRead(/*in*/IMFAsyncResult* /*result*/, /*out*/ULONG* /*cbRead*/) {
     return E_NOTIMPL;
 }
 
@@ -140,7 +140,7 @@ HRESULT WebStream::WriteImpl(/*in*/const BYTE* pb, /*in*/ULONG cb) {
     return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE WebStream::Write(/*in*/const BYTE* pb, /*in*/ULONG cb, /*out*/ULONG* cbWritten) {
+HRESULT WebStream::Write(/*in*/const BYTE* pb, /*in*/ULONG cb, /*out*/ULONG* cbWritten) {
     std::lock_guard<std::mutex> lock(m_mutex);
 
      HRESULT hr = WriteImpl(pb, cb);
@@ -151,7 +151,7 @@ HRESULT STDMETHODCALLTYPE WebStream::Write(/*in*/const BYTE* pb, /*in*/ULONG cb,
     return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE WebStream::BeginWrite(/*in*/const BYTE* pb, /*in*/ULONG cb, /*in*/IMFAsyncCallback* callback, /*in*/IUnknown* unkState) {
+HRESULT WebStream::BeginWrite(/*in*/const BYTE* pb, /*in*/ULONG cb, /*in*/IMFAsyncCallback* callback, /*in*/IUnknown* unkState) {
     m_mutex.lock();
 
      HRESULT hr = WriteImpl(pb, cb);
@@ -172,7 +172,7 @@ HRESULT STDMETHODCALLTYPE WebStream::BeginWrite(/*in*/const BYTE* pb, /*in*/ULON
     return hr;
 }
 
-HRESULT STDMETHODCALLTYPE WebStream::EndWrite(/*in*/IMFAsyncResult* /*result*/, /*out*/ULONG* cbWritten) {
+HRESULT WebStream::EndWrite(/*in*/IMFAsyncResult* /*result*/, /*out*/ULONG* cbWritten) {
     *cbWritten = m_tmp_bytes_written;
     m_tmp_bytes_written = 0;
 
@@ -180,15 +180,15 @@ HRESULT STDMETHODCALLTYPE WebStream::EndWrite(/*in*/IMFAsyncResult* /*result*/, 
     return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE WebStream::Seek(/*in*/MFBYTESTREAM_SEEK_ORIGIN /*SeekOrigin*/, /*in*/LONGLONG /*SeekOffset*/,/*in*/DWORD /*SeekFlags*/, /*out*/QWORD* /*CurrentPosition*/) {
+HRESULT WebStream::Seek(/*in*/MFBYTESTREAM_SEEK_ORIGIN /*SeekOrigin*/, /*in*/LONGLONG /*SeekOffset*/,/*in*/DWORD /*SeekFlags*/, /*out*/QWORD* /*CurrentPosition*/) {
     return E_NOTIMPL;
 }
 
-HRESULT STDMETHODCALLTYPE WebStream::Flush() {
+HRESULT WebStream::Flush() {
     return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE WebStream::Close() {
+HRESULT WebStream::Close() {
     std::lock_guard<std::mutex> lock(m_mutex);
 
     m_impl.reset();

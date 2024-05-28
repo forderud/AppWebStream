@@ -18,35 +18,35 @@ public:
 
     void SetPortAndWindowHandle(const char * port_str, HWND wnd);
 
-    HRESULT STDMETHODCALLTYPE GetCapabilities(/*out*/DWORD *capabilities) override;
+    HRESULT GetCapabilities(/*out*/DWORD *capabilities) override;
 
-    HRESULT STDMETHODCALLTYPE GetLength(/*out*/QWORD* length) override;
+    HRESULT GetLength(/*out*/QWORD* length) override;
 
-    HRESULT STDMETHODCALLTYPE SetLength(/*in*/QWORD length) override;
+    HRESULT SetLength(/*in*/QWORD length) override;
 
-    HRESULT STDMETHODCALLTYPE GetCurrentPosition(/*out*/QWORD* position) override;
+    HRESULT GetCurrentPosition(/*out*/QWORD* position) override;
 
-    HRESULT STDMETHODCALLTYPE SetCurrentPosition(/*in*/QWORD position) override;
+    HRESULT SetCurrentPosition(/*in*/QWORD position) override;
 
-    HRESULT STDMETHODCALLTYPE IsEndOfStream(/*out*/BOOL* endOfStream) override;
+    HRESULT IsEndOfStream(/*out*/BOOL* endOfStream) override;
 
-    HRESULT STDMETHODCALLTYPE Read(/*out*/BYTE* pb, /*in*/ULONG cb, /*out*/ULONG* bRead) override;
+    HRESULT Read(/*out*/BYTE* pb, /*in*/ULONG cb, /*out*/ULONG* bRead) override;
 
-    HRESULT STDMETHODCALLTYPE BeginRead(/*out*/BYTE* pb, /*in*/ULONG cb, /*in*/IMFAsyncCallback* callback, /*in*/IUnknown* unkState) override;
+    HRESULT BeginRead(/*out*/BYTE* pb, /*in*/ULONG cb, /*in*/IMFAsyncCallback* callback, /*in*/IUnknown* unkState) override;
 
-    HRESULT STDMETHODCALLTYPE EndRead(/*in*/IMFAsyncResult* result, /*out*/ULONG* cbRead) override;
+    HRESULT EndRead(/*in*/IMFAsyncResult* result, /*out*/ULONG* cbRead) override;
 
-    HRESULT STDMETHODCALLTYPE Write(/*in*/const BYTE* pb, /*in*/ULONG cb, /*out*/ULONG* cbWritten) override;
+    HRESULT Write(/*in*/const BYTE* pb, /*in*/ULONG cb, /*out*/ULONG* cbWritten) override;
 
-    HRESULT STDMETHODCALLTYPE BeginWrite(/*in*/const BYTE* pb, /*in*/ULONG cb, /*in*/IMFAsyncCallback* callback, /*in*/IUnknown* unkState) override;
+    HRESULT BeginWrite(/*in*/const BYTE* pb, /*in*/ULONG cb, /*in*/IMFAsyncCallback* callback, /*in*/IUnknown* unkState) override;
 
-    HRESULT STDMETHODCALLTYPE EndWrite(/*in*/IMFAsyncResult* result, /*out*/ULONG* cbWritten) override;
+    HRESULT EndWrite(/*in*/IMFAsyncResult* result, /*out*/ULONG* cbWritten) override;
 
-    HRESULT STDMETHODCALLTYPE Seek(/*in*/MFBYTESTREAM_SEEK_ORIGIN SeekOrigin, /*in*/LONGLONG SeekOffset,/*in*/DWORD SeekFlags, /*out*/QWORD* CurrentPosition) override;
+    HRESULT Seek(/*in*/MFBYTESTREAM_SEEK_ORIGIN SeekOrigin, /*in*/LONGLONG SeekOffset,/*in*/DWORD SeekFlags, /*out*/QWORD* CurrentPosition) override;
 
-    HRESULT STDMETHODCALLTYPE Flush() override;
+    HRESULT Flush() override;
 
-    HRESULT STDMETHODCALLTYPE Close() override;
+    HRESULT Close() override;
 
     BEGIN_COM_MAP(WebStream)
         COM_INTERFACE_ENTRY(IMFByteStream)
