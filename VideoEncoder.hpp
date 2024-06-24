@@ -91,6 +91,21 @@ public:
     virtual R8G8B8A8* WriteFrameBegin () = 0;
     virtual HRESULT   WriteFrameEnd () = 0;
 
+
+    size_t GetRGBABuffersize()  {
+        return 4 * Align(m_width) * Align(m_height);
+    }
+
+    size_t GetYUV420Buffersize()  {
+        return 3 * Align(m_width) * Align(m_height)/ 2 ;
+    }
+
+
+    size_t GetAlignedSize(unsigned short dim) {
+        return Align(dim);
+    }
+    
+
     HRESULT WriteFrame (const R8G8B8A8* src_data, bool swap_rb) {
         R8G8B8A8 * buffer_ptr = WriteFrameBegin();
 
@@ -126,6 +141,23 @@ public:
 
     static R8G8B8A8 SwapRGBAtoBGRA (R8G8B8A8 in) {
         return{ in.b, in.g, in.r, in.a };
+    }
+
+    static void RGBfromYUV(double& R, double& G, double& B, double Y, double U, double V)
+    {
+        Y -= 16;
+        U -= 128;
+        V -= 128;
+        R = 1.164 * Y + 1.596 * V;
+        G = 1.164 * Y - 0.392 * U - 0.813 * V;
+        B = 1.164 * Y + 2.017 * U;
+    }
+
+    static void YUVfromRGB(double& Y, double& U, double& V, const double R, const double G, const double B)
+    {
+        Y = 0.257 * R + 0.504 * G + 0.098 * B + 16;
+        U = -0.148 * R - 0.291 * G + 0.439 * B + 128;
+        V = 0.439 * R - 0.368 * G - 0.071 * B + 128;
     }
 
 protected:
@@ -220,7 +252,8 @@ public:
     }
 
     R8G8B8A8* WriteFrameBegin () override {
-        const DWORD frame_size = 4*Align(m_width)*Align(m_height);
+        const DWORD frame_size = 3*Align(m_width)*Align(m_height)/2;
+        //const DWORD frame_size = 4 * Align(m_width) * Align(m_height);
 
         // Create a new memory buffer.
         if (!m_buffer)
@@ -233,7 +266,8 @@ public:
     }
 
     HRESULT WriteFrameEnd () override {
-        const DWORD frame_size = 4*Align(m_width)*Align(m_height);
+        const DWORD frame_size = 3 / 2 * Align(m_width)*Align(m_height);
+        //const DWORD frame_size = 4 * Align(m_width) * Align(m_height);
 
         COM_CHECK(m_buffer->Unlock());
 
@@ -268,9 +302,10 @@ private:
         IMFMediaTypePtr mediaTypeIn;
         COM_CHECK(MFCreateMediaType(&mediaTypeIn));
         COM_CHECK(mediaTypeIn->SetGUID(MF_MT_MAJOR_TYPE, MFMediaType_Video));
-        COM_CHECK(mediaTypeIn->SetGUID(MF_MT_SUBTYPE, MFVideoFormat_RGB32)); // X8R8G8B8 format
+        COM_CHECK(mediaTypeIn->SetGUID(MF_MT_SUBTYPE, MFVideoFormat_IYUV)); // X8R8G8B8 format
         COM_CHECK(mediaTypeIn->SetUINT32(MF_MT_INTERLACE_MODE, MFVideoInterlace_Progressive));
         COM_CHECK(mediaTypeIn->SetUINT32(MF_MT_ALL_SAMPLES_INDEPENDENT, TRUE));
+
         // Frame size is aligned to avoid crash
         COM_CHECK(MFSetAttributeSize(mediaTypeIn, MF_MT_FRAME_SIZE, Align(m_width), Align(m_height)));
         COM_CHECK(MFSetAttributeRatio(mediaTypeIn, MF_MT_FRAME_RATE, fps, 1));
