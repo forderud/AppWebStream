@@ -25,7 +25,7 @@ public:
     OutputStream();
     /*NOT virtual*/ ~OutputStream();
 
-    void SetNetworkPort(const char * port_str);
+    void SetPortOrFilename(const char * port_or_filename);
 
     HRESULT GetCapabilities(/*out*/DWORD *capabilities) override;
 

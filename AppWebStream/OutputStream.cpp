@@ -87,14 +87,35 @@ private:
 };
 
 
+class FileStream : public ByteWriter {
+public:
+    FileStream(const char* filename) : m_file(filename, std::ofstream::binary) {
+    }
+
+    ~FileStream() override {
+    }
+
+    int WriteBytes(/*in*/const BYTE* buf, /*in*/ULONG size) override {
+        m_file.write(reinterpret_cast<const char*>(buf), size);
+        return size;
+    }
+
+private:
+    std::ofstream m_file;
+};
+
+
 OutputStream::OutputStream() {
 }
 
 OutputStream::~OutputStream() {
 }
 
-void OutputStream::SetNetworkPort(const char * port_str) {
-    m_writer = std::make_unique<WebStream>(port_str);
+void OutputStream::SetPortOrFilename(const char * port_or_filename) {
+    if (atoi(port_or_filename))
+        m_writer = std::make_unique<WebStream>(port_or_filename);
+    else
+        m_writer = std::make_unique<FileStream>(port_or_filename);
 }
 
 HRESULT OutputStream::GetCapabilities(/*out*/DWORD *capabilities) {

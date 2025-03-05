@@ -145,10 +145,10 @@ int main (int argc, char *argv[]) {
     std::cout << "Starting web server to stream window " << std::hex << win_handle << ". Please connect with a web browser on port " <<port << " to receive the stream" << std::endl;
     auto os = CreateLocalInstance<OutputStream>();
 #ifdef ENABLE_FFMPEG
-    os->SetNetworkPort(port); // blocking call
+    os->SetPortOrFilename(port); // blocking call
     VideoEncoderFF encoder(dims, FPS, os);
 #else
-    os->SetNetworkPort(port); // blocking call
+    os->SetPortOrFilename(port); // blocking call
     VideoEncoderMF encoder(dims, FPS, os);
 #endif
     std::cout << "Connecting to client..." << std::endl;
