@@ -142,7 +142,7 @@ int main (int argc, char *argv[]) {
     const unsigned int FPS = 50;
 
     // create H.264/MPEG4 encoder
-    std::cout << "Starting web server to stream window " << std::hex << win_handle << ". Please connect with a web browser on port " <<port << " to receive the stream" << std::endl;
+    std::cout << "Window handle: " << std::hex << win_handle << "." << std::endl;
     auto os = CreateLocalInstance<OutputStream>();
 #ifdef ENABLE_FFMPEG
     os->SetPortOrFilename(port); // blocking call

@@ -112,10 +112,13 @@ OutputStream::~OutputStream() {
 }
 
 void OutputStream::SetPortOrFilename(const char * port_or_filename) {
-    if (atoi(port_or_filename))
+    if (atoi(port_or_filename)) {
+        std::cout << "Please connect with a web browser on port " << port_or_filename << " to receive the stream" << std::endl;
         m_writer = std::make_unique<WebStream>(port_or_filename);
-    else
+    } else {
+        std::cout << "Storing movie to file " << port_or_filename << std::endl;
         m_writer = std::make_unique<FileStream>(port_or_filename);
+    }
 }
 
 HRESULT OutputStream::GetCapabilities(/*out*/DWORD *capabilities) {
