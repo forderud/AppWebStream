@@ -77,6 +77,7 @@ public:
         return byte_count;
     }
 
+private:
     ServerSock              m_server;  ///< listens for new connections
     std::unique_ptr<ClientSock> m_stream_client;  ///< video streaming socket
     std::atomic<bool>       m_block_ctor;
