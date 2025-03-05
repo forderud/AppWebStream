@@ -63,5 +63,6 @@ private:
     struct impl;
     std::unique_ptr<impl> m_impl;
 
+    unsigned __int64      m_cur_pos = 0;
     MP4FragmentEditor     m_stream_editor;
 };

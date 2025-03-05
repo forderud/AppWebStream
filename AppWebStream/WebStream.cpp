@@ -68,7 +68,6 @@ struct WebStream::impl : public StreamSockSetter {
     std::thread             m_thread;
     std::vector<std::unique_ptr<ClientSock>> m_clients; // heap allocated objects to ensure that they never change addreess
     HWND                    m_wnd = nullptr;
-    unsigned __int64        m_cur_pos = 0;
 };
 
 
@@ -96,7 +95,7 @@ HRESULT WebStream::SetLength(/*in*/QWORD /*length*/) {
 }
 
 HRESULT WebStream::GetCurrentPosition(/*out*/QWORD* position) {
-    *position = m_impl->m_cur_pos;
+    *position = m_cur_pos;
     return S_OK;
 }
 
@@ -134,7 +133,7 @@ HRESULT WebStream::WriteImpl(/*in*/const BYTE* pb, /*in*/ULONG cb) {
         m_impl->m_stream_client.reset();
         return E_FAIL;
     }
-    m_impl->m_cur_pos += byte_count;
+    m_cur_pos += byte_count;
     return S_OK;
 }
 
