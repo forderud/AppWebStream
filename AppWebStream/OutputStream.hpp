@@ -60,7 +60,7 @@ private:
     mutable std::mutex m_mutex;
     unsigned long      m_tmp_bytes_written = 0;
 
-    struct impl;
+    class impl;
     std::unique_ptr<impl> m_impl;
 
     unsigned __int64      m_cur_pos = 0;

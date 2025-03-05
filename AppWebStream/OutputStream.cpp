@@ -5,7 +5,8 @@
 #include "WebSocket.hpp"
 
 
-struct OutputStream::impl : public StreamSockSetter {
+class OutputStream::impl : public StreamSockSetter {
+public:
     impl(const char * port_str) : m_server(port_str), m_block_ctor(true) {
         // start server thread
         m_thread = std::thread(&OutputStream::impl::WaitForClients, this);
