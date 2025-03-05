@@ -178,51 +178,80 @@ private:
         return TFDT_SIZE - BASE_DATA_OFFSET_SIZE; // tfdt added, tfhd shrunk
     }
 
+    struct matrix {
+        int32_t m11, m12, m13;
+        int32_t m21, m22, m23;
+        int32_t m31, m32, m33;
+    };
+    static_assert(sizeof(matrix) == 36);
+
     std::tuple<const BYTE*, ULONG> ModifyMovieContainer(const BYTE* buf, const ULONG size) {
         const BYTE* ptr = buf;
         assert(IsAtomType(ptr, "moov"));
         assert(GetAtomSize(ptr) == size);
         ptr += 8; // skip size & type
 
-        // now entering the "mvhd" atom
-        assert(IsAtomType(ptr, "mvhd"));
-        uint32_t mvhd_len = GetAtomSize(ptr);
-        ptr += 8; // skip size & type
+        {
+            // now entering the "mvhd" atom
+            assert(IsAtomType(ptr, "mvhd"));
+            uint32_t mvhd_len = GetAtomSize(ptr);
+            ptr += 8; // skip size & type
 
-        auto version = DeSerialize<uint8_t>(ptr);
-        ptr += 1;
+            auto version = DeSerialize<uint8_t>(ptr);
+            ptr += 1;
 
-        ptr += 3; // skip over "flags" field
+            ptr += 3; // skip over "flags" field
 
-        if (version == 1) {
-            assert(mvhd_len == 120);
+            if (version == 1) {
+                assert(mvhd_len == 120);
 
-            // seconds since Fri Jan 1 00:00:00 1904
-            auto creationTime = DeSerialize<uint64_t>(ptr);
-            ptr += 8;
+                // seconds since Fri Jan 1 00:00:00 1904
+                auto creationTime = DeSerialize<uint64_t>(ptr);
+                ptr += 8;
 
-            auto modificationTime = DeSerialize<uint64_t>(ptr);
-            ptr += 8;
-        } else {
-            assert(mvhd_len == 108);
+                auto modificationTime = DeSerialize<uint64_t>(ptr);
+                ptr += 8;
+            } else {
+                assert(mvhd_len == 108);
 
-            // seconds since Fri Jan 1 00:00:00 1904
-            auto creationTime = DeSerialize<uint32_t>(ptr);
+                // seconds since Fri Jan 1 00:00:00 1904
+                auto creationTime = DeSerialize<uint32_t>(ptr);
+                ptr += 4;
+
+                auto modificationTime = DeSerialize<uint32_t>(ptr);
+                ptr += 4;
+            }
+
+            auto timeScale = DeSerialize<uint32_t>(ptr); // 50000 = 50ms
             ptr += 4;
 
-            auto modificationTime = DeSerialize<uint32_t>(ptr);
-            ptr += 4;
-        }
+            if (version == 1) {
+                auto duration = DeSerialize<uint64_t>(ptr);
+                ptr += 8;
+            } else {
+                auto duration = DeSerialize<uint32_t>(ptr);
+                ptr += 4;
+            }
 
-        auto timeScale = DeSerialize<uint32_t>(ptr); // 50000 = 50ms
-        ptr += 4;
-
-        if (version == 1) {
-            auto duration = DeSerialize<uint64_t>(ptr);
-            ptr += 8;
-        } else {
-            auto duration = DeSerialize<uint32_t>(ptr);
+            auto rate = DeSerialize<uint32_t>(ptr); // preferred playback rate
             ptr += 4;
+
+            auto volume = DeSerialize<int16_t>(ptr); // master volume of file
+            ptr += 2;
+
+            ptr += sizeof(uint16_t); // reserved
+            ptr += sizeof(uint32_t) * 2; // reserved
+
+            auto mat = DeSerialize<matrix>(ptr);
+            ptr += sizeof(matrix);
+
+            ptr += sizeof(uint32_t) * 6; // reserved
+
+            auto nextTrackId = DeSerialize<uint32_t>(ptr);
+            ptr += 4;
+
+            // end of "mvhd" atom
+            assert(ptr == buf + 8 + mvhd_len);
         }
 
         return std::tie(buf, size);
