@@ -94,7 +94,6 @@
     <ClInclude Include="WebStream.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="README.md" />
     <None Include="WebStream.html" />
   </ItemGroup>
   <ItemGroup>
