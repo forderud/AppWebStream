@@ -77,6 +77,9 @@ public:
         return byte_count;
     }
 
+    void Flush() override {
+    }
+
 private:
     ServerSock              m_server;  ///< listens for new connections
     std::unique_ptr<ClientSock> m_stream_client;  ///< video streaming socket
@@ -98,6 +101,10 @@ public:
     int WriteBytes(/*in*/const BYTE* buf, /*in*/ULONG size) override {
         m_file.write(reinterpret_cast<const char*>(buf), size);
         return size;
+    }
+
+    void Flush() override {
+        m_file.flush();
     }
 
 private:
@@ -217,6 +224,7 @@ HRESULT OutputStream::Seek(/*in*/MFBYTESTREAM_SEEK_ORIGIN /*SeekOrigin*/, /*in*/
 }
 
 HRESULT OutputStream::Flush() {
+    m_writer->Flush();
     return S_OK;
 }
 

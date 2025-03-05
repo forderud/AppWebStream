@@ -14,6 +14,7 @@ class ByteWriter {
 public:
     virtual ~ByteWriter() = default;
     virtual int WriteBytes(/*in*/const BYTE* buf, /*in*/ULONG size) = 0;
+    virtual void Flush() = 0;
 };
 
 
