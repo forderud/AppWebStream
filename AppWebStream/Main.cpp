@@ -116,8 +116,9 @@ static HRESULT EncodeFrame (VideoEncoder & encoder, window_dc & wnd_dc) {
 int main (int argc, char *argv[]) {
     std::cout << "WebAppStream: Sample application for streaming a window to a web browser." << std::endl;
     if (argc < 2) {
-        std::cout << "Usage  : WebAppStream.exe port [window handle]\n";
+        std::cout << "Usage  : WebAppStream.exe port-or-filename [window handle]\n";
         std::cout << "Example: WebAppStream.exe 8080\n";
+        std::cout << "Example: WebAppStream.exe movie.mp4\n";
         std::cout << "Use Spy++ (included with Visual Studio) to determine window handles.\n" << std::flush;
         return 1;
     }
@@ -129,7 +130,7 @@ int main (int argc, char *argv[]) {
         ss << std::hex << argv[2];
         ss >> reinterpret_cast<size_t&>(win_handle);
     }
-    char* port = argv[1];
+    char* port_filename = argv[1];
 
     // check window handle
     window_dc wnd_dc(win_handle);
@@ -145,10 +146,10 @@ int main (int argc, char *argv[]) {
     std::cout << "Window handle: " << std::hex << win_handle << "." << std::endl;
     auto os = CreateLocalInstance<OutputStream>();
 #ifdef ENABLE_FFMPEG
-    os->SetPortOrFilename(port); // blocking call
+    os->SetPortOrFilename(port_filename); // blocking call
     VideoEncoderFF encoder(dims, FPS, os);
 #else
-    os->SetPortOrFilename(port); // blocking call
+    os->SetPortOrFilename(port_filename); // blocking call
     VideoEncoderMF encoder(dims, FPS, os);
 #endif
     std::cout << "Connecting to client..." << std::endl;
