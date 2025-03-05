@@ -18,7 +18,7 @@ public:
     WebStream();
     /*NOT virtual*/ ~WebStream();
 
-    void SetPortAndWindowHandle(const char * port_str, HWND wnd);
+    void SetNetworkPort(const char * port_str);
 
     HRESULT GetCapabilities(/*out*/DWORD *capabilities) override;
 

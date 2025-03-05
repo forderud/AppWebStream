@@ -6,7 +6,7 @@
 
 
 struct WebStream::impl : public StreamSockSetter {
-    impl(const char * port_str, HWND wnd) : m_server(port_str), m_block_ctor(true), m_wnd(wnd) {
+    impl(const char * port_str) : m_server(port_str), m_block_ctor(true) {
         // start server thread
         m_thread = std::thread(&WebStream::impl::WaitForClients, this);
 
@@ -67,7 +67,6 @@ struct WebStream::impl : public StreamSockSetter {
     std::condition_variable m_cond_var;
     std::thread             m_thread;
     std::vector<std::unique_ptr<ClientSock>> m_clients; // heap allocated objects to ensure that they never change addreess
-    HWND                    m_wnd = nullptr;
 };
 
 
@@ -77,8 +76,8 @@ WebStream::WebStream() {
 WebStream::~WebStream() {
 }
 
-void WebStream::SetPortAndWindowHandle(const char * port_str, HWND wnd) {
-    m_impl = std::make_unique<impl>(port_str, wnd);
+void WebStream::SetNetworkPort(const char * port_str) {
+    m_impl = std::make_unique<impl>(port_str);
 }
 
 HRESULT WebStream::GetCapabilities(/*out*/DWORD *capabilities) {
