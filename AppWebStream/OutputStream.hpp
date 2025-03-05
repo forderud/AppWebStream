@@ -10,13 +10,13 @@
 #include "MP4FragmentEditor.hpp"
 
 
-class ATL_NO_VTABLE WebStream :
+class ATL_NO_VTABLE OutputStream :
     public CComObjectRootEx<CComMultiThreadModel>,
-    public CComCoClass<WebStream>,
+    public CComCoClass<OutputStream>,
     public IMFByteStream {
 public:
-    WebStream();
-    /*NOT virtual*/ ~WebStream();
+    OutputStream();
+    /*NOT virtual*/ ~OutputStream();
 
     void SetNetworkPort(const char * port_str);
 
@@ -50,7 +50,7 @@ public:
 
     HRESULT Close() override;
 
-    BEGIN_COM_MAP(WebStream)
+    BEGIN_COM_MAP(OutputStream)
         COM_INTERFACE_ENTRY(IMFByteStream)
     END_COM_MAP()
 

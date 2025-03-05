@@ -84,14 +84,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="WebStream.cpp" />
+    <ClCompile Include="OutputStream.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MP4FragmentEditor.hpp" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="VideoEncoder.hpp" />
     <ClInclude Include="WebSocket.hpp" />
-    <ClInclude Include="WebStream.hpp" />
+    <ClInclude Include="OutputStream.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="WebStream.html" />

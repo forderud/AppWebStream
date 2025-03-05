@@ -2,7 +2,7 @@
 #include <iostream>
 #include <string>
 #include "VideoEncoder.hpp"
-#include "WebStream.hpp"
+#include "OutputStream.hpp"
 
 
 struct window_dc {
@@ -143,13 +143,13 @@ int main (int argc, char *argv[]) {
 
     // create H.264/MPEG4 encoder
     std::cout << "Starting web server to stream window " << std::hex << win_handle << ". Please connect with a web browser on port " <<port << " to receive the stream" << std::endl;
-    auto ws = CreateLocalInstance<WebStream>();
+    auto os = CreateLocalInstance<OutputStream>();
 #ifdef ENABLE_FFMPEG
-    ws->SetNetworkPort(port); // blocking call
-    VideoEncoderFF encoder(dims, FPS, ws);
+    os->SetNetworkPort(port); // blocking call
+    VideoEncoderFF encoder(dims, FPS, os);
 #else
-    ws->SetNetworkPort(port); // blocking call
-    VideoEncoderMF encoder(dims, FPS, ws);
+    os->SetNetworkPort(port); // blocking call
+    VideoEncoderMF encoder(dims, FPS, os);
 #endif
     std::cout << "Connecting to client..." << std::endl;
 

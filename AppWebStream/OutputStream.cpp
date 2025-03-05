@@ -1,14 +1,14 @@
 #define WIN32_LEAN_AND_MEAN
 #include <atomic>
 #include <Mfapi.h>
-#include "WebStream.hpp"
+#include "OutputStream.hpp"
 #include "WebSocket.hpp"
 
 
-struct WebStream::impl : public StreamSockSetter {
+struct OutputStream::impl : public StreamSockSetter {
     impl(const char * port_str) : m_server(port_str), m_block_ctor(true) {
         // start server thread
-        m_thread = std::thread(&WebStream::impl::WaitForClients, this);
+        m_thread = std::thread(&OutputStream::impl::WaitForClients, this);
 
         // wait for video request or socket failure
         std::mutex mutex;
@@ -70,55 +70,55 @@ struct WebStream::impl : public StreamSockSetter {
 };
 
 
-WebStream::WebStream() {
+OutputStream::OutputStream() {
 }
 
-WebStream::~WebStream() {
+OutputStream::~OutputStream() {
 }
 
-void WebStream::SetNetworkPort(const char * port_str) {
+void OutputStream::SetNetworkPort(const char * port_str) {
     m_impl = std::make_unique<impl>(port_str);
 }
 
-HRESULT WebStream::GetCapabilities(/*out*/DWORD *capabilities) {
+HRESULT OutputStream::GetCapabilities(/*out*/DWORD *capabilities) {
     *capabilities = MFBYTESTREAM_IS_WRITABLE | MFBYTESTREAM_IS_REMOTE;
     return S_OK;
 }
 
-HRESULT WebStream::GetLength(/*out*/QWORD* /*length*/) {
+HRESULT OutputStream::GetLength(/*out*/QWORD* /*length*/) {
     return E_NOTIMPL;
 }
 
-HRESULT WebStream::SetLength(/*in*/QWORD /*length*/) {
+HRESULT OutputStream::SetLength(/*in*/QWORD /*length*/) {
     return E_NOTIMPL;
 }
 
-HRESULT WebStream::GetCurrentPosition(/*out*/QWORD* position) {
+HRESULT OutputStream::GetCurrentPosition(/*out*/QWORD* position) {
     *position = m_cur_pos;
     return S_OK;
 }
 
-HRESULT WebStream::SetCurrentPosition(/*in*/QWORD /*position*/) {
+HRESULT OutputStream::SetCurrentPosition(/*in*/QWORD /*position*/) {
     return E_NOTIMPL;
 }
 
-HRESULT WebStream::IsEndOfStream(/*out*/BOOL* /*endOfStream*/) {
+HRESULT OutputStream::IsEndOfStream(/*out*/BOOL* /*endOfStream*/) {
     return E_NOTIMPL;
 }
 
-HRESULT WebStream::Read(/*out*/BYTE* /*pb*/, /*in*/ULONG /*cb*/, /*out*/ULONG* /*bRead*/) {
+HRESULT OutputStream::Read(/*out*/BYTE* /*pb*/, /*in*/ULONG /*cb*/, /*out*/ULONG* /*bRead*/) {
     return E_NOTIMPL;
 }
 
-HRESULT WebStream::BeginRead(/*out*/BYTE* /*pb*/, /*in*/ULONG /*cb*/, /*in*/IMFAsyncCallback* /*callback*/, /*in*/IUnknown* /*unkState*/) {
+HRESULT OutputStream::BeginRead(/*out*/BYTE* /*pb*/, /*in*/ULONG /*cb*/, /*in*/IMFAsyncCallback* /*callback*/, /*in*/IUnknown* /*unkState*/) {
     return E_NOTIMPL;
 }
 
-HRESULT WebStream::EndRead(/*in*/IMFAsyncResult* /*result*/, /*out*/ULONG* /*cbRead*/) {
+HRESULT OutputStream::EndRead(/*in*/IMFAsyncResult* /*result*/, /*out*/ULONG* /*cbRead*/) {
     return E_NOTIMPL;
 }
 
-HRESULT WebStream::WriteImpl(/*in*/const BYTE* pb, /*in*/ULONG cb) {
+HRESULT OutputStream::WriteImpl(/*in*/const BYTE* pb, /*in*/ULONG cb) {
 #ifndef ENABLE_FFMPEG
     std::tie(pb,cb) = m_stream_editor.EditStream(pb, cb);
 #endif
@@ -136,7 +136,7 @@ HRESULT WebStream::WriteImpl(/*in*/const BYTE* pb, /*in*/ULONG cb) {
     return S_OK;
 }
 
-HRESULT WebStream::Write(/*in*/const BYTE* pb, /*in*/ULONG cb, /*out*/ULONG* cbWritten) {
+HRESULT OutputStream::Write(/*in*/const BYTE* pb, /*in*/ULONG cb, /*out*/ULONG* cbWritten) {
     std::lock_guard<std::mutex> lock(m_mutex);
 
      HRESULT hr = WriteImpl(pb, cb);
@@ -147,7 +147,7 @@ HRESULT WebStream::Write(/*in*/const BYTE* pb, /*in*/ULONG cb, /*out*/ULONG* cbW
     return S_OK;
 }
 
-HRESULT WebStream::BeginWrite(/*in*/const BYTE* pb, /*in*/ULONG cb, /*in*/IMFAsyncCallback* callback, /*in*/IUnknown* unkState) {
+HRESULT OutputStream::BeginWrite(/*in*/const BYTE* pb, /*in*/ULONG cb, /*in*/IMFAsyncCallback* callback, /*in*/IUnknown* unkState) {
     m_mutex.lock();
 
      HRESULT hr = WriteImpl(pb, cb);
@@ -168,7 +168,7 @@ HRESULT WebStream::BeginWrite(/*in*/const BYTE* pb, /*in*/ULONG cb, /*in*/IMFAsy
     return hr;
 }
 
-HRESULT WebStream::EndWrite(/*in*/IMFAsyncResult* /*result*/, /*out*/ULONG* cbWritten) {
+HRESULT OutputStream::EndWrite(/*in*/IMFAsyncResult* /*result*/, /*out*/ULONG* cbWritten) {
     *cbWritten = m_tmp_bytes_written;
     m_tmp_bytes_written = 0;
 
@@ -176,15 +176,15 @@ HRESULT WebStream::EndWrite(/*in*/IMFAsyncResult* /*result*/, /*out*/ULONG* cbWr
     return S_OK;
 }
 
-HRESULT WebStream::Seek(/*in*/MFBYTESTREAM_SEEK_ORIGIN /*SeekOrigin*/, /*in*/LONGLONG /*SeekOffset*/,/*in*/DWORD /*SeekFlags*/, /*out*/QWORD* /*CurrentPosition*/) {
+HRESULT OutputStream::Seek(/*in*/MFBYTESTREAM_SEEK_ORIGIN /*SeekOrigin*/, /*in*/LONGLONG /*SeekOffset*/,/*in*/DWORD /*SeekFlags*/, /*out*/QWORD* /*CurrentPosition*/) {
     return E_NOTIMPL;
 }
 
-HRESULT WebStream::Flush() {
+HRESULT OutputStream::Flush() {
     return S_OK;
 }
 
-HRESULT WebStream::Close() {
+HRESULT OutputStream::Close() {
     std::lock_guard<std::mutex> lock(m_mutex);
 
     m_impl.reset();
