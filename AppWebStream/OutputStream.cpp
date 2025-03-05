@@ -62,6 +62,21 @@ public:
         }
     }
 
+    int WriteBytes(/*in*/const BYTE* data, /*in*/ULONG len) {
+        // transmit data over socket
+        int byte_count = send(m_stream_client->Socket(), reinterpret_cast<const char*>(data), len, 0);
+        if (byte_count == SOCKET_ERROR) {
+            //_com_error error(WSAGetLastError());
+            //const TCHAR* msg = error.ErrorMessage();
+
+            // destroy failing client socket (typ. caused by client-side closing)
+            m_stream_client.reset();
+            return -1;
+        }
+
+        return byte_count;
+    }
+
     ServerSock              m_server;  ///< listens for new connections
     std::unique_ptr<ClientSock> m_stream_client;  ///< video streaming socket
     std::atomic<bool>       m_block_ctor;
@@ -124,15 +139,10 @@ HRESULT OutputStream::WriteImpl(/*in*/const BYTE* pb, /*in*/ULONG cb) {
     std::tie(pb,cb) = m_stream_editor.EditStream(pb, cb);
 #endif
 
-    int byte_count = send(m_impl->m_stream_client->Socket(), reinterpret_cast<const char*>(pb), cb, 0);
-    if (byte_count == SOCKET_ERROR) {
-        //_com_error error(WSAGetLastError());
-        //const TCHAR* msg = error.ErrorMessage();
-
-        // destroy failing client socket (typ. caused by client-side closing)
-        m_impl->m_stream_client.reset();
+    int byte_count = m_impl->WriteBytes(pb, cb);
+    if (byte_count < 0)
         return E_FAIL;
-    }
+
     m_cur_pos += byte_count;
     return S_OK;
 }
