@@ -26,7 +26,7 @@ struct WebStream::impl : public StreamSockSetter {
                 break;
 
             // create a thread to the handle client connection
-            current->Start(m_wnd, this);
+            current->Start(this);
             m_clients.push_back(std::move(current));
         }
 

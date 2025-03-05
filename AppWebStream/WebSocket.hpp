@@ -43,7 +43,7 @@ public:
     ClientSock(ClientSock&& other) = delete;
     ClientSock& operator = (ClientSock&& other) = delete;
 
-    Connect Handshake (HWND wnd) {
+    Connect Handshake () {
         // receive request
         std::string receive_buf;
         receive_buf.resize(1024);
@@ -124,8 +124,8 @@ public:
             m_thread.join();
     }
 
-    void Start (HWND wnd, StreamSockSetter * parent) {
-        m_thread = std::thread(&ClientSock::ConnectionThread, this, wnd, parent);
+    void Start (StreamSockSetter* parent) {
+        m_thread = std::thread(&ClientSock::ConnectionThread, this, parent);
     }
 
     SOCKET Socket() {
@@ -133,10 +133,10 @@ public:
     }
 
 private:
-    void ConnectionThread (HWND wnd, StreamSockSetter * parent) {
+    void ConnectionThread (StreamSockSetter* parent) {
         Connect type;
         do {
-            type = Handshake(wnd);
+            type = Handshake();
         } while (type == Connect::CONTINUE);
 
         if (type == Connect::SOCKET_FAILURE) {
