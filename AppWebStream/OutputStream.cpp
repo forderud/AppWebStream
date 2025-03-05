@@ -62,9 +62,9 @@ public:
         }
     }
 
-    int WriteBytes(/*in*/const BYTE* data, /*in*/ULONG len) {
+    int WriteBytes(/*in*/const BYTE* buf, /*in*/ULONG size) {
         // transmit data over socket
-        int byte_count = send(m_stream_client->Socket(), reinterpret_cast<const char*>(data), len, 0);
+        int byte_count = send(m_stream_client->Socket(), reinterpret_cast<const char*>(buf), size, 0);
         if (byte_count == SOCKET_ERROR) {
             //_com_error error(WSAGetLastError());
             //const TCHAR* msg = error.ErrorMessage();
