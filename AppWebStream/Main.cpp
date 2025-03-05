@@ -155,9 +155,12 @@ int main (int argc, char *argv[]) {
     std::cout << "Connecting to client..." << std::endl;
 
     // encode & transmit frames
-    HRESULT hr = S_OK;
-    while (SUCCEEDED(hr)) {
-        hr = EncodeFrame(encoder, wnd_dc);
+    for (;;) {
+        HRESULT hr = EncodeFrame(encoder, wnd_dc);
+        if (FAILED(hr))
+            break;
+
+        os->Flush();
 
         // synchronize framerate
         Sleep(1000/FPS);
