@@ -7,6 +7,8 @@
 #include <MFidl.h>
 #include <Mfreadwrite.h>
 #include "Resource.h"
+#include "MP4FragmentEditor.hpp"
+
 
 class ATL_NO_VTABLE WebStream :
     public CComObjectRootEx<CComMultiThreadModel>,
@@ -60,4 +62,6 @@ private:
 
     struct impl;
     std::unique_ptr<impl> m_impl;
+
+    MP4FragmentEditor     m_stream_editor;
 };

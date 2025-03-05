@@ -3,7 +3,6 @@
 #include <Mfapi.h>
 #include "WebStream.hpp"
 #include "WebSocket.hpp"
-#include "MP4FragmentEditor.hpp"
 
 
 struct WebStream::impl : public StreamSockSetter {
@@ -70,7 +69,6 @@ struct WebStream::impl : public StreamSockSetter {
     std::vector<std::unique_ptr<ClientSock>> m_clients; // heap allocated objects to ensure that they never change addreess
     HWND                    m_wnd = nullptr;
     unsigned __int64        m_cur_pos = 0;
-    MP4FragmentEditor       m_stream_editor;
 };
 
 
@@ -124,7 +122,7 @@ HRESULT WebStream::EndRead(/*in*/IMFAsyncResult* /*result*/, /*out*/ULONG* /*cbR
 
 HRESULT WebStream::WriteImpl(/*in*/const BYTE* pb, /*in*/ULONG cb) {
 #ifndef ENABLE_FFMPEG
-    std::tie(pb,cb) = m_impl->m_stream_editor.EditStream(pb, cb);
+    std::tie(pb,cb) = m_stream_editor.EditStream(pb, cb);
 #endif
 
     int byte_count = send(m_impl->m_stream_client->Socket(), reinterpret_cast<const char*>(pb), cb, 0);
