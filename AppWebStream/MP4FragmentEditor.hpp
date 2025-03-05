@@ -197,6 +197,7 @@ private:
         if (version == 1) {
             assert(mvhd_len == 120);
 
+            // relative to Fri Jan 1 00:00:00 1904
             auto creationTime = DeSerialize<uint64_t>(ptr);
             ptr += 8;
 
