@@ -179,9 +179,49 @@ private:
     }
 
     std::tuple<const BYTE*, ULONG> ModifyMovieContainer(const BYTE* buf, const ULONG size) {
-        assert(GetAtomSize(buf) == size);
+        const BYTE* ptr = buf;
+        assert(IsAtomType(ptr, "moov"));
+        assert(GetAtomSize(ptr) == size);
+        ptr += 8; // skip size & type
 
-        // TODO: Implement "creation_time" parsing
+        // now entering the "mvhd" atom
+        assert(IsAtomType(ptr, "mvhd"));
+        uint32_t mvhd_len = GetAtomSize(ptr);
+        ptr += 8; // skip size & type
+
+        auto version = DeSerialize<uint8_t>(ptr);
+        ptr += 1;
+
+        ptr += 3; // skip over "flags" field
+
+        if (version == 1) {
+            assert(mvhd_len == 120);
+
+            auto creationTime = DeSerialize<uint64_t>(ptr);
+            ptr += 8;
+
+            auto modificationTime = DeSerialize<uint64_t>(ptr);
+            ptr += 8;
+        } else {
+            assert(mvhd_len == 108);
+
+            auto creationTime = DeSerialize<uint32_t>(ptr);
+            ptr += 4;
+
+            auto modificationTime = DeSerialize<uint32_t>(ptr);
+            ptr += 4;
+        }
+
+        auto timeScale = DeSerialize<uint32_t>(ptr);
+        ptr += 4;
+
+        if (version == 1) {
+            auto duration = DeSerialize<uint64_t>(ptr);
+            ptr += 8;
+        } else {
+            auto duration = DeSerialize<uint32_t>(ptr);
+            ptr += 4;
+        }
 
         return std::tie(buf, size);
     }
