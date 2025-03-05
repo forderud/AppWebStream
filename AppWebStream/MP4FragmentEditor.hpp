@@ -178,10 +178,13 @@ private:
         return TFDT_SIZE - BASE_DATA_OFFSET_SIZE; // tfdt added, tfhd shrunk
     }
 
+    /* QuickTime transformation matrix.
+        a,b,c,d,x,y: divided as 16.16 bits.
+        u,v,w;       divided as 2.30 bits */
     struct matrix {
-        int32_t m11, m12, m13;
-        int32_t m21, m22, m23;
-        int32_t m31, m32, m33;
+        int32_t a, b, u;
+        int32_t c, d, v;
+        int32_t x, y, w;
     };
     static_assert(sizeof(matrix) == 36);
 
