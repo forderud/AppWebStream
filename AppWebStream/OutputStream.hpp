@@ -10,6 +10,9 @@
 #include "MP4FragmentEditor.hpp"
 
 
+class WebStream; // forward decl.
+
+
 class ATL_NO_VTABLE OutputStream :
     public CComObjectRootEx<CComMultiThreadModel>,
     public CComCoClass<OutputStream>,
@@ -60,8 +63,7 @@ private:
     mutable std::mutex m_mutex;
     unsigned long      m_tmp_bytes_written = 0;
 
-    class impl;
-    std::unique_ptr<impl> m_impl;
+    std::unique_ptr<WebStream> m_impl;
 
     unsigned __int64      m_cur_pos = 0;
     MP4FragmentEditor     m_stream_editor;

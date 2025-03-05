@@ -5,11 +5,11 @@
 #include "WebSocket.hpp"
 
 
-class OutputStream::impl : public StreamSockSetter {
+class WebStream : public StreamSockSetter {
 public:
-    impl(const char * port_str) : m_server(port_str), m_block_ctor(true) {
+    WebStream(const char * port_str) : m_server(port_str), m_block_ctor(true) {
         // start server thread
-        m_thread = std::thread(&OutputStream::impl::WaitForClients, this);
+        m_thread = std::thread(&WebStream::WaitForClients, this);
 
         // wait for video request or socket failure
         std::mutex mutex;
@@ -48,7 +48,7 @@ public:
         m_cond_var.notify_all();
     }
 
-    ~impl() override {
+    ~WebStream() override {
         // close open sockets (forces blocking calls to complete)
         m_server  = ServerSock();
         m_thread.join();
@@ -93,7 +93,7 @@ OutputStream::~OutputStream() {
 }
 
 void OutputStream::SetNetworkPort(const char * port_str) {
-    m_impl = std::make_unique<impl>(port_str);
+    m_impl = std::make_unique<WebStream>(port_str);
 }
 
 HRESULT OutputStream::GetCapabilities(/*out*/DWORD *capabilities) {
