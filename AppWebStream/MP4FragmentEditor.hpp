@@ -33,7 +33,7 @@ public:
         if (IsAtomType(buf, "moov")) {
             // Movie container (moov)
             assert(atom_size == size);
-            return std::tie(buf, size);
+            return ModifyMovieContainer(buf, size);
         } else if (IsAtomType(buf, "moof")) {
             // Movie Fragment (moof)
             assert(atom_size == size);
@@ -176,6 +176,14 @@ private:
         }
 
         return TFDT_SIZE - BASE_DATA_OFFSET_SIZE; // tfdt added, tfhd shrunk
+    }
+
+    std::tuple<const BYTE*, ULONG> ModifyMovieContainer(const BYTE* buf, const ULONG size) {
+        assert(GetAtomSize(buf) == size);
+
+        // TODO: Implement "creation_time" parsing
+
+        return std::tie(buf, size);
     }
 
     /** Deserialize & conververt from big-endian. */
