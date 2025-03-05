@@ -28,7 +28,7 @@ struct window_dc {
         return rect.bottom - rect.top;
     }
 
-    HWND wnd;
+    HWND wnd  = nullptr;
     HDC  dc   = nullptr;
     RECT rect = {};
 };
@@ -53,8 +53,8 @@ struct offscreen_bmp {
         DeleteDC(dc);
     }
 
-    HDC     dc;
-    HBITMAP bmp;
+    HDC     dc   = nullptr;
+    HBITMAP bmp  = nullptr;
     HGDIOBJ prev = nullptr;
 };
 
