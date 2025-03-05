@@ -33,6 +33,7 @@ public:
         if (IsAtomType(buf, "moov")) {
             // Movie container (moov)
             assert(atom_size == size);
+            return std::tie(buf, size);
         } else if (IsAtomType(buf, "moof")) {
             // Movie Fragment (moof)
             assert(atom_size == size);
