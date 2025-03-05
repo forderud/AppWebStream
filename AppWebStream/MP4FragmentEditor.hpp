@@ -212,7 +212,7 @@ private:
             ptr += 4;
         }
 
-        auto timeScale = DeSerialize<uint32_t>(ptr);
+        auto timeScale = DeSerialize<uint32_t>(ptr); // 50000 = 50ms
         ptr += 4;
 
         if (version == 1) {
