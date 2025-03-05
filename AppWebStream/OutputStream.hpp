@@ -10,7 +10,11 @@
 #include "MP4FragmentEditor.hpp"
 
 
-class WebStream; // forward decl.
+class ByteWriter {
+public:
+    virtual ~ByteWriter() = default;
+    virtual int WriteBytes(/*in*/const BYTE* buf, /*in*/ULONG size) = 0;
+};
 
 
 class ATL_NO_VTABLE OutputStream :
@@ -63,7 +67,7 @@ private:
     mutable std::mutex m_mutex;
     unsigned long      m_tmp_bytes_written = 0;
 
-    std::unique_ptr<WebStream> m_impl;
+    std::unique_ptr<ByteWriter> m_writer;
 
     unsigned __int64      m_cur_pos = 0;
     MP4FragmentEditor     m_stream_editor;

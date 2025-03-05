@@ -5,7 +5,7 @@
 #include "WebSocket.hpp"
 
 
-class WebStream : public StreamSockSetter {
+class WebStream : public ByteWriter, StreamSockSetter {
 public:
     WebStream(const char * port_str) : m_server(port_str), m_block_ctor(true) {
         // start server thread
@@ -62,7 +62,7 @@ public:
         }
     }
 
-    int WriteBytes(/*in*/const BYTE* buf, /*in*/ULONG size) {
+    int WriteBytes(/*in*/const BYTE* buf, /*in*/ULONG size) override {
         // transmit data over socket
         int byte_count = send(m_stream_client->Socket(), reinterpret_cast<const char*>(buf), size, 0);
         if (byte_count == SOCKET_ERROR) {
@@ -93,7 +93,7 @@ OutputStream::~OutputStream() {
 }
 
 void OutputStream::SetNetworkPort(const char * port_str) {
-    m_impl = std::make_unique<WebStream>(port_str);
+    m_writer = std::make_unique<WebStream>(port_str);
 }
 
 HRESULT OutputStream::GetCapabilities(/*out*/DWORD *capabilities) {
@@ -139,7 +139,7 @@ HRESULT OutputStream::WriteImpl(/*in*/const BYTE* buf, ULONG size) {
     std::tie(buf,size) = m_stream_editor.EditStream(buf, size);
 #endif
 
-    int byte_count = m_impl->WriteBytes(buf, size);
+    int byte_count = m_writer->WriteBytes(buf, size);
     if (byte_count < 0)
         return E_FAIL;
 
@@ -198,6 +198,6 @@ HRESULT OutputStream::Flush() {
 HRESULT OutputStream::Close() {
     std::lock_guard<std::mutex> lock(m_mutex);
 
-    m_impl.reset();
+    m_writer.reset();
     return S_OK;
 }
