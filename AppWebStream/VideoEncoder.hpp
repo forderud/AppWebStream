@@ -147,6 +147,15 @@ public:
         COM_CHECK(attribs->SetGUID(MF_TRANSCODE_CONTAINERTYPE, MFTranscodeContainerType_MPEG4));
         COM_CHECK(attribs->SetUINT32(MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS, TRUE));
 
+        FILETIME time{};
+        {
+            SYSTEMTIME st{};
+            GetSystemTime(&st);
+            st.wYear = 2027;
+            SystemTimeToFileTime(&st, &time);
+        }
+        COM_CHECK(MFSetAttribute2UINT32asUINT64(attribs, MF_STF_VERSION_DATE, time.dwLowDateTime, time.dwHighDateTime));
+
         // create sink writer with specified output format
         COM_CHECK(MFCreateSinkWriterFromURL(filename, nullptr, attribs, &m_sink_writer));
         IMFMediaTypePtr mediaTypeOut = MediaTypeutput(fps, bit_rate);
@@ -289,6 +298,16 @@ private:
         COM_CHECK(MFSetAttributeSize(mediaTypeOut, MF_MT_FRAME_SIZE, Align(m_width), Align(m_height)));
         COM_CHECK(MFSetAttributeRatio(mediaTypeOut, MF_MT_FRAME_RATE, fps, 1));
         COM_CHECK(MFSetAttributeRatio(mediaTypeOut, MF_MT_PIXEL_ASPECT_RATIO, 1, 1));
+
+        FILETIME time{};
+        {
+            SYSTEMTIME st{};
+            GetSystemTime(&st);
+            st.wYear = 2028;
+            SystemTimeToFileTime(&st, &time);
+        }
+        COM_CHECK(MFSetAttribute2UINT32asUINT64(mediaTypeOut, MFSampleExtension_DecodeTimestamp, time.dwLowDateTime, time.dwHighDateTime));
+
         return mediaTypeOut;
     }
 

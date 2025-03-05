@@ -149,7 +149,7 @@ int main (int argc, char *argv[]) {
     VideoEncoderFF encoder(dims, FPS, ws);
 #else
     ws->SetPortAndWindowHandle(port, win_handle); // blocking call
-    VideoEncoderMF encoder(dims, FPS, ws);
+    VideoEncoderMF encoder(dims, FPS, L"delme.mp4");
 #endif
     std::cout << "Connecting to client..." << std::endl;
 
