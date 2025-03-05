@@ -134,12 +134,12 @@ HRESULT OutputStream::EndRead(/*in*/IMFAsyncResult* /*result*/, /*out*/ULONG* /*
     return E_NOTIMPL;
 }
 
-HRESULT OutputStream::WriteImpl(/*in*/const BYTE* pb, /*in*/ULONG cb) {
+HRESULT OutputStream::WriteImpl(/*in*/const BYTE* buf, ULONG size) {
 #ifndef ENABLE_FFMPEG
-    std::tie(pb,cb) = m_stream_editor.EditStream(pb, cb);
+    std::tie(buf,size) = m_stream_editor.EditStream(buf, size);
 #endif
 
-    int byte_count = m_impl->WriteBytes(pb, cb);
+    int byte_count = m_impl->WriteBytes(buf, size);
     if (byte_count < 0)
         return E_FAIL;
 

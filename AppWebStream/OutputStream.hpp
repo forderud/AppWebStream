@@ -55,7 +55,7 @@ public:
     END_COM_MAP()
 
 private:
-    HRESULT WriteImpl(/*in*/const BYTE* pb, /*in*/ULONG cb);
+    HRESULT WriteImpl(/*in*/const BYTE* buf, ULONG size);
 
     mutable std::mutex m_mutex;
     unsigned long      m_tmp_bytes_written = 0;
