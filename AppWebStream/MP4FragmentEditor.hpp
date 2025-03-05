@@ -30,7 +30,10 @@ public:
         uint32_t atom_size = GetAtomSize(buf);
         assert(atom_size <= size);
 
-        if (IsAtomType(buf, "moof")) {
+        if (IsAtomType(buf, "moov")) {
+            // Movie container (moov)
+            assert(atom_size == size);
+        } else if (IsAtomType(buf, "moof")) {
             // Movie Fragment (moof)
             assert(atom_size == size);
             return ModifyMovieFragment(buf, atom_size);
