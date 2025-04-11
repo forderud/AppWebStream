@@ -21,7 +21,7 @@ Outstanding tasks:
 The FFMPEG-based encoder is not affected by this issue.
 
 ### Frame grabbing method
-The project is currently using `BitBlt` to copy the content of the specified window handle to an offscreen `HBITMAP` object. It would probably be preferable to instead use the newer [Desktop Duplication API](https://learn.microsoft.com/en-us/windows/win32/direct3ddxgi/desktop-dup-api) for frame grabbing.
+The project is currently using the GDI [`BitBlt`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-bitblt) function to copy the content of the specified window handle to an offscreen `HBITMAP` object. It would probably be preferable to instead use the newer [Desktop Duplication API](https://learn.microsoft.com/en-us/windows/win32/direct3ddxgi/desktop-dup-api) for frame grabbing.
 
 ### Browser support
 * Confirmed to work with Google Chrome, Microsoft Edge and Firefox.
