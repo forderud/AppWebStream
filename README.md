@@ -25,4 +25,4 @@ The project is currently using the GDI [`BitBlt`](https://learn.microsoft.com/en
 
 ### Browser support
 * Confirmed to work with Google Chrome, Microsoft Edge and Firefox.
-* Safary doesn't work on iOS. This appear to be due to Apple not supporting MSE on mobile devices and instead recommend adopting [ManagedMediaSource](https://developer.apple.com/videos/play/wwdc2023/10122/).
+* Safary doesn't work on iOS. This appear to be due to Apple not supporting MSE on mobile devices and instead recommend tranisitioning to [ManagedMediaSource](https://developer.apple.com/videos/play/wwdc2023/10122/).
