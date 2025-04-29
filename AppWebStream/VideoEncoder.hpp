@@ -193,6 +193,10 @@ public:
             COM_CHECK(codec->GetValue(&CODECAPI_AVEncMPVGOPSize, &gop_size));
             //gop_size = (unsigned int)1; // VT_UI4 type
             //COM_CHECK(codec->SetValue(&CODECAPI_AVEncMPVGOPSize, &gop_size));
+
+            // query number of bidirectional (B) frames between intra (I) & predicted (P) frames
+            CComVariant b_picture_count;
+            COM_CHECK(codec->GetValue(&CODECAPI_AVEncMPVDefaultBPictureCount, &b_picture_count));
         }
 
         COM_CHECK(m_sink_writer->BeginWriting());
