@@ -14,7 +14,7 @@
 class ByteWriter {
 public:
     virtual ~ByteWriter() = default;
-    virtual int WriteBytes(/*in*/std::string_view buffer) = 0;
+    virtual int WriteBytes(const std::string_view buffer) = 0;
     virtual void Flush() = 0;
 };
 

@@ -63,7 +63,7 @@ public:
         }
     }
 
-    int WriteBytes(/*in*/std::string_view buffer) override {
+    int WriteBytes(const std::string_view buffer) override {
         // transmit data over socket
         int byte_count = send(m_stream_client->Socket(), buffer.data(), (int)buffer.size(), 0);
         if (byte_count == SOCKET_ERROR) {
@@ -102,7 +102,7 @@ public:
     ~FileStream() override {
     }
 
-    int WriteBytes(/*in*/std::string_view buffer) override {
+    int WriteBytes(const std::string_view buffer) override {
         m_file.write(buffer.data(), buffer.size());
         return (int)buffer.size();
     }
