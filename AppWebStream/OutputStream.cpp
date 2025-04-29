@@ -71,7 +71,7 @@ public:
             int err = WSAGetLastError();
             assert((err == WSAECONNABORTED) || (err == WSAECONNRESET));
             _com_error err_str(err);
-            wprintf(L"Socket send error: %s\n", err_str.ErrorMessage());
+            wprintf(L"Socket send error %u: %s\n", err, err_str.ErrorMessage());
 
             // destroy failing client socket (typ. caused by client-side closing)
             m_stream_client.reset();
