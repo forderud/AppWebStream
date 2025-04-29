@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <mutex>
+#include <string_view>
 #include <MFidl.h>
 #include <Mfreadwrite.h>
 #include "Resource.h"
@@ -13,7 +14,7 @@
 class ByteWriter {
 public:
     virtual ~ByteWriter() = default;
-    virtual int WriteBytes(/*in*/const BYTE* buf, /*in*/ULONG size) = 0;
+    virtual int WriteBytes(/*in*/std::string_view buffer) = 0;
     virtual void Flush() = 0;
 };
 

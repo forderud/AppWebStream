@@ -63,9 +63,9 @@ public:
         }
     }
 
-    int WriteBytes(/*in*/const BYTE* buf, /*in*/ULONG size) override {
+    int WriteBytes(/*in*/std::string_view buffer) override {
         // transmit data over socket
-        int byte_count = send(m_stream_client->Socket(), reinterpret_cast<const char*>(buf), size, 0);
+        int byte_count = send(m_stream_client->Socket(), buffer.data(), (int)buffer.size(), 0);
         if (byte_count == SOCKET_ERROR) {
             // WSAECONNABORTED expected on client disconnect
             int err = WSAGetLastError();
@@ -102,9 +102,9 @@ public:
     ~FileStream() override {
     }
 
-    int WriteBytes(/*in*/const BYTE* buf, /*in*/ULONG size) override {
-        m_file.write(reinterpret_cast<const char*>(buf), size);
-        return size;
+    int WriteBytes(/*in*/std::string_view buffer) override {
+        m_file.write(buffer.data(), buffer.size());
+        return (int)buffer.size();
     }
 
     void Flush() override {
@@ -175,7 +175,7 @@ HRESULT OutputStream::WriteImpl(/*in*/const BYTE* buf, ULONG size) {
     std::tie(buf,size) = m_stream_editor.EditStream(buf, size);
 #endif
 
-    int byte_count = m_writer->WriteBytes(buf, size);
+    int byte_count = m_writer->WriteBytes(std::string_view((const char*)buf, size));
     if (byte_count < 0)
         return E_FAIL;
 
