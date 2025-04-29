@@ -18,14 +18,17 @@ video.addEventListener('play',function(e){
 });
 
 if (window.ManagedMediaSource || window.MediaSource) {
-    if (window.ManagedMediaSource)
+    if (window.ManagedMediaSource) {
         var mediaSource = new ManagedMediaSource(); // for iOS compatibility
-    else
+        console.log("Using ManagedMediaSource extension.")
+    } else {
         var mediaSource = new MediaSource();
+        console.log("Using Media Source extension.")
+    }
     video.src = URL.createObjectURL(mediaSource);
     mediaSource.addEventListener('sourceopen', sourceOpen);
 } else {
-    console.error("Media Source Extensions API not supported.")
+    console.error("Media Source Extensions (MSE) not supported.")
 }
 
 function sourceOpen(e) {
