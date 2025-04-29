@@ -46,6 +46,13 @@ function sourceOpen(e) {
         console.error("sourceBuffer abort: "+mediaSource.readyState+", "+e);
     });
 
+    mediaSource.onstartstreaming = async () => { // ManagedMediaSource event
+        // TODO
+    }
+    mediaSource.onendstreaming = () => { // ManagedMediaSource event
+        // TODO
+    }
+
     var queue = [];
     function AppendToQueue (data) {
         queue.push(data);
