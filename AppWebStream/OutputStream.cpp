@@ -1,5 +1,6 @@
 #define WIN32_LEAN_AND_MEAN
 #include <atomic>
+#include <comdef.h>
 #include <Mfapi.h>
 #include "OutputStream.hpp"
 #include "WebSocket.hpp"
@@ -66,8 +67,11 @@ public:
         // transmit data over socket
         int byte_count = send(m_stream_client->Socket(), reinterpret_cast<const char*>(buf), size, 0);
         if (byte_count == SOCKET_ERROR) {
-            //_com_error error(WSAGetLastError());
-            //const TCHAR* msg = error.ErrorMessage();
+            // WSAECONNABORTED expected on client disconnect
+            int err = WSAGetLastError();
+            assert((err == WSAECONNABORTED) || (err == WSAECONNRESET));
+            _com_error err_str(err);
+            wprintf(L"Socket send error: %s\n", err_str.ErrorMessage());
 
             // destroy failing client socket (typ. caused by client-side closing)
             m_stream_client.reset();
