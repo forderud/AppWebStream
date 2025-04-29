@@ -4,7 +4,7 @@
 #include <Windows.h>
 
 /** Process atoms within a MPEG4 MovieFragment (moof) to make the stream comply with ISO base media file format (https://www.iso.org/standard/68960.html).
-    Work-around for shortcommings in the Media Foundation MPEG4 file sink (https://msdn.microsoft.com/en-us/library/windows/desktop/dd757763).
+    Work-around for shortcommings in the Media Foundation MPEG4 file sink (https://learn.microsoft.com/en-us/windows/win32/medfound/mpeg-4-file-sink).
     Please delete this class if a better alternative becomes available.
 Expected atom hiearchy:
 [moof] movie fragment
