@@ -25,4 +25,4 @@ The project is currently using the GDI [`BitBlt`](https://learn.microsoft.com/en
 
 ### Browser support
 * Confirmed to work with Google Chrome, Microsoft Edge and Firefox.
-* Safary doesn't work properly yet. The movie is streamed, but not show on screen. Don't understand why.
+* Safary doesn't work on iOS. This appear to be due to Apple not supporting MSE on mobile devices and instead recommend adopting [ManagedMediaSource](https://developer.apple.com/videos/play/wwdc2023/10122/).
