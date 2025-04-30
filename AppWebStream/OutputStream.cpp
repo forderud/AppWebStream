@@ -69,9 +69,9 @@ public:
         if (byte_count == SOCKET_ERROR) {
             // WSAECONNABORTED expected on client disconnect
             int err = WSAGetLastError();
-            assert((err == WSAECONNABORTED) || (err == WSAECONNRESET));
             _com_error err_str(err);
             wprintf(L"Socket send error %u: %s\n", err, err_str.ErrorMessage());
+            assert((err == WSAECONNABORTED) || (err == WSAECONNRESET));
 
             // destroy failing client socket (typ. caused by client-side closing)
             m_stream_client.reset();
