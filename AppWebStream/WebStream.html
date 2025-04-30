@@ -74,8 +74,8 @@ function sourceOpen(e) {
     });
 
     console.log("streaming URL: "+url);
-    fetch(url).then(function(res) {
-        var reader = res.body.getReader();
+    fetch(url).then(function(response) {
+        var reader = response.body.getReader();
         
         function pump() {
             return reader.read().then(({done, value}) => {
