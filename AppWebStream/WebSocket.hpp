@@ -57,7 +57,7 @@ public:
         const std::string NO_CONTENT_RESPONSE = "HTTP/1.1 204 No Content\r\n\r\n";
 
         if ((receive_buf.find("Range: bytes=0-") != std::string::npos) || (receive_buf.find("GET /movie.mp4") != std::string::npos)) {
-            // streaming video request
+            printf("INFO: streaming video request.\n");
 
             // send HTTP header
             std::string header = "HTTP/1.1 200 OK\r\n";
@@ -68,7 +68,7 @@ public:
             header += "\r\n";
             return SendResponse(header, Connect::STREAM);
         } else if (receive_buf.find("GET / ") != std::string::npos) {
-            // index.html request 
+            printf("INFO: index.html request.\n");
 
             // load HTML page from resource embedded into DLL/EXE
             HRSRC   html_info = FindResource(CurrentModule(), MAKEINTRESOURCE(IDR_WebStreamHtml), RT_RCDATA);
@@ -92,7 +92,8 @@ public:
 
             return Connect::CONTINUE;
         } else {
-            // unknown request
+            printf("WARNING: Unknown HTTP request.\n");
+
             std::string header = "HTTP/1.1 404 Not found\r\n";
             header += "Content-Length: 0\r\n";
             header += "\r\n";
