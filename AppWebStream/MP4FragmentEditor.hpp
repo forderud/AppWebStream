@@ -195,7 +195,7 @@ private:
             const char prefix[] = "<?xpacket begin=\"﻿\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>"; // "begin" value is UTF-8 BOM (0xEF 0xBB 0xBF)
             m_xmp_buf.insert(m_xmp_buf.end(), prefix, prefix + sizeof(prefix));
 
-            const char header[] = "<x:xmpmeta xmlns:x='adobe:ns:meta/' x:xmptk='Image::ExifTool 13.22'><rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'><rdf:Description rdf:about='' xmlns:tiff='http://ns.adobe.com/tiff/1.0/'>";
+            const char header[] = "<x:xmpmeta xmlns:x='adobe:ns:meta/'><rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'><rdf:Description rdf:about='' xmlns:tiff='http://ns.adobe.com/tiff/1.0/'>";
             m_xmp_buf.insert(m_xmp_buf.end(), header, header + sizeof(header));
 
             const char resUnit[] = "<tiff:ResolutionUnit>3</tiff:ResolutionUnit>"; // 3 is cm
