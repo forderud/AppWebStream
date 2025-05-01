@@ -191,6 +191,14 @@ private:
         const char suffix[] = "<?xpacket end=\"r\"?>"; // "r" means read-only (not in-place editable)
 
         m_xmp_buf.clear();
+        m_xmp_buf.resize(4 + 4 + 16); // 4byte size prefix, 4byte "uuid" type, 16byte UUID
+        memcpy(m_xmp_buf.data() + 4, "uuid", 4); // atom type
+
+        GUID guid{};
+        CLSIDFromString(L"{be7acfcb-97a9-42e8-9c71-999491e3afac}", &guid);
+        memcpy(m_xmp_buf.data() + 8, &guid, sizeof(guid)); // XMP UUID value
+
+
         m_xmp_buf.insert(m_xmp_buf.end(), prefix, prefix + sizeof(prefix));
         m_xmp_buf.insert(m_xmp_buf.end(), header, header + sizeof(header));
         m_xmp_buf.insert(m_xmp_buf.end(), resUnit, resUnit + sizeof(resUnit));
@@ -198,6 +206,9 @@ private:
         m_xmp_buf.insert(m_xmp_buf.end(), yRes, yRes + sizeof(yRes));
         m_xmp_buf.insert(m_xmp_buf.end(), footer, footer + sizeof(footer));
         m_xmp_buf.insert(m_xmp_buf.end(), suffix, suffix + sizeof(suffix));
+
+        // set atom size
+        Serialize<uint32_t>(m_xmp_buf.data(), (uint32_t)m_xmp_buf.size());
     }
 
 
