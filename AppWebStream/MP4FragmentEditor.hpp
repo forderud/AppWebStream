@@ -49,10 +49,10 @@ private:
         assert(GetAtomSize(buf) == size);
 
         // copy to temporary buffer before modifying & extending atoms
-        m_write_buf.resize(size-8+20);
-        memcpy(m_write_buf.data()/*dst*/, buf, size);
+        m_moof_buf.resize(size-8+20);
+        memcpy(m_moof_buf.data()/*dst*/, buf, size);
 
-        BYTE * moof_ptr = m_write_buf.data(); // switch to internal buffer
+        BYTE * moof_ptr = m_moof_buf.data(); // switch to internal buffer
 
         // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/MovieFragmentHeaderBox.java
         BYTE * mfhd_ptr = moof_ptr + S_HEADER_SIZE;
@@ -70,7 +70,7 @@ private:
         BYTE* tfhd_ptr = traf_ptr + S_HEADER_SIZE;
 
         unsigned long pos_idx = static_cast<unsigned long>(tfhd_ptr - moof_ptr);
-        int rel_size = ProcessTrackFrameChildren(m_write_buf.data()+pos_idx, size, size-pos_idx);
+        int rel_size = ProcessTrackFrameChildren(m_moof_buf.data()+pos_idx, size, size-pos_idx);
         if (rel_size) {
             // size have changed - update size of parent atoms
             Serialize<uint32_t>(moof_ptr, size+rel_size);
@@ -349,6 +349,6 @@ private:
 
 private:
     uint64_t          m_cur_time = 0;
-    std::vector<BYTE> m_write_buf; ///< write buffer (used when modifying moof atoms)
-    std::vector<BYTE> m_xmp_buf;   ///< top-level "uuid" atom with XMP resolution metadata
+    std::vector<BYTE> m_moof_buf; ///< "moof" atom modification buffer
+    std::vector<BYTE> m_xmp_buf;  ///< top-level "uuid" atom with XMP resolution metadata
 };
