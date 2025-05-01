@@ -36,10 +36,7 @@ public:
         } else if (IsAtomType(buf.data(), "moof")) {
             // Movie Fragment (moof)
             assert(atom_size == buf.size());
-            const char* tmp = nullptr;
-            size_t size = 0;
-            std::tie(tmp, size) = ModifyMovieFragment(buf.data(), atom_size);
-            return std::string_view(tmp, size);
+            return ModifyMovieFragment(buf.data(), atom_size);
         }
 
         return buf;
@@ -47,7 +44,7 @@ public:
 
 private:
     /** REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/MovieFragmentBox.java */
-    std::tuple<const char*,ULONG> ModifyMovieFragment (const char* buf, const ULONG size) {
+    std::string_view ModifyMovieFragment (const char* buf, const ULONG size) {
         assert(GetAtomSize(buf) == size);
 
         // copy to temporary buffer before modifying & extending atoms
@@ -78,7 +75,7 @@ private:
             Serialize<uint32_t>(moof_ptr, size+rel_size);
             Serialize<uint32_t>(traf_ptr, traf_size+rel_size);
         }
-        return std::make_tuple(moof_ptr, size + rel_size);
+        return std::string_view(moof_ptr, size + rel_size);
     }
 
 
