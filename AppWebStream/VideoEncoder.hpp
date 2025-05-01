@@ -485,6 +485,7 @@ private:
         const AVCodec *codec = avcodec_find_encoder(codec_id);
         if (!codec) {
             const char * name = avcodec_get_name(codec_id);
+            fprintf(stderr, "ERROR: Could not find encoder for %s\n", name);
             throw std::runtime_error("Could not find encoder for");
         }
         assert(codec->type == AVMEDIA_TYPE_VIDEO);
