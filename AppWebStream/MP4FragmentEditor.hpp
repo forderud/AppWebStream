@@ -142,8 +142,7 @@ private:
             *tfdt_ptr = 1; // version 1 (no other flags)
             tfdt_ptr += FLAGS_SIZE; // skip flags
             // write tfdt/baseMediaDecodeTime
-            Serialize<uint64_t>(tfdt_ptr, m_cur_time);
-            tfdt_ptr += sizeof(uint64_t);
+            tfdt_ptr = Serialize<uint64_t>(tfdt_ptr, m_cur_time);
         }
 
         {
@@ -166,8 +165,7 @@ private:
             payload += sizeof(sample_count);
 
             // overwrite data_offset field
-            Serialize<uint32_t>(payload, moof_size-BASE_DATA_OFFSET_SIZE+TFDT_SIZE+8); // +8 experiementally derived
-            payload += sizeof(uint32_t);
+            payload = Serialize<uint32_t>(payload, moof_size-BASE_DATA_OFFSET_SIZE+TFDT_SIZE+8); // +8 experiementally derived
 
             auto sample_dur = DeSerialize<uint32_t>(payload); // duration of first sample
 
@@ -189,12 +187,9 @@ private:
             char* dst = m_xmp_buf.data() + 8;
             GUID guid{};
             CLSIDFromString(L"{be7acfcb-97a9-42e8-9c71-999491e3afac}", &guid);  // XMP UUID value
-            Serialize<ULONG>(dst, guid.Data1);
-            dst += sizeof(ULONG);
-            Serialize<USHORT>(dst, guid.Data2);
-            dst += sizeof(USHORT);
-            Serialize<USHORT>(dst, guid.Data3);
-            dst += sizeof(USHORT);
+            dst = Serialize<ULONG>(dst, guid.Data1);
+            dst = Serialize<USHORT>(dst, guid.Data2);
+            dst = Serialize<USHORT>(dst, guid.Data3);
             memcpy(dst, guid.Data4, sizeof(guid.Data4));
         }
         {
@@ -327,9 +322,11 @@ private:
 
     /** Serialize & conververt to big-endian. */
     template <typename T>
-    static void Serialize (char* buf, T val) {
+    static char* Serialize (char* buf, T val) {
         for (size_t i = 0; i < sizeof(T); ++i)
             buf[i] = reinterpret_cast<BYTE*>(&val)[sizeof(T)-1-i];
+
+        return buf + sizeof(T);
     }
 
     /** Mofified version of "memmove" that clears the abandoned bytes, as well as intermediate data.
