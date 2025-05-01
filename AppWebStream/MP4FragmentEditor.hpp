@@ -7,6 +7,15 @@
     Work-around for shortcommings in the Media Foundation MPEG4 file sink (https://learn.microsoft.com/en-us/windows/win32/medfound/mpeg-4-file-sink).
     Please delete this class if a better alternative becomes available.
 Expected atom hiearchy:
+[moov] movie box
+* [trak] track box
+  - [mdia] media box
+    * [minf] media information box
+      - [dinf] data information box
+        * [dref] data reference box
+      - [stbl] ample table box
+        * [stsd] sample description box
+          - [avc1] (will be modified)
 [moof] movie fragment
 * [mfhd] movie fragment header
 * [traf] track fragment
