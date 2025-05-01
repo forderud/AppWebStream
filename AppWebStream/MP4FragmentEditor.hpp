@@ -17,10 +17,10 @@ class MP4FragmentEditor {
     static constexpr unsigned long S_HEADER_SIZE = 8;
 
 public:
-    MP4FragmentEditor() {
-        // 10 pixels per cm
-        m_resolution[0] = 10;
-        m_resolution[1] = 1;
+    MP4FragmentEditor(ULONG res_num, ULONG res_den) {
+        // pixels per cm
+        m_resolution[0] = res_num;
+        m_resolution[1] = res_den;
     }
 
     /** Intended to be called from IMFByteStream::BeginWrite and IMFByteStream::Write before forwarding the data to a socket.

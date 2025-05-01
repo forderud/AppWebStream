@@ -116,7 +116,7 @@ private:
 };
 
 
-OutputStream::OutputStream() {
+OutputStream::OutputStream() : m_stream_editor(10, 1) { // 10 pixels per cm
 }
 
 OutputStream::~OutputStream() {
