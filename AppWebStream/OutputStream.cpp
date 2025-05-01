@@ -172,12 +172,14 @@ HRESULT OutputStream::EndRead(/*in*/IMFAsyncResult* /*result*/, /*out*/ULONG* /*
     return E_NOTIMPL;
 }
 
-HRESULT OutputStream::WriteImpl(/*in*/const BYTE* buf, ULONG size) {
+HRESULT OutputStream::WriteImpl(/*in*/const char* buf, ULONG size) {
 #ifndef ENABLE_FFMPEG
-    std::tie(buf,size) = m_stream_editor.EditStream(buf, size);
+    const BYTE* tmp = nullptr;
+    std::tie(tmp,size) = m_stream_editor.EditStream((BYTE*)buf, size);
+    buf = (char*)tmp;
 #endif
 
-    int byte_count = m_writer->WriteBytes(std::string_view((const char*)buf, size));
+    int byte_count = m_writer->WriteBytes(std::string_view(buf, size));
     if (byte_count < 0)
         return E_FAIL;
 
@@ -188,7 +190,7 @@ HRESULT OutputStream::WriteImpl(/*in*/const BYTE* buf, ULONG size) {
 HRESULT OutputStream::Write(/*in*/const BYTE* pb, /*in*/ULONG cb, /*out*/ULONG* cbWritten) {
     std::lock_guard<std::mutex> lock(m_mutex);
 
-     HRESULT hr = WriteImpl(pb, cb);
+     HRESULT hr = WriteImpl((char*)pb, cb);
      if (FAILED(hr))
          return E_FAIL;
      
@@ -199,7 +201,7 @@ HRESULT OutputStream::Write(/*in*/const BYTE* pb, /*in*/ULONG cb, /*out*/ULONG* 
 HRESULT OutputStream::BeginWrite(/*in*/const BYTE* pb, /*in*/ULONG cb, /*in*/IMFAsyncCallback* callback, /*in*/IUnknown* unkState) {
     m_mutex.lock();
 
-     HRESULT hr = WriteImpl(pb, cb);
+     HRESULT hr = WriteImpl((char*)pb, cb);
      if (FAILED(hr)) {
          m_mutex.unlock();
          return E_FAIL;
