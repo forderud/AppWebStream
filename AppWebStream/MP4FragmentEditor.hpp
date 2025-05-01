@@ -184,7 +184,7 @@ private:
         // based on https://archimedespalimpsest.net/Documents/External/XMP/XMPSpecificationPart3.pdf
         const char prefix[] = "<?xpacket begin=\"﻿\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>"; // "begin" value is UTF-8 BOM (0xEF 0xBB 0xBF)
         const char header[] = "<x:xmpmeta xmlns:x='adobe:ns:meta/' x:xmptk='Image::ExifTool 13.22'><rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'><rdf:Description rdf:about='' xmlns:tiff='http://ns.adobe.com/tiff/1.0/'>";
-        const char resUnit[] = "<tiff:ResolutionUnit>3</tiff:ResolutionUnit>";
+        const char resUnit[] = "<tiff:ResolutionUnit>3</tiff:ResolutionUnit>"; // 3 is cm
         const char xRes[] = "<tiff:XResolution>1000/1</tiff:XResolution>";
         const char yRes[] = "<tiff:YResolution>1000/1</tiff:YResolution>";
         const char footer[] = "</rdf:Description></rdf:RDF></x:xmpmeta>";
