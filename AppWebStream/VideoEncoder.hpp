@@ -344,10 +344,10 @@ public:
     VideoEncoderFF (unsigned short dimensions[2], unsigned int fps, const wchar_t * _filename) : VideoEncoderFF(dimensions, fps) {
         // Add the video streams using the default format codecs and initialize the codecs
         const AVCodec * video_codec = nullptr;
-        std::tie(video_codec, stream, enc) = add_stream(m_out_ctx->oformat->video_codec);
+        std::tie(video_codec, m_stream, enc) = add_stream(m_out_ctx->oformat->video_codec);
 
         // open the video codecs and allocate the necessary encode buffers
-        frame = open_video(video_codec, nullptr, enc, stream->codecpar);
+        frame = open_video(video_codec, nullptr, enc, m_stream->codecpar);
 
         // open the output file
         assert(!(m_out_ctx->oformat->flags & AVFMT_NOFILE));
@@ -363,7 +363,7 @@ public:
     VideoEncoderFF (unsigned short dimensions[2], unsigned int fps, IMFByteStream * socket) : VideoEncoderFF(dimensions, fps) {
         // Add the video streams using the default format codecs and initialize the codecs
         const AVCodec * video_codec = nullptr;
-        std::tie(video_codec, stream, enc) = add_stream(m_out_ctx->oformat->video_codec);
+        std::tie(video_codec, m_stream, enc) = add_stream(m_out_ctx->oformat->video_codec);
 
         // REF: https://ffmpeg.org/ffmpeg-formats.html#Options-8 (-movflags arguments)
         // REF: https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/movenc.c
@@ -371,7 +371,7 @@ public:
         av_dict_set(&opt, "movflags", "empty_moov+default_base_moof+frag_every_frame", 0); // fragmented MP4
 
         // open the video codecs and allocate the necessary encode buffers
-        frame = open_video(video_codec, opt, enc, stream->codecpar);
+        frame = open_video(video_codec, opt, enc, m_stream->codecpar);
 
         m_out_buf.resize(16*1024*1024); // 16MB
         m_socket = socket; // prevent socket from being destroyed before this object
@@ -466,8 +466,8 @@ public:
                 throw std::runtime_error("avcodec_receive_packet failed");
 
             // rescale output packet timestamp values from codec to stream timebase
-            av_packet_rescale_ts(&pkt, enc->time_base, stream->time_base);
-            pkt.stream_index = stream->index;
+            av_packet_rescale_ts(&pkt, enc->time_base, m_stream->time_base);
+            pkt.stream_index = m_stream->index;
 
             // write compressed frame to stream
             ret = av_interleaved_write_frame(m_out_ctx, &pkt);
@@ -580,7 +580,7 @@ private:
     unsigned int       m_fps = 0;
     int64_t         next_pts = 0; // pts of the next frame that will be generated
     AVFormatContext *m_out_ctx = nullptr;
-    AVStream         *stream = nullptr;
+    AVStream         *m_stream = nullptr;
     AVCodecContext      *enc = nullptr;
     AVFrame           *frame = nullptr;
 
