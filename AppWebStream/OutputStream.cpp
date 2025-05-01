@@ -116,11 +116,17 @@ private:
 };
 
 
-OutputStream::OutputStream() : m_stream_editor(10, 1) { // 10 pixels per cm
+OutputStream::OutputStream() {
 }
 
 OutputStream::~OutputStream() {
 }
+
+
+void OutputStream::SetResolution(ULONG res_num, ULONG res_den) {
+    m_stream_editor = std::make_unique<MP4FragmentEditor>(res_num, res_den);
+}
+
 
 void OutputStream::SetPortOrFilename(const char * port_or_filename) {
     if (atoi(port_or_filename)) {
@@ -174,7 +180,7 @@ HRESULT OutputStream::EndRead(/*in*/IMFAsyncResult* /*result*/, /*out*/ULONG* /*
 
 HRESULT OutputStream::WriteImpl(std::string_view buffer) {
 #ifndef ENABLE_FFMPEG
-    buffer = m_stream_editor.EditStream(buffer);
+    buffer = m_stream_editor->EditStream(buffer);
 #endif
 
     int byte_count = m_writer->WriteBytes(buffer);

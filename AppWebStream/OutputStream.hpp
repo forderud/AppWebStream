@@ -27,6 +27,9 @@ public:
     OutputStream();
     /*NOT virtual*/ ~OutputStream();
 
+    /** Configure resolution in pixels per cm. */
+    void SetResolution(ULONG res_num, ULONG res_den);
+
     void SetPortOrFilename(const char * port_or_filename);
 
     HRESULT GetCapabilities(/*out*/DWORD *capabilities) override;
@@ -72,5 +75,5 @@ private:
     std::unique_ptr<ByteWriter> m_writer;
 
     unsigned __int64      m_cur_pos = 0;
-    MP4FragmentEditor     m_stream_editor;
+    std::unique_ptr<MP4FragmentEditor> m_stream_editor;
 };
