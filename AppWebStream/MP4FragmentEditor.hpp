@@ -21,8 +21,8 @@ Expected atom hiearchy:
           - [url] data entry url box
       - [stbl] ample table box
         * [stsd] sample description box
-          - [avc1]
-            * [avcC] AVC configuration box (will be modified)
+          - [avc1] (will be modified)
+            * [avcC] AVC configuration box
 [moof] movie fragment
 * [mfhd] movie fragment header
 * [traf] track fragment
