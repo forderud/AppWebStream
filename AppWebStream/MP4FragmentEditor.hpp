@@ -178,6 +178,27 @@ private:
         return TFDT_SIZE - BASE_DATA_OFFSET_SIZE; // tfdt added, tfhd shrunk
     }
 
+    void ConstructXmpPacket() {
+        // based on https://archimedespalimpsest.net/Documents/External/XMP/XMPSpecificationPart3.pdf
+        const char prefix[] = "<?xpacket begin=\"﻿\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>"; // "begin" value is UTF-8 BOM (0xEF 0xBB 0xBF)
+        const char header[] = "<x:xmpmeta xmlns:x='adobe:ns:meta/' x:xmptk='Image::ExifTool 13.22'><rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'><rdf:Description rdf:about='' xmlns:tiff='http://ns.adobe.com/tiff/1.0/'>";
+        const char resUnit[] = "<tiff:ResolutionUnit>3</tiff:ResolutionUnit>";
+        const char xRes[] = "<tiff:XResolution>1000/1</tiff:XResolution>";
+        const char yRes[] = "<tiff:YResolution>1000/1</tiff:YResolution>";
+        const char footer[] = "</rdf:Description></rdf:RDF></x:xmpmeta>";
+        const char suffix[] = "<?xpacket end=\"r\"?>"; // "r" means read-only (not in-place editable)
+
+        m_xmp_buf.clear();
+        m_xmp_buf.insert(m_xmp_buf.end(), prefix, prefix + sizeof(prefix));
+        m_xmp_buf.insert(m_xmp_buf.end(), header, header + sizeof(header));
+        m_xmp_buf.insert(m_xmp_buf.end(), resUnit, resUnit + sizeof(resUnit));
+        m_xmp_buf.insert(m_xmp_buf.end(), xRes, xRes + sizeof(xRes));
+        m_xmp_buf.insert(m_xmp_buf.end(), yRes, yRes + sizeof(yRes));
+        m_xmp_buf.insert(m_xmp_buf.end(), footer, footer + sizeof(footer));
+        m_xmp_buf.insert(m_xmp_buf.end(), suffix, suffix + sizeof(suffix));
+    }
+
+
     /* QuickTime transformation matrix.
         a,b,c,d,x,y: divided as 16.16 bits.
         u,v,w;       divided as 2.30 bits */
@@ -304,4 +325,5 @@ private:
 private:
     uint64_t          m_cur_time = 0;
     std::vector<BYTE> m_write_buf; ///< write buffer (used when modifying moof atoms)
+    std::vector<BYTE> m_xmp_buf;
 };
