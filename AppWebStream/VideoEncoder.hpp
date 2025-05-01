@@ -343,7 +343,7 @@ public:
 
     VideoEncoderFF (unsigned short dimensions[2], unsigned int fps, const wchar_t * _filename) : VideoEncoderFF(dimensions, fps) {
         // Add the video streams using the default format codecs and initialize the codecs
-        AVCodec * video_codec = nullptr;
+        const AVCodec * video_codec = nullptr;
         std::tie(video_codec, stream, enc) = add_stream(out_ctx->oformat->video_codec);
 
         // open the video codecs and allocate the necessary encode buffers
@@ -362,7 +362,7 @@ public:
 
     VideoEncoderFF (unsigned short dimensions[2], unsigned int fps, IMFByteStream * socket) : VideoEncoderFF(dimensions, fps) {
         // Add the video streams using the default format codecs and initialize the codecs
-        AVCodec * video_codec = nullptr;
+        const AVCodec * video_codec = nullptr;
         std::tie(video_codec, stream, enc) = add_stream(out_ctx->oformat->video_codec);
 
         // REF: https://ffmpeg.org/ffmpeg-formats.html#Options-8 (-movflags arguments)
@@ -481,7 +481,7 @@ public:
 
 private:
     /* Add an output stream. */
-    std::tuple<AVCodec*,AVStream*, AVCodecContext*> add_stream (AVCodecID codec_id) {
+    std::tuple<const AVCodec*,AVStream*, AVCodecContext*> add_stream (AVCodecID codec_id) {
         // find the encoder
         const AVCodec *codec = avcodec_find_encoder(codec_id);
         if (!codec) {
