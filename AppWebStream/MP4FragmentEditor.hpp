@@ -23,24 +23,24 @@ public:
     /** Intended to be called from IMFByteStream::BeginWrite and IMFByteStream::Write before forwarding the data to a socket.
         Will modify the "moof" atom if present.
         returns a (ptr, size) tuple pointing to a potentially modified buffer. */
-    std::string_view EditStream (std::string_view buf) {
-        if (buf.size() < 5*S_HEADER_SIZE)
-            return buf; // too small to contain a moof (skip processing)
+    std::string_view EditStream (std::string_view buffer) {
+        if (buffer.size() < 5*S_HEADER_SIZE)
+            return buffer; // too small to contain a moof (skip processing)
 
-        uint32_t atom_size = GetAtomSize(buf.data());
-        assert(atom_size <= buf.size());
+        uint32_t atom_size = GetAtomSize(buffer.data());
+        assert(atom_size <= buffer.size());
 
-        if (IsAtomType(buf.data(), "moov")) {
+        if (IsAtomType(buffer.data(), "moov")) {
             // Movie container (moov)
-            assert(atom_size == buf.size());
-            return PrependXmpPacket(buf);
-        } else if (IsAtomType(buf.data(), "moof")) {
+            assert(atom_size == buffer.size());
+            return PrependXmpPacket(buffer);
+        } else if (IsAtomType(buffer.data(), "moof")) {
             // Movie Fragment (moof)
-            assert(atom_size == buf.size());
-            return ModifyMovieFragment(buf.data(), atom_size);
+            assert(atom_size == buffer.size());
+            return ModifyMovieFragment(buffer.data(), atom_size);
         }
 
-        return buf;
+        return buffer;
     }
 
 private:
