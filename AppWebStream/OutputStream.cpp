@@ -211,6 +211,8 @@ HRESULT OutputStream::BeginWrite(/*in*/const BYTE* pb, /*in*/ULONG cb, /*in*/IMF
 #ifndef ENABLE_FFMPEG
     if (FAILED(MFCreateAsyncResult(nullptr, callback, unkState, &async_res)))
         throw std::runtime_error("MFCreateAsyncResult failed");
+#else
+    (void)unkState; // mute unreferenced variable warning
 #endif
     
     hr = callback->Invoke(async_res); // will trigger EndWrite
