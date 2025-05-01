@@ -55,7 +55,7 @@ function AppendToQueue(sourceBuffer, data) {
 
 mediaSource.onsourceopen = (e) => {
     var mediaSource = e.target;
-    console.log("MSE: sourceOpen: "+mediaSource.readyState); // open
+    console.log("MSE: onsourceopen: "+mediaSource.readyState); // open
     URL.revokeObjectURL(video.src);
 
     var sourceBuffer = mediaSource.addSourceBuffer('video/mp4; codecs="avc1.64001F"');
@@ -91,18 +91,18 @@ mediaSource.onsourceopen = (e) => {
     });
 }
 mediaSource.onsourceended = (e) => {
-    console.log("MSE: sourceended.");
+    console.log("MSE: onsourceended.");
 }
 mediaSource.onsourceclose = (e) => {
-    console.log("MSE: sourceclose.");
+    console.log("MSE: onsourceclose.");
 }
 
 // Apple iOS ManagedMediaSource compatibility handlers
 mediaSource.onstartstreaming = (e) => {
-    console.log("MMSE: startstreaming.");
+    console.log("MMSE: onstartstreaming.");
 }
 mediaSource.onendstreaming = (e) => {
-    console.log("MMSE: endstreaming.");
+    console.log("MMSE: onendstreaming.");
 }
 
 </script>
