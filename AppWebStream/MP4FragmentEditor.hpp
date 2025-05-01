@@ -33,7 +33,7 @@ public:
         if (IsAtomType(buf.data(), "moov")) {
             // Movie container (moov)
             assert(atom_size == buf.size());
-            return PrependXmpPacket(buf.data(), buf.size());
+            return PrependXmpPacket(buf);
         } else if (IsAtomType(buf.data(), "moof")) {
             // Movie Fragment (moof)
             assert(atom_size == buf.size());
@@ -178,9 +178,9 @@ private:
         return TFDT_SIZE - BASE_DATA_OFFSET_SIZE; // tfdt added, tfhd shrunk
     }
 
-    std::string_view PrependXmpPacket(const char* buf, size_t size) {
+    std::string_view PrependXmpPacket(std::string_view buffer) {
         m_xmp_buf.clear();
-        m_xmp_buf.reserve(512 + size);
+        m_xmp_buf.reserve(512 + buffer.size());
         m_xmp_buf.resize(4 + 4 + 16); // 4byte size prefix, 4byte "uuid" type, 16byte UUID
         memcpy(m_xmp_buf.data() + 4, "uuid", 4); // atom type
 
@@ -226,7 +226,7 @@ private:
         Serialize<uint32_t>(m_xmp_buf.data(), (uint32_t)m_xmp_buf.size());
 
         // add "moov" atom afterwards
-        m_xmp_buf.insert(m_xmp_buf.end(), buf, buf + size);
+        m_xmp_buf.insert(m_xmp_buf.end(), buffer.data(), buffer.data() + buffer.size());
 
         return std::string_view(m_xmp_buf.data(), m_xmp_buf.size());
     }
