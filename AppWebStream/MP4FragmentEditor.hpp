@@ -332,9 +332,14 @@ private:
             memset(dest+num/*dst*/, 0/*val*/, source-dest/*size*/);
     }
 
+    /** Get MPEG4 atom type (4 chars). */
+    static char* GetAtomType(const BYTE* atom_ptr) {
+        return (char*)atom_ptr + 4;
+    }
+
     /** Check if an MPEG4 atom is of a given type. */
     static bool IsAtomType (const BYTE* atom_ptr, const char type[4]) {
-        return memcmp(atom_ptr+4, type, 4) == 0; // atom type is stored at offset 4-7
+        return memcmp(GetAtomType(atom_ptr), type, 4) == 0; // atom type is stored at offset 4-7
     }
 
     /** Get the size of an MPEG4 atom. */
