@@ -7,15 +7,15 @@
 
 <script>
 var video = document.getElementById("movie");
-video.addEventListener('error',function(e){
+video.onerror = (e) => {
     console.error("Video tag error: "+e);
-});
-video.addEventListener('play',function(e){
+};
+video.onplay = (e) => {
     console.log("Resuming video playback");
     // jump to last frame to catch up with stream
     if (video.buffered.length > 0)
         video.currentTime = video.buffered.end(0);
-});
+};
 
 if (window.ManagedMediaSource || window.MediaSource) {
     if (window.ManagedMediaSource) {
