@@ -30,6 +30,29 @@ if (window.ManagedMediaSource || window.MediaSource) {
     console.error("Media Source Extensions (MSE) not supported.")
 }
 
+var queue = [];
+function AppendToQueue(sourceBuffer, data) {
+    queue.push(data);
+
+    // check if SourceBuffer is ready to receive data
+    if (sourceBuffer.updating)
+        return;
+
+    // concatenate queued elements into a single array
+    var totalSize = 0;
+    for (var i = 0; i < queue.length; ++i)
+        totalSize += queue[i].byteLength;
+    var concatArray = new Uint8Array(totalSize);
+    var curPos = 0;
+    for (var i = 0; i < queue.length; ++i) {
+        concatArray.set(queue[i], curPos);
+        curPos += queue[i].byteLength;
+    }
+
+    sourceBuffer.appendBuffer(concatArray);
+    queue = [];
+}
+
 mediaSource.onsourceopen = (e) => {
     var mediaSource = e.target;
     console.log("MSE: sourceOpen: "+mediaSource.readyState); // open
@@ -43,30 +66,6 @@ mediaSource.onsourceopen = (e) => {
     sourceBuffer.addEventListener('abort', function (e) {
         console.error("sourceBuffer abort: "+mediaSource.readyState+", "+e);
     });
-
-    var queue = [];
-    function AppendToQueue (data) {
-        queue.push(data);
-        
-        // check if SourceBuffer is ready to receive data
-        if (sourceBuffer.updating)
-            return;
-
-        // concatenate queued elements into a single array
-        var totalSize = 0;
-        for (var i = 0; i < queue.length; ++i)
-            totalSize += queue[i].byteLength ;
-        var concatArray = new Uint8Array(totalSize);
-        var curPos = 0;
-        for (var i = 0; i < queue.length; ++i) {
-            concatArray.set(queue[i], curPos);
-            curPos += queue[i].byteLength ;
-        }
-        
-        sourceBuffer.appendBuffer(concatArray);
-        queue = [];
-    }
-
     sourceBuffer.addEventListener('updateend', function (e) {
         //console.log("sourceBuffer updateend");
     });
@@ -81,7 +80,7 @@ mediaSource.onsourceopen = (e) => {
                 if (done)
                     return;
                 
-                AppendToQueue(value);
+                AppendToQueue(sourceBuffer, value);
                 return pump();
             })
         }
