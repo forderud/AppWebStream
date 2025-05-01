@@ -443,8 +443,8 @@ public:
                 }
             }
 
-            m_frame->pts = next_pts;
-            next_pts++; // increment next pts
+            m_frame->pts = m_next_pts;
+            m_next_pts++; // increment next pts
         }
 
         // encode frame
@@ -577,7 +577,7 @@ private:
     }
 
     unsigned int       m_fps = 0;
-    int64_t         next_pts = 0; // pts of the next frame that will be generated
+    int64_t         m_next_pts = 0; // pts of the next frame that will be generated
     AVFormatContext *m_out_ctx = nullptr;
     AVStream         *m_stream = nullptr;
     AVCodecContext      *m_enc = nullptr;
