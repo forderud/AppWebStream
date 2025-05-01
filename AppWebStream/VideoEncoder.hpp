@@ -50,6 +50,7 @@ _COM_SMARTPTR_TYPEDEF(IMFMediaType,   __uuidof(IMFMediaType));
 extern "C" {
 #include <libavutil/opt.h>
 #include <libavformat/avformat.h>
+#include <libavcodec/avcodec.h>
 }
 
 #endif
@@ -482,7 +483,7 @@ private:
     /* Add an output stream. */
     std::tuple<AVCodec*,AVStream*, AVCodecContext*> add_stream (AVCodecID codec_id, /*in/out*/AVFormatContext *out_ctx) {
         // find the encoder
-        AVCodec *codec = avcodec_find_encoder(codec_id);
+        const AVCodec *codec = avcodec_find_encoder(codec_id);
         if (!codec) {
             const char * name = avcodec_get_name(codec_id);
             throw std::runtime_error("Could not find encoder for");
