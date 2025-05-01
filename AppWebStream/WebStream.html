@@ -53,15 +53,15 @@ mediaSource.onsourceopen = (e) => {
 
     var sourceBuffer = mediaSource.addSourceBuffer('video/mp4; codecs="avc1.64001F"');
     sourceBuffer.mode = "sequence";
-    sourceBuffer.addEventListener('error', function (e) {
+    sourceBuffer.onerror = (e) => {
         console.error("sourceBuffer error: "+mediaSource.readyState+", "+e);
-    });
-    sourceBuffer.addEventListener('abort', function (e) {
+    };
+    sourceBuffer.onabort = (e) => {
         console.error("sourceBuffer abort: "+mediaSource.readyState+", "+e);
-    });
-    sourceBuffer.addEventListener('updateend', function (e) {
+    };
+    sourceBuffer.onupdateend = (e) => {
         //console.log("sourceBuffer updateend");
-    });
+    };
 
     var url = "movie.mp4";
     console.log("streaming URL: "+url);
