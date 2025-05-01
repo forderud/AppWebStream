@@ -189,7 +189,7 @@ private:
         memcpy(m_xmp_buf.data() + 8, &guid, sizeof(guid)); // XMP UUID value
 
         {
-            // XML payload
+            // XMP packet in UTF-8
             // based on https://archimedespalimpsest.net/Documents/External/XMP/XMPSpecificationPart3.pdf
             const char prefix[] = "<?xpacket begin=\"﻿\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>"; // "begin" value is UTF-8 BOM (0xEF 0xBB 0xBF)
             m_xmp_buf.insert(m_xmp_buf.end(), prefix, prefix + sizeof(prefix));
