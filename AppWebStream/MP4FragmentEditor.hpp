@@ -23,23 +23,26 @@ public:
     /** Intended to be called from IMFByteStream::BeginWrite and IMFByteStream::Write before forwarding the data to a socket.
         Will modify the "moof" atom if present.
         returns a (ptr, size) tuple pointing to a potentially modified buffer. */
-    std::tuple<const char*, ULONG> EditStream (const char* buf, ULONG size) {
-        if (size < 5*S_HEADER_SIZE)
-            return std::tie(buf,size); // too small to contain a moof (skip processing)
+    std::string_view EditStream (std::string_view buf) {
+        if (buf.size() < 5*S_HEADER_SIZE)
+            return buf; // too small to contain a moof (skip processing)
 
-        uint32_t atom_size = GetAtomSize(buf);
-        assert(atom_size <= size);
+        uint32_t atom_size = GetAtomSize(buf.data());
+        assert(atom_size <= buf.size());
 
-        if (IsAtomType(buf, "moov")) {
+        if (IsAtomType(buf.data(), "moov")) {
             // Movie container (moov)
-            assert(atom_size == size);
-        } else if (IsAtomType(buf, "moof")) {
+            assert(atom_size == buf.size());
+        } else if (IsAtomType(buf.data(), "moof")) {
             // Movie Fragment (moof)
-            assert(atom_size == size);
-            return ModifyMovieFragment(buf, atom_size);
+            assert(atom_size == buf.size());
+            const char* tmp = nullptr;
+            size_t size = 0;
+            std::tie(tmp, size) = ModifyMovieFragment(buf.data(), atom_size);
+            return std::string_view(tmp, size);
         }
 
-        return std::tie(buf, size);
+        return buf;
     }
 
 private:

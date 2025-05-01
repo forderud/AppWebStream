@@ -174,10 +174,7 @@ HRESULT OutputStream::EndRead(/*in*/IMFAsyncResult* /*result*/, /*out*/ULONG* /*
 
 HRESULT OutputStream::WriteImpl(std::string_view buffer) {
 #ifndef ENABLE_FFMPEG
-    const char* tmp = nullptr;
-    size_t size = 0;
-    std::tie(tmp,size) = m_stream_editor.EditStream(buffer.data(), (ULONG)buffer.size());
-    buffer = std::string_view(tmp, size);
+    buffer = m_stream_editor.EditStream(buffer);
 #endif
 
     int byte_count = m_writer->WriteBytes(buffer);
