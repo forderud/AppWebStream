@@ -181,12 +181,13 @@ private:
     void ConstructXmpPacket() {
         m_xmp_buf.clear();
         m_xmp_buf.reserve(512);
-        m_xmp_buf.resize(4 + 4 + 16); // 4byte size prefix, 4byte "uuid" type, 16byte UUID
+        m_xmp_buf.resize(4 + 4); // 4byte size prefix, 4byte "uuid" type
         memcpy(m_xmp_buf.data() + 4, "uuid", 4); // atom type
 
         GUID guid{};
         CLSIDFromString(L"{be7acfcb-97a9-42e8-9c71-999491e3afac}", &guid);
         memcpy(m_xmp_buf.data() + 8, &guid, sizeof(guid)); // XMP UUID value
+        m_xmp_buf.insert(m_xmp_buf.end(), (BYTE*)&guid, (BYTE*)&guid + sizeof(guid));
 
         {
             // XMP packet in UTF-8
