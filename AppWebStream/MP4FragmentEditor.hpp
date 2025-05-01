@@ -363,7 +363,7 @@ private:
     }
 
 private:
-    ULONG             m_resolution[2] = {}; // {numerator, denominator}
+    ULONG             m_resolution[2] = {}; // {numerator, denominator} pixels per cm
     uint64_t          m_cur_time = 0;
     std::vector<char> m_moof_buf; ///< "moof" atom modification buffer
     std::vector<char> m_xmp_buf;  ///< top-level "uuid" atom with XMP resolution metadata
