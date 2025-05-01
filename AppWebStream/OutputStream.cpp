@@ -124,10 +124,10 @@ OutputStream::~OutputStream() {
 
 void OutputStream::SetPortOrFilename(const char * port_or_filename) {
     if (atoi(port_or_filename)) {
-        std::cout << "Please connect with a web browser on port " << port_or_filename << " to receive the stream" << std::endl;
+        printf("Please connect with a web browser on port %s to receive the stream\n", port_or_filename);
         m_writer = std::make_unique<WebStream>(port_or_filename);
     } else {
-        std::cout << "Storing movie to file " << port_or_filename << std::endl;
+        printf("Storing movie to file %s\n", port_or_filename);
         m_writer = std::make_unique<FileStream>(port_or_filename);
     }
 }

@@ -136,7 +136,7 @@ int main (int argc, char *argv[]) {
     window_dc wnd_dc(win_handle);
     std::array<unsigned short,2> dims = { static_cast<unsigned short>(wnd_dc.width()), static_cast<unsigned short>(wnd_dc.height()) };
     if (!wnd_dc.dc) {
-        std::cerr << "ERROR: Invalid window handle" << std::flush;
+        fprintf(stderr, "ERROR: Invalid window handle\n");
         return -1;
     }
 
