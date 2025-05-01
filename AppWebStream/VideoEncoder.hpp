@@ -347,7 +347,7 @@ public:
         std::tie(video_codec, m_stream, m_enc) = add_stream(m_out_ctx->oformat->video_codec);
 
         // open the video codecs and allocate the necessary encode buffers
-        frame = open_video(video_codec, nullptr, m_enc, m_stream->codecpar);
+        m_frame = open_video(video_codec, nullptr, m_enc, m_stream->codecpar);
 
         // open the output file
         assert(!(m_out_ctx->oformat->flags & AVFMT_NOFILE));
@@ -371,7 +371,7 @@ public:
         av_dict_set(&opt, "movflags", "empty_moov+default_base_moof+frag_every_frame", 0); // fragmented MP4
 
         // open the video codecs and allocate the necessary encode buffers
-        frame = open_video(video_codec, opt, m_enc, m_stream->codecpar);
+        m_frame = open_video(video_codec, opt, m_enc, m_stream->codecpar);
 
         m_out_buf.resize(16*1024*1024); // 16MB
         m_socket = socket; // prevent socket from being destroyed before this object
@@ -390,7 +390,7 @@ public:
 
         avcodec_free_context(&m_enc);
 
-        av_frame_free(&frame);
+        av_frame_free(&m_frame);
 
         avio_context_free(&m_out_ctx->pb);
         avformat_free_context(m_out_ctx);
@@ -418,7 +418,7 @@ public:
 
     HRESULT WriteFrameImpl (bool has_frame) {
         if (has_frame) {
-            if (av_frame_make_writable(frame) < 0)
+            if (av_frame_make_writable(m_frame) < 0)
                 exit(1);
 
             assert(m_enc->pix_fmt == AV_PIX_FMT_YUV420P);
@@ -431,24 +431,24 @@ public:
                     unsigned char Y=0, U=0, V=0;
                     YUVfromRGB(rgb, Y, U, V);
                     // write Y value
-                    frame->data[0][y*frame->linesize[0] + x] = Y;
+                    m_frame->data[0][y* m_frame->linesize[0] + x] = Y;
                     // write subsambled Cb,Cr values
                     if (((x % 2) == 0) && ((y % 2) == 0)) {
-                        frame->data[1][y/2*frame->linesize[1] + x/2] = V/4;
-                        frame->data[2][y/2*frame->linesize[2] + x/2] = U/4;
+                        m_frame->data[1][y/2* m_frame->linesize[1] + x/2] = V/4;
+                        m_frame->data[2][y/2* m_frame->linesize[2] + x/2] = U/4;
                     } else {
-                        frame->data[1][y/2*frame->linesize[1] + x/2] += V/4;
-                        frame->data[2][y/2*frame->linesize[2] + x/2] += U/4;
+                        m_frame->data[1][y/2* m_frame->linesize[1] + x/2] += V/4;
+                        m_frame->data[2][y/2* m_frame->linesize[2] + x/2] += U/4;
                     }
                 }
             }
 
-            frame->pts = next_pts;
+            m_frame->pts = next_pts;
             next_pts++; // increment next pts
         }
 
         // encode frame
-        int ret = avcodec_send_frame(m_enc, has_frame ? frame : nullptr);
+        int ret = avcodec_send_frame(m_enc, has_frame ? m_frame : nullptr);
         if (ret < 0)
             throw std::runtime_error("Error encoding video frame");
 
@@ -582,7 +582,7 @@ private:
     AVFormatContext *m_out_ctx = nullptr;
     AVStream         *m_stream = nullptr;
     AVCodecContext      *m_enc = nullptr;
-    AVFrame           *frame = nullptr;
+    AVFrame           *m_frame = nullptr;
 
     std::vector<R8G8B8A8>      m_rgb_buf;
     std::vector<unsigned char> m_out_buf;
