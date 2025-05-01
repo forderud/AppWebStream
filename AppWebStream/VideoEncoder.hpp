@@ -388,7 +388,6 @@ public:
         // write file ending (discard error codes)
         av_write_trailer(out_ctx);
 
-        avcodec_close(enc);
         avcodec_free_context(&enc);
 
         av_frame_free(&frame);
