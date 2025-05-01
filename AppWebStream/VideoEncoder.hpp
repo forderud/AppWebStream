@@ -344,7 +344,7 @@ public:
     VideoEncoderFF (unsigned short dimensions[2], unsigned int fps, const wchar_t * _filename) : VideoEncoderFF(dimensions, fps) {
         // Add the video streams using the default format codecs and initialize the codecs
         AVCodec * video_codec = nullptr;
-        std::tie(video_codec, stream, enc) = add_stream(out_ctx->oformat->video_codec, out_ctx);
+        std::tie(video_codec, stream, enc) = add_stream(out_ctx->oformat->video_codec);
 
         // open the video codecs and allocate the necessary encode buffers
         frame = open_video(video_codec, nullptr, enc, stream->codecpar);
@@ -363,7 +363,7 @@ public:
     VideoEncoderFF (unsigned short dimensions[2], unsigned int fps, IMFByteStream * socket) : VideoEncoderFF(dimensions, fps) {
         // Add the video streams using the default format codecs and initialize the codecs
         AVCodec * video_codec = nullptr;
-        std::tie(video_codec, stream, enc) = add_stream(out_ctx->oformat->video_codec, out_ctx);
+        std::tie(video_codec, stream, enc) = add_stream(out_ctx->oformat->video_codec);
 
         // REF: https://ffmpeg.org/ffmpeg-formats.html#Options-8 (-movflags arguments)
         // REF: https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/movenc.c
@@ -481,7 +481,7 @@ public:
 
 private:
     /* Add an output stream. */
-    std::tuple<AVCodec*,AVStream*, AVCodecContext*> add_stream (AVCodecID codec_id, /*in/out*/AVFormatContext *out_ctx) {
+    std::tuple<AVCodec*,AVStream*, AVCodecContext*> add_stream (AVCodecID codec_id) {
         // find the encoder
         const AVCodec *codec = avcodec_find_encoder(codec_id);
         if (!codec) {
