@@ -31,11 +31,11 @@ if (window.ManagedMediaSource || window.MediaSource) {
 }
 
 mediaSource.onsourceopen = (e) => {
-    console.log("sourceOpen: "+this.readyState); // open
+    var mediaSource = e.target;
+    console.log("sourceOpen: "+mediaSource.readyState); // open
     URL.revokeObjectURL(video.src);
     var url = "movie.mp4";
     var mime = 'video/mp4; codecs="avc1.64001F"';
-    var mediaSource = e.target;
     var sourceBuffer = mediaSource.addSourceBuffer(mime);
     sourceBuffer.mode = "sequence";
     sourceBuffer.addEventListener('error', function (e) {
