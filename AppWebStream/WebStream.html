@@ -26,12 +26,11 @@ if (window.ManagedMediaSource || window.MediaSource) {
         console.log("Using Media Source extension.")
     }
     video.src = URL.createObjectURL(mediaSource);
-    mediaSource.addEventListener('sourceopen', sourceOpen);
 } else {
     console.error("Media Source Extensions (MSE) not supported.")
 }
 
-function sourceOpen(e) {
+mediaSource.onsourceopen = (e) => {
     console.log("sourceOpen: "+this.readyState); // open
     URL.revokeObjectURL(video.src);
     var url = "movie.mp4";
