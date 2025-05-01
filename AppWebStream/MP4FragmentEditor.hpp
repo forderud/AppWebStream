@@ -184,13 +184,19 @@ private:
         m_xmp_buf.resize(4 + 4 + 16); // 4byte size prefix, 4byte "uuid" type, 16byte UUID
         memcpy(m_xmp_buf.data() + 4, "uuid", 4); // atom type
 
-        GUID guid{};
-        CLSIDFromString(L"{be7acfcb-97a9-42e8-9c71-999491e3afac}", &guid);  // XMP UUID value
-        Serialize<ULONG>(m_xmp_buf.data() + 8, guid.Data1);
-        Serialize<USHORT>(m_xmp_buf.data() + 12, guid.Data2);
-        Serialize<USHORT>(m_xmp_buf.data() + 14, guid.Data3);
-        memcpy(m_xmp_buf.data() + 16, guid.Data4, sizeof(guid.Data4));
-
+        {
+            // big endian UUID serialization
+            char* dst = m_xmp_buf.data() + 8;
+            GUID guid{};
+            CLSIDFromString(L"{be7acfcb-97a9-42e8-9c71-999491e3afac}", &guid);  // XMP UUID value
+            Serialize<ULONG>(dst, guid.Data1);
+            dst += sizeof(ULONG);
+            Serialize<USHORT>(dst, guid.Data2);
+            dst += sizeof(USHORT);
+            Serialize<USHORT>(dst, guid.Data3);
+            dst += sizeof(USHORT);
+            memcpy(dst, guid.Data4, sizeof(guid.Data4));
+        }
         {
             // XMP packet in UTF-8
             // based on https://archimedespalimpsest.net/Documents/External/XMP/XMPSpecificationPart3.pdf
