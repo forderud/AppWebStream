@@ -319,7 +319,7 @@ private:
 class VideoEncoderFF : public VideoEncoder {
 public:
     /** Stream writing callback. */
-    static int WritePackage (void *opaque, uint8_t *buf, int buf_size) {
+    static int WritePackage (void *opaque, const uint8_t *buf, int buf_size) {
         IMFByteStream * stream = reinterpret_cast<IMFByteStream*>(opaque);
         ULONG bytes_written = 0;
         if (FAILED(stream->Write(buf, buf_size, &bytes_written)))
