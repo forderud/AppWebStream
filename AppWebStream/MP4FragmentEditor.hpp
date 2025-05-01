@@ -8,14 +8,21 @@
     Please delete this class if a better alternative becomes available.
 Expected atom hiearchy:
 [moov] movie box
+* [mvhd] movie header box
 * [trak] track box
+  - [tkhd] track header box
   - [mdia] media box
+    * [mdhd] media header box
+    * [hdlr] handler box
     * [minf] media information box
+      - [vmhd] video media header box
       - [dinf] data information box
         * [dref] data reference box
+          - [url] data entry url box
       - [stbl] ample table box
         * [stsd] sample description box
-          - [avc1] (will be modified)
+          - [avc1]
+            * [avcC] AVC configuration box (will be modified)
 [moof] movie fragment
 * [mfhd] movie fragment header
 * [traf] track fragment
