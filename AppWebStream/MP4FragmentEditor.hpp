@@ -33,7 +33,6 @@ public:
         if (IsAtomType(buf, "moov")) {
             // Movie container (moov)
             assert(atom_size == size);
-            return ModifyMovieContainer(buf, size);
         } else if (IsAtomType(buf, "moof")) {
             // Movie Fragment (moof)
             assert(atom_size == size);
@@ -229,8 +228,8 @@ private:
     };
     static_assert(sizeof(matrix) == 36);
 
-    std::tuple<const BYTE*, ULONG> ModifyMovieContainer(const BYTE* buf, const ULONG size) {
 #if 0
+    std::tuple<const BYTE*, ULONG> ModifyMovieContainer(const BYTE* buf, const ULONG size) {
         const BYTE* ptr = buf;
         assert(IsAtomType(ptr, "moov"));
         assert(GetAtomSize(ptr) == size);
@@ -298,9 +297,9 @@ private:
             // end of "mvhd" atom
             assert(ptr == buf + 8 + mvhd_len);
         }
-#endif
         return std::tie(buf, size);
     }
+#endif
 
     /** Deserialize & conververt from big-endian. */
     template <typename T>
