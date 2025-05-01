@@ -64,7 +64,7 @@ public:
     END_COM_MAP()
 
 private:
-    HRESULT WriteImpl(/*in*/const char* buf, ULONG size);
+    HRESULT WriteImpl(std::string_view buffer);
 
     mutable std::mutex m_mutex;
     unsigned long      m_tmp_bytes_written = 0;
