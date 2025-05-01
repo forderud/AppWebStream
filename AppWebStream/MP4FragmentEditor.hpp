@@ -201,10 +201,10 @@ private:
             const char resUnit[] = "<tiff:ResolutionUnit>3</tiff:ResolutionUnit>"; // 3 is cm
             m_xmp_buf.insert(m_xmp_buf.end(), resUnit, resUnit + sizeof(resUnit));
 
-            const char xRes[] = "<tiff:XResolution>1000/1</tiff:XResolution>";
+            const char xRes[] = "<tiff:XResolution>1000/1</tiff:XResolution>"; // horizontal pixels per cm
             m_xmp_buf.insert(m_xmp_buf.end(), xRes, xRes + sizeof(xRes));
 
-            const char yRes[] = "<tiff:YResolution>1000/1</tiff:YResolution>";
+            const char yRes[] = "<tiff:YResolution>1000/1</tiff:YResolution>"; // vertical pixels per cm
             m_xmp_buf.insert(m_xmp_buf.end(), yRes, yRes + sizeof(yRes));
 
             const char footer[] = "</rdf:Description></rdf:RDF></x:xmpmeta>";
