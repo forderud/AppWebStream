@@ -91,6 +91,15 @@ mediaSource.onsourceopen = (e) => {
         console.error("fetch error: "+e);
     });
 }
+
+// Apple iOS ManagedMediaSource compatibility handlers
+mediaSource.onstartstreaming = (e) => {
+    console.log("MMSE: startstreaming.");
+}
+mediaSource.onendstreaming = (e) => {
+    console.log("MMSE: endstreaming.");
+}
+
 </script>
 </body>
 </html>
