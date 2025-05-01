@@ -54,10 +54,10 @@ mediaSource.onsourceopen = (e) => {
     var sourceBuffer = mediaSource.addSourceBuffer('video/mp4; codecs="avc1.64001F"');
     sourceBuffer.mode = "sequence";
     sourceBuffer.onerror = (e) => {
-        console.error("sourceBuffer error: "+mediaSource.readyState+", "+e);
+        console.error("sourceBuffer error: "+parent.mediaSource.readyState+", "+e);
     };
     sourceBuffer.onabort = (e) => {
-        console.error("sourceBuffer abort: "+mediaSource.readyState+", "+e);
+        console.error("sourceBuffer abort: "+parent.mediaSource.readyState+", "+e);
     };
     sourceBuffer.onupdateend = (e) => {
         //console.log("sourceBuffer updateend");
