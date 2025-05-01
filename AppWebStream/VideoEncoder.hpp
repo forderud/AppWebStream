@@ -334,8 +334,8 @@ public:
 #endif
 
         /* allocate the output media context */
-        avformat_alloc_output_context2(&out_ctx, nullptr, "mp4", nullptr);
-        if (!out_ctx)
+        avformat_alloc_output_context2(&m_out_ctx, nullptr, "mp4", nullptr);
+        if (!m_out_ctx)
             throw std::runtime_error("avformat_alloc_output_context2 failure");
 
         m_rgb_buf.resize(Align(m_width)*Align(m_height));
@@ -344,15 +344,15 @@ public:
     VideoEncoderFF (unsigned short dimensions[2], unsigned int fps, const wchar_t * _filename) : VideoEncoderFF(dimensions, fps) {
         // Add the video streams using the default format codecs and initialize the codecs
         const AVCodec * video_codec = nullptr;
-        std::tie(video_codec, stream, enc) = add_stream(out_ctx->oformat->video_codec);
+        std::tie(video_codec, stream, enc) = add_stream(m_out_ctx->oformat->video_codec);
 
         // open the video codecs and allocate the necessary encode buffers
         frame = open_video(video_codec, nullptr, enc, stream->codecpar);
 
         // open the output file
-        assert(!(out_ctx->oformat->flags & AVFMT_NOFILE));
+        assert(!(m_out_ctx->oformat->flags & AVFMT_NOFILE));
         auto filename = ToAscii(_filename);
-        int ret = avio_open(&out_ctx->pb, filename.c_str(), AVIO_FLAG_WRITE);
+        int ret = avio_open(&m_out_ctx->pb, filename.c_str(), AVIO_FLAG_WRITE);
         if (ret < 0) {
             throw std::runtime_error("avio_open failure");
         }
@@ -363,7 +363,7 @@ public:
     VideoEncoderFF (unsigned short dimensions[2], unsigned int fps, IMFByteStream * socket) : VideoEncoderFF(dimensions, fps) {
         // Add the video streams using the default format codecs and initialize the codecs
         const AVCodec * video_codec = nullptr;
-        std::tie(video_codec, stream, enc) = add_stream(out_ctx->oformat->video_codec);
+        std::tie(video_codec, stream, enc) = add_stream(m_out_ctx->oformat->video_codec);
 
         // REF: https://ffmpeg.org/ffmpeg-formats.html#Options-8 (-movflags arguments)
         // REF: https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/movenc.c
@@ -375,7 +375,7 @@ public:
 
         m_out_buf.resize(16*1024*1024); // 16MB
         m_socket = socket; // prevent socket from being destroyed before this object
-        out_ctx->pb = avio_alloc_context(m_out_buf.data(), static_cast<int>(m_out_buf.size()), 1/*writable*/, socket, nullptr/*read*/, WritePackage, nullptr/*seek*/);
+        m_out_ctx->pb = avio_alloc_context(m_out_buf.data(), static_cast<int>(m_out_buf.size()), 1/*writable*/, socket, nullptr/*read*/, WritePackage, nullptr/*seek*/);
         //out_ctx->flags |= AVFMT_FLAG_CUSTOM_IO;
 
         WriteHeader(opt);
@@ -386,24 +386,24 @@ public:
         WriteFrameImpl(false);
 
         // write file ending (discard error codes)
-        av_write_trailer(out_ctx);
+        av_write_trailer(m_out_ctx);
 
         avcodec_free_context(&enc);
 
         av_frame_free(&frame);
 
-        avio_context_free(&out_ctx->pb);
-        avformat_free_context(out_ctx);
+        avio_context_free(&m_out_ctx->pb);
+        avformat_free_context(m_out_ctx);
     }
 
     void WriteHeader (AVDictionary *opt) {
 #ifndef NDEBUG
         // write info to console
-        av_dump_format(out_ctx, 0, nullptr, 1);
+        av_dump_format(m_out_ctx, 0, nullptr, 1);
 #endif
 
         // Write the stream header, if any
-        int ret = avformat_write_header(out_ctx, &opt);
+        int ret = avformat_write_header(m_out_ctx, &opt);
         if (ret < 0)
             throw std::runtime_error("avformat_write_header failed");
     }
@@ -470,7 +470,7 @@ public:
             pkt.stream_index = stream->index;
 
             // write compressed frame to stream
-            ret = av_interleaved_write_frame(out_ctx, &pkt);
+            ret = av_interleaved_write_frame(m_out_ctx, &pkt);
             if (ret < 0)
                 return E_FAIL;
         }
@@ -490,11 +490,11 @@ private:
         }
         assert(codec->type == AVMEDIA_TYPE_VIDEO);
 
-        AVStream * stream = avformat_new_stream(out_ctx, NULL);
+        AVStream * stream = avformat_new_stream(m_out_ctx, NULL);
         if (!stream)
             throw std::runtime_error("Could not allocate stream");
 
-        stream->id = out_ctx->nb_streams-1;
+        stream->id = m_out_ctx->nb_streams-1;
 
         // setup context
         AVCodecContext *enc = avcodec_alloc_context3(codec);
@@ -520,7 +520,7 @@ private:
                 throw std::runtime_error("zerolatency tuning failed");
 
             // Some formats want stream headers to be separate
-            if (out_ctx->oformat->flags & AVFMT_GLOBALHEADER)
+            if (m_out_ctx->oformat->flags & AVFMT_GLOBALHEADER)
                 enc->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
         }
 
@@ -579,7 +579,7 @@ private:
 
     unsigned int       m_fps = 0;
     int64_t         next_pts = 0; // pts of the next frame that will be generated
-    AVFormatContext *out_ctx = nullptr;
+    AVFormatContext *m_out_ctx = nullptr;
     AVStream         *stream = nullptr;
     AVCodecContext      *enc = nullptr;
     AVFrame           *frame = nullptr;
