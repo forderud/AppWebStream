@@ -576,7 +576,7 @@ private:
         V = static_cast<unsigned char>( 0.439f*rgb.r - 0.368f*rgb.g - 0.071f*rgb.b + 128);
     }
 
-    unsigned int       m_fps = 0;
+    unsigned int         m_fps = 0;
     int64_t         m_next_pts = 0; // pts of the next frame that will be generated
     AVFormatContext *m_out_ctx = nullptr;
     AVStream         *m_stream = nullptr;
