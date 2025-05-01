@@ -452,7 +452,7 @@ public:
         if (ret < 0)
             throw std::runtime_error("Error encoding video frame");
 
-        std::unique_ptr<AVPacket, void(*)(AVPacket*)> pkt(av_packet_alloc(), av_packet_unref);
+        std::unique_ptr<AVPacket, decltype(&av_packet_unref)> pkt(av_packet_alloc(), av_packet_unref);
 
         // process packages
         for (;;) {
