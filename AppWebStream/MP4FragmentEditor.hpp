@@ -177,7 +177,7 @@ private:
         return TFDT_SIZE - BASE_DATA_OFFSET_SIZE; // tfdt added, tfhd shrunk
     }
 
-    void ConstructXmpPacket() {
+    std::string_view GetXmpPacket() {
         m_xmp_buf.clear();
         m_xmp_buf.reserve(512);
         m_xmp_buf.resize(4 + 4); // 4byte size prefix, 4byte "uuid" type
@@ -215,6 +215,8 @@ private:
 
         // set atom size prefix
         Serialize<uint32_t>(m_xmp_buf.data(), (uint32_t)m_xmp_buf.size());
+
+        return std::string_view(m_xmp_buf.data(), m_xmp_buf.size());
     }
 
 
