@@ -79,7 +79,7 @@ public:
             return size + block_size - (size % block_size);
     }
 
-    VideoEncoder (std::array<unsigned short, 2> dimensions) : m_width(dimensions[0]), m_height(dimensions[1]) {
+    VideoEncoder (unsigned short dimensions[2]) : m_width(dimensions[0]), m_height(dimensions[1]) {
     }
 
     virtual ~VideoEncoder () = default;
@@ -139,7 +139,7 @@ protected:
 class VideoEncoderMF : public VideoEncoder {
 public:
     /** File-based video encoding. */
-    VideoEncoderMF (std::array<unsigned short, 2> dimensions, unsigned int fps, const wchar_t * filename) : VideoEncoderMF(dimensions, fps) {
+    VideoEncoderMF (unsigned short dimensions[2], unsigned int fps, const wchar_t * filename) : VideoEncoderMF(dimensions, fps) {
         const unsigned int bit_rate = static_cast<unsigned int>(0.78f*fps*Align(m_width)*Align(m_height)); // yields 40Mb/s for 1920x1080@25fps (max blu-ray quality)
 
         CComPtr<IMFAttributes> attribs;
@@ -159,7 +159,7 @@ public:
     }
 
     /** Stream-based video encoding. */
-    VideoEncoderMF (std::array<unsigned short, 2> dimensions, unsigned int fps, IMFByteStream * stream) : VideoEncoderMF(dimensions, fps) {
+    VideoEncoderMF (unsigned short dimensions[2], unsigned int fps, IMFByteStream * stream) : VideoEncoderMF(dimensions, fps) {
         const unsigned int bit_rate = static_cast<unsigned int>(0.78f*fps*m_width*m_height); // yields 40Mb/s for 1920x1080@25fps
 
         CComPtr<IMFAttributes> attribs;
@@ -202,7 +202,7 @@ public:
         COM_CHECK(m_sink_writer->BeginWriting());
     }
 
-    VideoEncoderMF (std::array<unsigned short, 2> dimensions, unsigned int fps) : VideoEncoder(dimensions) {
+    VideoEncoderMF (unsigned short dimensions[2], unsigned int fps) : VideoEncoder(dimensions) {
         COM_CHECK(MFStartup(MF_VERSION));
         COM_CHECK(MFFrameRateToAverageTimePerFrame(fps, 1, const_cast<unsigned long long*>(&m_frame_duration)));
     }
@@ -332,7 +332,7 @@ public:
         return buf_size;
     }
 
-    VideoEncoderFF (std::array<unsigned short, 2> dimensions, unsigned int fps) : VideoEncoder(dimensions), m_fps(fps) {
+    VideoEncoderFF (unsigned short dimensions[2], unsigned int fps) : VideoEncoder(dimensions), m_fps(fps) {
 #if LIBAVFORMAT_VERSION_MAJOR < 58
         av_register_all();
 #endif
@@ -345,7 +345,7 @@ public:
         m_rgb_buf.resize(Align(m_width)*Align(m_height));
     }
 
-    VideoEncoderFF (std::array<unsigned short, 2> dimensions, unsigned int fps, const wchar_t * _filename) : VideoEncoderFF(dimensions, fps) {
+    VideoEncoderFF (unsigned short dimensions[2], unsigned int fps, const wchar_t * _filename) : VideoEncoderFF(dimensions, fps) {
         // Add the video streams using the default format codecs and initialize the codecs
         AVCodec * video_codec = nullptr;
         std::tie(video_codec, stream, enc) = add_stream(out_ctx->oformat->video_codec, out_ctx);
@@ -364,7 +364,7 @@ public:
         WriteHeader(nullptr);
     }
 
-    VideoEncoderFF (std::array<unsigned short, 2> dimensions, unsigned int fps, IMFByteStream * socket) : VideoEncoderFF(dimensions, fps) {
+    VideoEncoderFF (unsigned short dimensions[2], unsigned int fps, IMFByteStream * socket) : VideoEncoderFF(dimensions, fps) {
         // Add the video streams using the default format codecs and initialize the codecs
         AVCodec * video_codec = nullptr;
         std::tie(video_codec, stream, enc) = add_stream(out_ctx->oformat->video_codec, out_ctx);
