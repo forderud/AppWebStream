@@ -18,6 +18,9 @@ class MP4FragmentEditor {
 
 public:
     MP4FragmentEditor() {
+        // 10 pixels per cm
+        m_resolution[0] = 10;
+        m_resolution[1] = 1;
     }
 
     /** Intended to be called from IMFByteStream::BeginWrite and IMFByteStream::Write before forwarding the data to a socket.
@@ -33,7 +36,7 @@ public:
         if (IsAtomType(buffer.data(), "moov")) {
             // Movie container (moov)
             assert(atom_size == buffer.size());
-            return PrependXmpPacket(buffer, 10, 1);
+            return PrependXmpPacket(buffer);
         } else if (IsAtomType(buffer.data(), "moof")) {
             // Movie Fragment (moof)
             assert(atom_size == buffer.size());
@@ -176,7 +179,7 @@ private:
         return TFDT_SIZE - BASE_DATA_OFFSET_SIZE; // tfdt added, tfhd shrunk
     }
 
-    std::string_view PrependXmpPacket(std::string_view buffer, ULONG res_num, ULONG res_den) {
+    std::string_view PrependXmpPacket(std::string_view buffer) {
         m_xmp_buf.clear();
         m_xmp_buf.reserve(512 + buffer.size());
         m_xmp_buf.resize(4 + 4 + 16); // 4byte size prefix, 4byte "uuid" type, 16byte UUID
@@ -206,10 +209,10 @@ private:
 
             char resBuffer[64] = {};
             int resLen = 0;
-            resLen = sprintf_s(resBuffer, "<tiff:XResolution>%u/%u</tiff:XResolution>", res_num, res_den); // horizontal pixels per cm
+            resLen = sprintf_s(resBuffer, "<tiff:XResolution>%u/%u</tiff:XResolution>", m_resolution[0], m_resolution[1]); // horizontal pixels per cm
             m_xmp_buf.insert(m_xmp_buf.end(), resBuffer, resBuffer + resLen);
 
-            resLen = sprintf_s(resBuffer, "<tiff:YResolution>%u/%u</tiff:YResolution>", res_num, res_den); // vertical pixels per cm
+            resLen = sprintf_s(resBuffer, "<tiff:YResolution>%u/%u</tiff:YResolution>", m_resolution[0], m_resolution[1]); // vertical pixels per cm
             m_xmp_buf.insert(m_xmp_buf.end(), resBuffer, resBuffer + resLen);
 
             const char footer[] = "</rdf:Description></rdf:RDF></x:xmpmeta>";
@@ -360,6 +363,7 @@ private:
     }
 
 private:
+    ULONG             m_resolution[2] = {}; // {numerator, denominator}
     uint64_t          m_cur_time = 0;
     std::vector<char> m_moof_buf; ///< "moof" atom modification buffer
     std::vector<char> m_xmp_buf;  ///< top-level "uuid" atom with XMP resolution metadata
