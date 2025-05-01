@@ -30,18 +30,12 @@ if (window.ManagedMediaSource || window.MediaSource) {
     console.error("Media Source Extensions (MSE) not supported.")
 }
 
-var queue = [];
-function AppendToQueue(sourceBuffer, data) {
-    queue.push(data);
-
-    // check if SourceBuffer is ready to receive data
-    if (sourceBuffer.updating)
-        return;
-
+function ConcatenateQueue(queue) {
     // concatenate queued elements into a single array
     var totalSize = 0;
     for (var i = 0; i < queue.length; ++i)
         totalSize += queue[i].byteLength;
+
     var concatArray = new Uint8Array(totalSize);
     var curPos = 0;
     for (var i = 0; i < queue.length; ++i) {
@@ -49,8 +43,7 @@ function AppendToQueue(sourceBuffer, data) {
         curPos += queue[i].byteLength;
     }
 
-    sourceBuffer.appendBuffer(concatArray);
-    queue = [];
+    return concatArray;
 }
 
 mediaSource.onsourceopen = (e) => {
@@ -74,13 +67,18 @@ mediaSource.onsourceopen = (e) => {
     console.log("streaming URL: "+url);
     fetch(url).then(function(response) {
         var reader = response.body.getReader();
-        
+        var queue = [];
+
         function pump() {
             return reader.read().then(({done, value}) => {
                 if (done)
                     return;
-                
-                AppendToQueue(sourceBuffer, value);
+
+                queue.push(value);
+                if (!sourceBuffer.updating) {
+                    sourceBuffer.appendBuffer(ConcatenateQueue(queue));
+                    queue = [];
+                }
                 return pump();
             })
         }
