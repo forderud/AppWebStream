@@ -452,12 +452,11 @@ public:
         if (ret < 0)
             throw std::runtime_error("Error encoding video frame");
 
-        AVPacket pkt = {};
-        av_init_packet(&pkt);
+        std::unique_ptr<AVPacket, void(*)(AVPacket*)> pkt(av_packet_alloc(), av_packet_unref);
 
         // process packages
         for (;;) {
-            ret = avcodec_receive_packet(m_enc, &pkt);
+            ret = avcodec_receive_packet(m_enc, pkt.get());
             if (ret == AVERROR(EAGAIN))
                 break; // not yet available
             else if (!has_frame && (ret == AVERROR_EOF))
@@ -466,11 +465,11 @@ public:
                 throw std::runtime_error("avcodec_receive_packet failed");
 
             // rescale output packet timestamp values from codec to stream timebase
-            av_packet_rescale_ts(&pkt, m_enc->time_base, m_stream->time_base);
-            pkt.stream_index = m_stream->index;
+            av_packet_rescale_ts(pkt.get(), m_enc->time_base, m_stream->time_base);
+            pkt->stream_index = m_stream->index;
 
             // write compressed frame to stream
-            ret = av_interleaved_write_frame(m_out_ctx, &pkt);
+            ret = av_interleaved_write_frame(m_out_ctx, pkt.get());
             if (ret < 0)
                 return E_FAIL;
         }
