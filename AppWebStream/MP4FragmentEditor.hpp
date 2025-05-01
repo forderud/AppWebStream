@@ -180,6 +180,7 @@ private:
 
     void ConstructXmpPacket() {
         m_xmp_buf.clear();
+        m_xmp_buf.reserve(512);
         m_xmp_buf.resize(4 + 4 + 16); // 4byte size prefix, 4byte "uuid" type, 16byte UUID
         memcpy(m_xmp_buf.data() + 4, "uuid", 4); // atom type
 
