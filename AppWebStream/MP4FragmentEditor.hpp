@@ -185,8 +185,11 @@ private:
         memcpy(m_xmp_buf.data() + 4, "uuid", 4); // atom type
 
         GUID guid{};
-        CLSIDFromString(L"{be7acfcb-97a9-42e8-9c71-999491e3afac}", &guid);
-        memcpy(m_xmp_buf.data() + 8, &guid, sizeof(guid)); // XMP UUID value
+        CLSIDFromString(L"{be7acfcb-97a9-42e8-9c71-999491e3afac}", &guid);  // XMP UUID value
+        Serialize<ULONG>(m_xmp_buf.data() + 8, guid.Data1);
+        Serialize<USHORT>(m_xmp_buf.data() + 12, guid.Data2);
+        Serialize<USHORT>(m_xmp_buf.data() + 14, guid.Data3);
+        memcpy(m_xmp_buf.data() + 16, guid.Data4, sizeof(guid.Data4));
 
         {
             // XMP packet in UTF-8
