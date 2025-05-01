@@ -243,7 +243,7 @@ private:
     static_assert(sizeof(matrix) == 36);
 
 #if 0
-    std::tuple<const char*, ULONG> ModifyMovieContainer(const char* buf, const ULONG size) {
+    void ModifyMovieContainer(const char* buf, const ULONG size) {
         const char* ptr = buf;
         assert(IsAtomType(ptr, "moov"));
         assert(GetAtomSize(ptr) == size);
@@ -311,7 +311,6 @@ private:
             // end of "mvhd" atom
             assert(ptr == buf + 8 + mvhd_len);
         }
-        return std::tie(buf, size);
     }
 #endif
 
