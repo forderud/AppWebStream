@@ -90,6 +90,12 @@ mediaSource.onsourceopen = (e) => {
         console.error("fetch error: "+e);
     });
 }
+mediaSource.onsourceended = (e) => {
+    console.log("MSE: sourceended.");
+}
+mediaSource.onsourceclose = (e) => {
+    console.log("MSE: sourceclose.");
+}
 
 // Apple iOS ManagedMediaSource compatibility handlers
 mediaSource.onstartstreaming = (e) => {
