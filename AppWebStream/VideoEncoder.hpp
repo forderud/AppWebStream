@@ -2,7 +2,6 @@
 #include <stdexcept>
 #include <iostream>
 #include <vector>
-#include <array>
 #include <cassert>
 #include <Windows.h>
 #include <mfapi.h>
@@ -83,10 +82,6 @@ public:
     }
 
     virtual ~VideoEncoder () = default;
-
-    std::array<unsigned short, 2> Dims() const {
-        return {m_width, m_height};
-    }
 
     virtual R8G8B8A8* WriteFrameBegin () = 0;
     virtual HRESULT   WriteFrameEnd () = 0;
