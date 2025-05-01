@@ -32,11 +32,10 @@ if (window.ManagedMediaSource || window.MediaSource) {
 
 mediaSource.onsourceopen = (e) => {
     var mediaSource = e.target;
-    console.log("sourceOpen: "+mediaSource.readyState); // open
+    console.log("MSE: sourceOpen: "+mediaSource.readyState); // open
     URL.revokeObjectURL(video.src);
-    var url = "movie.mp4";
-    var mime = 'video/mp4; codecs="avc1.64001F"';
-    var sourceBuffer = mediaSource.addSourceBuffer(mime);
+
+    var sourceBuffer = mediaSource.addSourceBuffer('video/mp4; codecs="avc1.64001F"');
     sourceBuffer.mode = "sequence";
     sourceBuffer.addEventListener('error', function (e) {
         console.error("sourceBuffer error: "+mediaSource.readyState+", "+e);
@@ -72,6 +71,7 @@ mediaSource.onsourceopen = (e) => {
         //console.log("sourceBuffer updateend");
     });
 
+    var url = "movie.mp4";
     console.log("streaming URL: "+url);
     fetch(url).then(function(response) {
         var reader = response.body.getReader();
