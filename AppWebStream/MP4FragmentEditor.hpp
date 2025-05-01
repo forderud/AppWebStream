@@ -33,7 +33,7 @@ public:
         if (IsAtomType(buffer.data(), "moov")) {
             // Movie container (moov)
             assert(atom_size == buffer.size());
-            return PrependXmpPacket(buffer);
+            return PrependXmpPacket(buffer, 10, 1);
         } else if (IsAtomType(buffer.data(), "moof")) {
             // Movie Fragment (moof)
             assert(atom_size == buffer.size());
@@ -176,7 +176,7 @@ private:
         return TFDT_SIZE - BASE_DATA_OFFSET_SIZE; // tfdt added, tfhd shrunk
     }
 
-    std::string_view PrependXmpPacket(std::string_view buffer) {
+    std::string_view PrependXmpPacket(std::string_view buffer, ULONG res_num, ULONG res_den) {
         m_xmp_buf.clear();
         m_xmp_buf.reserve(512 + buffer.size());
         m_xmp_buf.resize(4 + 4 + 16); // 4byte size prefix, 4byte "uuid" type, 16byte UUID
@@ -204,11 +204,13 @@ private:
             const char resUnit[] = "<tiff:ResolutionUnit>3</tiff:ResolutionUnit>"; // 3 is cm
             m_xmp_buf.insert(m_xmp_buf.end(), resUnit, resUnit + sizeof(resUnit));
 
-            const char xRes[] = "<tiff:XResolution>10/1</tiff:XResolution>"; // horizontal pixels per cm
-            m_xmp_buf.insert(m_xmp_buf.end(), xRes, xRes + sizeof(xRes));
+            char resBuffer[64] = {};
+            int resLen = 0;
+            resLen = sprintf_s(resBuffer, "<tiff:XResolution>%u/%u</tiff:XResolution>", res_num, res_den); // horizontal pixels per cm
+            m_xmp_buf.insert(m_xmp_buf.end(), resBuffer, resBuffer + resLen);
 
-            const char yRes[] = "<tiff:YResolution>10/1</tiff:YResolution>"; // vertical pixels per cm
-            m_xmp_buf.insert(m_xmp_buf.end(), yRes, yRes + sizeof(yRes));
+            resLen = sprintf_s(resBuffer, "<tiff:YResolution>%u/%u</tiff:YResolution>", res_num, res_den); // vertical pixels per cm
+            m_xmp_buf.insert(m_xmp_buf.end(), resBuffer, resBuffer + resLen);
 
             const char footer[] = "</rdf:Description></rdf:RDF></x:xmpmeta>";
             m_xmp_buf.insert(m_xmp_buf.end(), footer, footer + sizeof(footer));
