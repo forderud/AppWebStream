@@ -52,6 +52,7 @@ public:
         if (IsAtomType(buffer.data(), "moov")) {
             // Movie box (moov)
             assert(atom_size == buffer.size());
+            //ModifyMovieBox(buffer.data(), buffer.size());
             return PrependXmpPacket(buffer);
         } else if (IsAtomType(buffer.data(), "moof")) {
             // Movie Fragment (moof)
@@ -74,7 +75,7 @@ private:
     static_assert(sizeof(matrix) == 36);
 
 #if 0
-    void ModifyMovieBox(const char* buf, const ULONG size) {
+    void ModifyMovieBox(const char* buf, const size_t size) {
         const char* ptr = buf;
         assert(IsAtomType(ptr, "moov"));
         assert(GetAtomSize(ptr) == size);
@@ -100,8 +101,7 @@ private:
 
                 auto modificationTime = DeSerialize<uint64_t>(ptr);
                 ptr += 8;
-            }
-            else {
+            } else {
                 assert(mvhd_len == 108);
 
                 // seconds since Fri Jan 1 00:00:00 1904
@@ -118,8 +118,7 @@ private:
             if (version == 1) {
                 auto duration = DeSerialize<uint64_t>(ptr);
                 ptr += 8;
-            }
-            else {
+            } else {
                 auto duration = DeSerialize<uint32_t>(ptr);
                 ptr += 4;
             }
