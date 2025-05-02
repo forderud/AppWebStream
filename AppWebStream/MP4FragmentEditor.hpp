@@ -149,8 +149,38 @@ private:
         {
             // entering "trak" atom
             assert(IsAtomType(ptr, "trak"));
-            uint32_t trak_len = GetAtomSize(ptr);
-            trak_len;
+            //uint32_t trak_len = GetAtomSize(ptr);
+            ptr += 8;
+
+            {
+                // entering "tkhd" atom
+                assert(IsAtomType(ptr, "tkhd"));
+                uint32_t tkhd_len = GetAtomSize(ptr);
+                ptr += tkhd_len; // skip over this stom
+            }
+
+            // entring "mdia" atom
+            assert(IsAtomType(ptr, "mdia"));
+            //uint32_t mdia_len = GetAtomSize(ptr);
+            ptr += 8;
+
+            {
+                // entering "mdhd" atom
+                assert(IsAtomType(ptr, "mdhd"));
+                uint32_t mdhd_len = GetAtomSize(ptr);
+                ptr += mdhd_len;
+            }
+            {
+                // entering "hdlr" atom
+                assert(IsAtomType(ptr, "hdlr"));
+                uint32_t hdlr_len = GetAtomSize(ptr);
+                ptr += hdlr_len;
+            }
+
+            // entering "minf" atom
+            assert(IsAtomType(ptr, "minf"));
+            //uint32_t minf_len = GetAtomSize(ptr);
+            ptr += 8;
         }
     }
 
