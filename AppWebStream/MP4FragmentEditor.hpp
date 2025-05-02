@@ -211,6 +211,11 @@ private:
             assert(IsAtomType(ptr, "avc1"));
             //uint32_t avc1_len = GetAtomSize(ptr);
             ptr += 8;
+
+            assert(DeSerialize<USHORT>(ptr + 28) == 72); // horizontal DPI
+            assert(DeSerialize<USHORT>(ptr + 30) == 0);
+            assert(DeSerialize<USHORT>(ptr + 32) == 72); // vertical DPI
+            assert(DeSerialize<USHORT>(ptr + 34) == 0);
         }
     }
 
