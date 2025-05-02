@@ -52,7 +52,7 @@ public:
         if (IsAtomType(buffer.data(), "moov")) {
             // Movie box (moov)
             assert(atom_size == buffer.size());
-            ModifyMovieBox(buffer.data(), buffer.size());
+            ModifyMovieBox((char*)buffer.data(), buffer.size());
             return PrependXmpPacket(buffer);
         } else if (IsAtomType(buffer.data(), "moof")) {
             // Movie Fragment (moof)
@@ -74,8 +74,8 @@ private:
     };
     static_assert(sizeof(matrix) == 36);
 
-    void ModifyMovieBox(const char* buf, const size_t size) {
-        const char* ptr = buf;
+    void ModifyMovieBox(char* buf, const size_t size) {
+        char* ptr = buf;
         assert(IsAtomType(ptr, "moov"));
         assert(GetAtomSize(ptr) == size);
         ptr += 8; // skip size & type
@@ -212,10 +212,10 @@ private:
             //uint32_t avc1_len = GetAtomSize(ptr);
             ptr += 8;
 
-            assert(DeSerialize<USHORT>(ptr + 28) == 72); // horizontal DPI
-            assert(DeSerialize<USHORT>(ptr + 30) == 0);
-            assert(DeSerialize<USHORT>(ptr + 32) == 72); // vertical DPI
-            assert(DeSerialize<USHORT>(ptr + 34) == 0);
+            assert(DeSerialize<USHORT>(ptr + 28) == 72); // horizontal DPI (integer part)
+            assert(DeSerialize<USHORT>(ptr + 30) == 0);  //                (fraction)
+            assert(DeSerialize<USHORT>(ptr + 32) == 72); // vertical DPI (integer part)
+            assert(DeSerialize<USHORT>(ptr + 34) == 0);  //              (fraction)
         }
     }
 
