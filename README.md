@@ -1,7 +1,7 @@
 [Windows Media Foundation](https://msdn.microsoft.com/en-us/library/ms694197.aspx) and [FFMPEG](http://ffmpeg.org/) sample code for streaming an application window to a web browser. The video is encoded as a H.264 stream inside a fragmented MPEG4 container that is [Media Source Extensions (MSE)](https://www.w3.org/TR/media-source/) compatible, so that it can be received by modern web browsers with minimal client-side buffering.
 
 ### Scope
-This repo contains a _reference implementation_ that demonstrates how H.264 streaming _can_ be implemented on a product.
+This repo contains a _reference implementation_ that demonstrates how MPEG4 streaming _can_ be implemented on a product.
 
 Intended usage:
 * Lightweight environment for experimenting with video encoding settings.
@@ -38,6 +38,13 @@ The FFMPEG-based encoder is not affected by this issue.
 #### Frame grabbing method
 The project is currently using the GDI [`BitBlt`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-bitblt) function to copy the content of the specified window handle to an offscreen `HBITMAP` object. This works fine for many applications, but doesn't work for apps that use GPU-accelerated drawing. It would therefore probably be better to switch to the newer [Desktop Duplication API](https://learn.microsoft.com/en-us/windows/win32/direct3ddxgi/desktop-dup-api) for frame grabbing ([sample](https://github.com/microsoft/Windows-classic-samples/tree/main/Samples/DXGIDesktopDuplication)).
 
-## Browser support
-* Confirmed to work with Google Chrome, Microsoft Edge and Firefox.
+## Client support
+The video stream adheres to the MPEG4 standard, so it should be supported by all client SW supporting H.264 encoded MPEG4 streams. The following clients have already been verified to work:
+* Google Chrome
+* Microsoft Edge
+* Firefox
+* VLC media player (open stream as `http://localhost:port/movie.mp4`)
+* [ExifTool](https://exiftool.org/) can be used for extracting metadata if saving the stream to file.
+
+Unsupported clients:
 * Doesn't yet work on iOS, due to incomplete `ManagedMediaSource` support ([issue #25](../../issues/25)).
