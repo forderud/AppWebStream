@@ -220,7 +220,7 @@ private:
 
             // update video DPI
             auto dpi_int = (USHORT)m_dpi;
-            auto dpi_frac = (USHORT)((m_dpi - dpi_int)/65536);
+            auto dpi_frac = (USHORT)((m_dpi - dpi_int)*65536);
             Serialize<USHORT>(ptr + 28, dpi_int);
             Serialize<USHORT>(ptr + 30, dpi_frac);
             Serialize<USHORT>(ptr + 32, dpi_int);
