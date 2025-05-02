@@ -200,12 +200,18 @@ private:
             //uint32_t stbl_len = GetAtomSize(ptr);
             ptr += 8;
 
-            // entering "stsd" atom
+            // entering "stsd" atom (see https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/movenc.c)
             assert(IsAtomType(ptr, "stsd"));
             //uint32_t stsd_len = GetAtomSize(ptr);
             ptr += 8;
 
-            ptr += 8; // TODO: Study "stsd" encoding to find which field is being skipped here
+            uint32_t versionFlags = DeSerialize<uint32_t>(ptr);
+            assert(versionFlags == 0);
+            ptr += sizeof(uint32_t);
+            
+            uint32_t entryCount = DeSerialize<uint32_t>(ptr);
+            assert(entryCount == 1);
+            ptr += sizeof(uint32_t);
 
             // entering "avc1" atom
             assert(IsAtomType(ptr, "avc1"));
