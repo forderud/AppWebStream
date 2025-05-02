@@ -205,7 +205,7 @@ private:
             //uint32_t stsd_len = GetAtomSize(ptr);
             ptr += 8;
 
-            ptr += 8; // TODO: Study "stsd" atom to find which field is being skipped here
+            ptr += 8; // TODO: Study "stsd" encoding to find which field is being skipped here
 
             // entering "avc1" atom
             assert(IsAtomType(ptr, "avc1"));
