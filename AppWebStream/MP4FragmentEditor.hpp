@@ -181,6 +181,36 @@ private:
             assert(IsAtomType(ptr, "minf"));
             //uint32_t minf_len = GetAtomSize(ptr);
             ptr += 8;
+
+            {
+                // entering "vmhd" atom
+                assert(IsAtomType(ptr, "vmhd"));
+                uint32_t vmhd_len = GetAtomSize(ptr);
+                ptr += vmhd_len;
+            }
+            {
+                // entering "dinf" atom
+                assert(IsAtomType(ptr, "dinf"));
+                uint32_t dinf_len = GetAtomSize(ptr);
+                ptr += dinf_len;
+            }
+
+            // entering "stbl" atmom
+            assert(IsAtomType(ptr, "stbl"));
+            //uint32_t stbl_len = GetAtomSize(ptr);
+            ptr += 8;
+
+            // entering "stsd" atom
+            assert(IsAtomType(ptr, "stsd"));
+            //uint32_t stsd_len = GetAtomSize(ptr);
+            ptr += 8;
+
+            ptr += 8; // TODO: Study "stsd" atom to find which field is being skipped here
+
+            // entering "avc1" atom
+            assert(IsAtomType(ptr, "avc1"));
+            //uint32_t avc1_len = GetAtomSize(ptr);
+            ptr += 8;
         }
     }
 
