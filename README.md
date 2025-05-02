@@ -34,4 +34,4 @@ The project is currently using the GDI [`BitBlt`](https://learn.microsoft.com/en
 
 ## Browser support
 * Confirmed to work with Google Chrome, Microsoft Edge and Firefox.
-* Doesn't yet work on iOS, due to [incomplete `ManagedMediaSource` support](../../issues/25).
+* Doesn't yet work on iOS, due to incomplete `ManagedMediaSource` support ([issue #25](../../issues/25)).
