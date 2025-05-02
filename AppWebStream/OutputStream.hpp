@@ -28,7 +28,7 @@ public:
     /*NOT virtual*/ ~OutputStream();
 
     /** Configure resolution in pixels per cm. */
-    void SetResolution(float dpi, ULONG res_num, ULONG res_den);
+    void SetResolution(float dpi);
 
     void SetPortOrFilename(const char * port_or_filename);
 

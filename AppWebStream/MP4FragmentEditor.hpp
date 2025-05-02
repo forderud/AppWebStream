@@ -33,11 +33,8 @@ class MP4FragmentEditor {
     static constexpr unsigned long S_HEADER_SIZE = 8;
 
 public:
-    MP4FragmentEditor(float dpi, ULONG res_num, ULONG res_den) {
-        // pixels per cm
+    MP4FragmentEditor(float dpi) {
         m_dpi = dpi;
-        m_resolution[0] = res_num;
-        m_resolution[1] = res_den;
     }
 
     /** Intended to be called from IMFByteStream::BeginWrite and IMFByteStream::Write before forwarding the data to a socket.
@@ -54,7 +51,9 @@ public:
             // Movie box (moov)
             assert(atom_size == buffer.size());
             ModifyMovieBox((char*)buffer.data(), buffer.size());
+#ifdef ENABLE_XMP_PACKET
             return PrependXmpPacket(buffer);
+#endif
         } else if (IsAtomType(buffer.data(), "moof")) {
             // Movie Fragment (moof)
             assert(atom_size == buffer.size());
@@ -361,6 +360,7 @@ private:
         return TFDT_SIZE - BASE_DATA_OFFSET_SIZE; // tfdt added, tfhd shrunk
     }
 
+#ifdef ENABLE_XMP_PACKET
     std::string_view PrependXmpPacket(std::string_view buffer) {
         m_xmp_buf.clear();
         m_xmp_buf.reserve(512 + buffer.size());
@@ -412,6 +412,7 @@ private:
 
         return std::string_view(m_xmp_buf.data(), m_xmp_buf.size());
     }
+#endif
 
     /** Deserialize & conververt from big-endian. */
     template <typename T>
@@ -462,7 +463,6 @@ private:
 
 private:
     float             m_dpi = 0;
-    ULONG             m_resolution[2] = {}; // {numerator, denominator} pixels per cm
     uint64_t          m_cur_time = 0;
     std::vector<char> m_moof_buf; ///< "moof" atom modification buffer
     std::vector<char> m_xmp_buf;  ///< top-level "uuid" atom with XMP resolution metadata
