@@ -50,7 +50,7 @@ public:
         assert(atom_size <= buffer.size());
 
         if (IsAtomType(buffer.data(), "moov")) {
-            // Movie container (moov)
+            // Movie box (moov)
             assert(atom_size == buffer.size());
             return PrependXmpPacket(buffer);
         } else if (IsAtomType(buffer.data(), "moof")) {
@@ -63,6 +63,90 @@ public:
     }
 
 private:
+    /* QuickTime transformation matrix.
+    a,b,c,d,x,y: divided as 16.16 bits.
+    u,v,w;       divided as 2.30 bits */
+    struct matrix {
+        int32_t a, b, u;
+        int32_t c, d, v;
+        int32_t x, y, w;
+    };
+    static_assert(sizeof(matrix) == 36);
+
+#if 0
+    void ModifyMovieBox(const char* buf, const ULONG size) {
+        const char* ptr = buf;
+        assert(IsAtomType(ptr, "moov"));
+        assert(GetAtomSize(ptr) == size);
+        ptr += 8; // skip size & type
+
+        {
+            // now entering the "mvhd" atom
+            assert(IsAtomType(ptr, "mvhd"));
+            uint32_t mvhd_len = GetAtomSize(ptr);
+            ptr += 8; // skip size & type
+
+            auto version = DeSerialize<uint8_t>(ptr);
+            ptr += 1;
+
+            ptr += 3; // skip over "flags" field
+
+            if (version == 1) {
+                assert(mvhd_len == 120);
+
+                // seconds since Fri Jan 1 00:00:00 1904
+                auto creationTime = DeSerialize<uint64_t>(ptr);
+                ptr += 8;
+
+                auto modificationTime = DeSerialize<uint64_t>(ptr);
+                ptr += 8;
+            }
+            else {
+                assert(mvhd_len == 108);
+
+                // seconds since Fri Jan 1 00:00:00 1904
+                auto creationTime = DeSerialize<uint32_t>(ptr);
+                ptr += 4;
+
+                auto modificationTime = DeSerialize<uint32_t>(ptr);
+                ptr += 4;
+            }
+
+            auto timeScale = DeSerialize<uint32_t>(ptr); // 50000 = 50ms
+            ptr += 4;
+
+            if (version == 1) {
+                auto duration = DeSerialize<uint64_t>(ptr);
+                ptr += 8;
+            }
+            else {
+                auto duration = DeSerialize<uint32_t>(ptr);
+                ptr += 4;
+            }
+
+            auto rate = DeSerialize<uint32_t>(ptr); // preferred playback rate
+            ptr += 4;
+
+            auto volume = DeSerialize<int16_t>(ptr); // master volume of file
+            ptr += 2;
+
+            ptr += sizeof(uint16_t); // reserved
+            ptr += sizeof(uint32_t) * 2; // reserved
+
+            auto mat = DeSerialize<matrix>(ptr);
+            ptr += sizeof(matrix);
+
+            ptr += sizeof(uint32_t) * 6; // reserved
+
+            auto nextTrackId = DeSerialize<uint32_t>(ptr);
+            ptr += 4;
+
+            // end of "mvhd" atom
+            assert(ptr == buf + 8 + mvhd_len);
+        }
+    }
+#endif
+
     /** REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/MovieFragmentBox.java */
     std::string_view ModifyMovieFragment (const char* buf, const ULONG size) {
         assert(GetAtomSize(buf) == size);
@@ -246,89 +330,6 @@ private:
 
         return std::string_view(m_xmp_buf.data(), m_xmp_buf.size());
     }
-
-
-    /* QuickTime transformation matrix.
-        a,b,c,d,x,y: divided as 16.16 bits.
-        u,v,w;       divided as 2.30 bits */
-    struct matrix {
-        int32_t a, b, u;
-        int32_t c, d, v;
-        int32_t x, y, w;
-    };
-    static_assert(sizeof(matrix) == 36);
-
-#if 0
-    void ModifyMovieContainer(const char* buf, const ULONG size) {
-        const char* ptr = buf;
-        assert(IsAtomType(ptr, "moov"));
-        assert(GetAtomSize(ptr) == size);
-        ptr += 8; // skip size & type
-
-        {
-            // now entering the "mvhd" atom
-            assert(IsAtomType(ptr, "mvhd"));
-            uint32_t mvhd_len = GetAtomSize(ptr);
-            ptr += 8; // skip size & type
-
-            auto version = DeSerialize<uint8_t>(ptr);
-            ptr += 1;
-
-            ptr += 3; // skip over "flags" field
-
-            if (version == 1) {
-                assert(mvhd_len == 120);
-
-                // seconds since Fri Jan 1 00:00:00 1904
-                auto creationTime = DeSerialize<uint64_t>(ptr);
-                ptr += 8;
-
-                auto modificationTime = DeSerialize<uint64_t>(ptr);
-                ptr += 8;
-            } else {
-                assert(mvhd_len == 108);
-
-                // seconds since Fri Jan 1 00:00:00 1904
-                auto creationTime = DeSerialize<uint32_t>(ptr);
-                ptr += 4;
-
-                auto modificationTime = DeSerialize<uint32_t>(ptr);
-                ptr += 4;
-            }
-
-            auto timeScale = DeSerialize<uint32_t>(ptr); // 50000 = 50ms
-            ptr += 4;
-
-            if (version == 1) {
-                auto duration = DeSerialize<uint64_t>(ptr);
-                ptr += 8;
-            } else {
-                auto duration = DeSerialize<uint32_t>(ptr);
-                ptr += 4;
-            }
-
-            auto rate = DeSerialize<uint32_t>(ptr); // preferred playback rate
-            ptr += 4;
-
-            auto volume = DeSerialize<int16_t>(ptr); // master volume of file
-            ptr += 2;
-
-            ptr += sizeof(uint16_t); // reserved
-            ptr += sizeof(uint32_t) * 2; // reserved
-
-            auto mat = DeSerialize<matrix>(ptr);
-            ptr += sizeof(matrix);
-
-            ptr += sizeof(uint32_t) * 6; // reserved
-
-            auto nextTrackId = DeSerialize<uint32_t>(ptr);
-            ptr += 4;
-
-            // end of "mvhd" atom
-            assert(ptr == buf + 8 + mvhd_len);
-        }
-    }
-#endif
 
     /** Deserialize & conververt from big-endian. */
     template <typename T>
