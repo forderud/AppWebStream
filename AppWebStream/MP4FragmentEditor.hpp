@@ -52,7 +52,7 @@ public:
         if (IsAtomType(buffer.data(), "moov")) {
             // Movie box (moov)
             assert(atom_size == buffer.size());
-            //ModifyMovieBox(buffer.data(), buffer.size());
+            ModifyMovieBox(buffer.data(), buffer.size());
             return PrependXmpPacket(buffer);
         } else if (IsAtomType(buffer.data(), "moof")) {
             // Movie Fragment (moof)
@@ -74,7 +74,6 @@ private:
     };
     static_assert(sizeof(matrix) == 36);
 
-#if 0
     void ModifyMovieBox(const char* buf, const size_t size) {
         const char* ptr = buf;
         assert(IsAtomType(ptr, "moov"));
@@ -82,9 +81,10 @@ private:
         ptr += 8; // skip size & type
 
         {
-            // now entering the "mvhd" atom
+            // entering "mvhd" atom
             assert(IsAtomType(ptr, "mvhd"));
             uint32_t mvhd_len = GetAtomSize(ptr);
+#ifdef ANALYZE_MVHD
             ptr += 8; // skip size & type
 
             auto version = DeSerialize<uint8_t>(ptr);
@@ -142,9 +142,17 @@ private:
 
             // end of "mvhd" atom
             assert(ptr == buf + 8 + mvhd_len);
+#else
+            ptr += mvhd_len;
+#endif
+        }
+        {
+            // entering "trak" atom
+            assert(IsAtomType(ptr, "trak"));
+            uint32_t trak_len = GetAtomSize(ptr);
+            trak_len;
         }
     }
-#endif
 
     /** REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/MovieFragmentBox.java */
     std::string_view ModifyMovieFragment (const char* buf, const ULONG size) {
