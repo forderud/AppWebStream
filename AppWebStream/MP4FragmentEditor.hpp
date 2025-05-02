@@ -33,8 +33,9 @@ class MP4FragmentEditor {
     static constexpr unsigned long S_HEADER_SIZE = 8;
 
 public:
-    MP4FragmentEditor(ULONG res_num, ULONG res_den) {
+    MP4FragmentEditor(float dpi, ULONG res_num, ULONG res_den) {
         // pixels per cm
+        m_dpi = dpi;
         m_resolution[0] = res_num;
         m_resolution[1] = res_den;
     }
@@ -153,10 +154,10 @@ private:
             ptr += 8;
 
             {
-                // entering "tkhd" atom
+                // skip over "tkhd" atom
                 assert(IsAtomType(ptr, "tkhd"));
                 uint32_t tkhd_len = GetAtomSize(ptr);
-                ptr += tkhd_len; // skip over this stom
+                ptr += tkhd_len;
             }
 
             // entring "mdia" atom
@@ -165,13 +166,13 @@ private:
             ptr += 8;
 
             {
-                // entering "mdhd" atom
+                // skip over "mdhd" atom
                 assert(IsAtomType(ptr, "mdhd"));
                 uint32_t mdhd_len = GetAtomSize(ptr);
                 ptr += mdhd_len;
             }
             {
-                // entering "hdlr" atom
+                // skip over "hdlr" atom
                 assert(IsAtomType(ptr, "hdlr"));
                 uint32_t hdlr_len = GetAtomSize(ptr);
                 ptr += hdlr_len;
@@ -183,13 +184,13 @@ private:
             ptr += 8;
 
             {
-                // entering "vmhd" atom
+                // skip over "vmhd" atom
                 assert(IsAtomType(ptr, "vmhd"));
                 uint32_t vmhd_len = GetAtomSize(ptr);
                 ptr += vmhd_len;
             }
             {
-                // entering "dinf" atom
+                // skip over "dinf" atom
                 assert(IsAtomType(ptr, "dinf"));
                 uint32_t dinf_len = GetAtomSize(ptr);
                 ptr += dinf_len;
@@ -212,10 +213,19 @@ private:
             //uint32_t avc1_len = GetAtomSize(ptr);
             ptr += 8;
 
+            // parse existing video DPI in <integer>/<fraction> format
             assert(DeSerialize<USHORT>(ptr + 28) == 72); // horizontal DPI (integer part)
             assert(DeSerialize<USHORT>(ptr + 30) == 0);  //                (fraction)
             assert(DeSerialize<USHORT>(ptr + 32) == 72); // vertical DPI (integer part)
             assert(DeSerialize<USHORT>(ptr + 34) == 0);  //              (fraction)
+
+            // update video DPI
+            auto dpi_int = (USHORT)m_dpi;
+            auto dpi_frac = (USHORT)((m_dpi - dpi_int)/65536);
+            Serialize<USHORT>(ptr + 28, dpi_int);
+            Serialize<USHORT>(ptr + 30, dpi_frac);
+            Serialize<USHORT>(ptr + 32, dpi_int);
+            Serialize<USHORT>(ptr + 34, dpi_frac);
         }
     }
 
@@ -451,6 +461,7 @@ private:
     }
 
 private:
+    float             m_dpi = 0;
     ULONG             m_resolution[2] = {}; // {numerator, denominator} pixels per cm
     uint64_t          m_cur_time = 0;
     std::vector<char> m_moof_buf; ///< "moof" atom modification buffer

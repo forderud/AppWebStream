@@ -123,8 +123,8 @@ OutputStream::~OutputStream() {
 }
 
 
-void OutputStream::SetResolution(ULONG res_num, ULONG res_den) {
-    m_stream_editor = std::make_unique<MP4FragmentEditor>(res_num, res_den);
+void OutputStream::SetResolution(float dpi, ULONG res_num, ULONG res_den) {
+    m_stream_editor = std::make_unique<MP4FragmentEditor>(dpi, res_num, res_den);
 }
 
 
