@@ -23,7 +23,7 @@ To build with FFMPG, you first need to download & unzip FFMPEG binaries to a fol
 Metadata implementation status:
 * [x] Pixel spacing metadata ([issue #20](../../issues/20))
 * [ ] Video "origin" metadata ([issue #23](../../issues/23))
-* [ ] Freeze & resume frame time-stapmps ([issue #24](../../issues/24))
+* [ ] Freeze & resume frame time-stamps ([issue #24](../../issues/24))
 
 #### HTTP and authentication
 * Authentication is currently missing.
