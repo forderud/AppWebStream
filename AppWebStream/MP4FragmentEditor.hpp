@@ -304,6 +304,8 @@ private:
                 assert(IsAtomType(ptr, "mdhd"));
                 uint32_t mdhd_len = GetAtomSize(ptr);
                 ptr += mdhd_len;
+
+                // TODO: Parse create- & modify-time (encoded same as "mvhd")
             }
             {
                 // skip over "hdlr" atom
