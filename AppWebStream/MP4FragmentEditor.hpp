@@ -23,6 +23,46 @@ static char* Serialize(char* buf, T val) {
     return buf + sizeof(T);
 }
 
+inline double ReadFixed1616(const char* buf) {
+    int32_t val = 0;
+    val |= buf[0] << 24;
+    val |= buf[1] << 16;
+    val |= buf[2] << 8;
+    val |= buf[3] << 0;
+
+    return ((double)val) / (1 << 16);
+}
+inline double ReadFixed0230(const char* buf) {
+    int32_t val = 0;
+    val |= buf[0] << 24;
+    val |= buf[1] << 16;
+    val |= buf[2] << 8;
+    val |= buf[3] << 0;
+
+    return ((double)val) / (1 << 30);
+}
+
+inline int32_t WriteFixed1616(double in) {
+    int32_t val = (int32_t)(in * (1 << 16));
+
+    int32_t result = 0;
+    result |= (val & 0xFF000000) >> 24;
+    result |= (val & 0x00FF0000) >> 8;
+    result |= (val & 0x0000FF00) << 8;
+    result |= (val & 0x000000FF) << 24;
+    return result;
+}
+inline int32_t WriteFixed0230(double in) {
+    int32_t val = (int32_t)(in * (1 << 30));
+
+    int32_t result = 0;
+    result |= (val & 0xFF000000) >> 24;
+    result |= (val & 0x00FF0000) >> 8;
+    result |= (val & 0x0000FF00) << 8;
+    result |= (val & 0x000000FF) << 24;
+    return result;
+}
+
 /** Process atoms within a MPEG4 MovieFragment (moof) to make the stream comply with ISO base media file format (https://www.iso.org/standard/68960.html).
     Work-around for shortcommings in the Media Foundation MPEG4 file sink (https://learn.microsoft.com/en-us/windows/win32/medfound/mpeg-4-file-sink).
     Please delete this class if a better alternative becomes available.
@@ -102,47 +142,6 @@ private:
             tx = ReadFixed1616(buf); buf += sizeof(int32_t);
             ty= ReadFixed1616(buf); buf += sizeof(int32_t);
             w = ReadFixed0230(buf); buf += sizeof(int32_t);
-        }
-
-    private:
-        double ReadFixed1616(const char* buf) {
-            int32_t val = 0;
-            val |= buf[0] << 24;
-            val |= buf[1] << 16;
-            val |= buf[2] << 8;
-            val |= buf[3] << 0;
-
-            return ((double)val)/(1 << 16);
-        }
-        double ReadFixed0230(const char* buf) {
-            int32_t val = 0;
-            val |= buf[0] << 24;
-            val |= buf[1] << 16;
-            val |= buf[2] << 8;
-            val |= buf[3] << 0;
-
-            return ((double)val)/(1 << 30);
-        }
-
-        int32_t WriteFixed1616(double in) {
-            int32_t val = (int32_t)(in* (1 << 16));
-
-            int32_t result = 0;
-            result |= (val & 0xFF000000) >> 24;
-            result |= (val & 0x00FF0000) >> 8;
-            result |= (val & 0x0000FF00) << 8;
-            result |= (val & 0x000000FF) << 24;
-            return result;
-        }
-        int32_t WriteFixed0230(double in) {
-            int32_t val = (int32_t)(in * (1 << 30));
-
-            int32_t result = 0;
-            result |= (val & 0xFF000000) >> 24;
-            result |= (val & 0x00FF0000) >> 8;
-            result |= (val & 0x0000FF00) << 8;
-            result |= (val & 0x000000FF) << 24;
-            return result;
         }
     };
 
@@ -318,10 +317,10 @@ private:
                 // check existing video DPI in fixed-point 16+16 format
                 // Resolution hardcoded to 72dpi (0x00480000) in FFMPEG encoder (https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/movenc.c)
                 // It also appear to be hardocded in the MF encoder. I've at least not found a parameter for adjusting it.
-                assert(DeSerialize<USHORT>(ptr + 0) == 72); // 72.00 horizontal DPI
-                assert(DeSerialize<USHORT>(ptr + 2) == 0);
-                assert(DeSerialize<USHORT>(ptr + 4) == 72); // 72.00 vertical DPI
-                assert(DeSerialize<USHORT>(ptr + 6) == 0);
+                double dpi = ReadFixed1616(ptr);
+                assert(dpi == 72); // 72.00 horizontal DPI
+                dpi = ReadFixed1616(ptr + 4);
+                assert(dpi == 72); // 72.00 vertical DPI
 
                 // update video DPI in fixed-point 16+16 format
                 auto tmp = (uint32_t)(m_dpi * 65536);
