@@ -576,6 +576,17 @@ private:
 
     /** REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/MovieFragmentBox.java */
     std::string_view ModifyMoof (const char* buf, const ULONG buf_size, bool add_tfdt) {
+        static size_t s_frame_counter = 0;
+        s_frame_counter++;
+        m_paused = (s_frame_counter % 20) >= 10; // toggle every 10 frame
+        printf("Paused: %u\n", m_paused);
+
+        m_time.updateSampleDuration = true;
+        if (m_paused)
+            m_time.sample_duration = 1;
+        else
+            m_time.sample_duration = 1000;
+
         assert(IsAtomType(buf, "moof"));
         assert(GetAtomSize(buf) <= buf_size);
 
@@ -824,5 +835,6 @@ private:
 private:
     double            m_dpi = 0;
     TimeHandler       m_time;
+    bool              m_paused = false;
     std::vector<char> m_moof_buf; ///< "moof" atom modification buffer
 };
