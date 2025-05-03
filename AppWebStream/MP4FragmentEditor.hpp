@@ -69,6 +69,40 @@ inline char* WriteFixed0230(char* buf, double in) {
     return buf + 4;
 }
 
+/**  MP4 file uses time counting in SECONDS since midnight, Jan. 1, 1904. */
+inline uint64_t CurrentTime1904() {
+#if 0
+    FILETIME curTime{};
+    {
+        SYSTEMTIME st{};
+        GetSystemTime(&st);
+        SystemTimeToFileTime(&st, &curTime);
+    }
+
+    FILETIME epochTime{};
+    {
+        SYSTEMTIME st{};
+        st.wYear = 1904;
+        st.wMonth = 1;
+        st.wDay = 1;
+        GetSystemTime(&st);
+        SystemTimeToFileTime(&st, &epochTime);
+    }
+
+    ULARGE_INTEGER diff{}; // 100ns resolution
+    diff.HighPart = curTime.dwHighDateTime - epochTime.dwHighDateTime;
+    diff.LowPart = curTime.dwLowDateTime - epochTime.dwLowDateTime;
+    //diff.QuadPart += 3600ULL * 10000000; // add 1hour based on 1904/1/1 midnight
+    return diff.QuadPart/10000000;
+#else
+    time_t now = time(NULL); // unix epoch since 1970-01-01
+    // Convert from unix epoch to MPEG-4 epoch since midnight, Jan. 1, 1904.
+    // Seconds between 1904-01-01 and Unix 1970 Epoch: (66 * 365 + 17) * (24 * 60 * 60) = 2082844800 (from https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/mov.c)
+    uint64_t mpeg4Time = now + (66 * 365 + 17) * (24 * 60 * 60);
+    return mpeg4Time;
+#endif
+}
+
 /** Process atoms within a MPEG4 MovieFragment (moof) to make the stream comply with ISO base media file format (https://www.iso.org/standard/68960.html).
     Work-around for shortcommings in the Media Foundation MPEG4 file sink (https://learn.microsoft.com/en-us/windows/win32/medfound/mpeg-4-file-sink).
     Please delete this class if a better alternative becomes available.
