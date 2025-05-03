@@ -51,9 +51,6 @@ public:
             // Movie box (moov)
             assert(atom_size == buffer.size());
             ModifyMovieBox((char*)buffer.data(), buffer.size());
-#ifdef ENABLE_XMP_PACKET
-            return PrependXmpPacket(buffer);
-#endif
         } else if (IsAtomType(buffer.data(), "moof")) {
             // Movie Fragment (moof)
             assert(atom_size == buffer.size());
@@ -366,60 +363,6 @@ private:
         return TFDT_SIZE - BASE_DATA_OFFSET_SIZE; // tfdt added, tfhd shrunk
     }
 
-#ifdef ENABLE_XMP_PACKET
-    std::string_view PrependXmpPacket(std::string_view buffer) {
-        m_xmp_buf.clear();
-        m_xmp_buf.reserve(512 + buffer.size());
-        m_xmp_buf.resize(4 + 4 + 16); // 4byte size prefix, 4byte "uuid" type, 16byte UUID
-        memcpy(m_xmp_buf.data() + 4, "uuid", 4); // atom type
-
-        {
-            // big endian UUID serialization
-            char* dst = m_xmp_buf.data() + 8;
-            GUID guid{};
-            CLSIDFromString(L"{be7acfcb-97a9-42e8-9c71-999491e3afac}", &guid);  // XMP UUID value
-            dst = Serialize<ULONG>(dst, guid.Data1);
-            dst = Serialize<USHORT>(dst, guid.Data2);
-            dst = Serialize<USHORT>(dst, guid.Data3);
-            memcpy(dst, guid.Data4, sizeof(guid.Data4));
-        }
-        {
-            // XMP packet in UTF-8
-            // based on https://archimedespalimpsest.net/Documents/External/XMP/XMPSpecificationPart3.pdf
-            const char prefix[] = "<?xpacket begin=\"﻿\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>"; // "begin" value is UTF-8 BOM (0xEF 0xBB 0xBF)
-            m_xmp_buf.insert(m_xmp_buf.end(), prefix, prefix + sizeof(prefix));
-
-            const char header[] = "<x:xmpmeta xmlns:x='adobe:ns:meta/'><rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'><rdf:Description rdf:about='' xmlns:tiff='http://ns.adobe.com/tiff/1.0/'>";
-            m_xmp_buf.insert(m_xmp_buf.end(), header, header + sizeof(header));
-
-            const char resUnit[] = "<tiff:ResolutionUnit>3</tiff:ResolutionUnit>"; // 3 is cm
-            m_xmp_buf.insert(m_xmp_buf.end(), resUnit, resUnit + sizeof(resUnit));
-
-            char resBuffer[64] = {};
-            int resLen = 0;
-            resLen = sprintf_s(resBuffer, "<tiff:XResolution>%u/%u</tiff:XResolution>", m_resolution[0], m_resolution[1]); // horizontal pixels per cm
-            m_xmp_buf.insert(m_xmp_buf.end(), resBuffer, resBuffer + resLen);
-
-            resLen = sprintf_s(resBuffer, "<tiff:YResolution>%u/%u</tiff:YResolution>", m_resolution[0], m_resolution[1]); // vertical pixels per cm
-            m_xmp_buf.insert(m_xmp_buf.end(), resBuffer, resBuffer + resLen);
-
-            const char footer[] = "</rdf:Description></rdf:RDF></x:xmpmeta>";
-            m_xmp_buf.insert(m_xmp_buf.end(), footer, footer + sizeof(footer));
-
-            const char suffix[] = "<?xpacket end=\"r\"?>"; // "r" means read-only (not in-place editable)
-            m_xmp_buf.insert(m_xmp_buf.end(), suffix, suffix + sizeof(suffix));
-        }
-
-        // set atom size prefix
-        Serialize<uint32_t>(m_xmp_buf.data(), (uint32_t)m_xmp_buf.size());
-
-        // add "moov" atom afterwards
-        m_xmp_buf.insert(m_xmp_buf.end(), buffer.data(), buffer.data() + buffer.size());
-
-        return std::string_view(m_xmp_buf.data(), m_xmp_buf.size());
-    }
-#endif
-
     /** Deserialize & conververt from big-endian. */
     template <typename T>
     static T DeSerialize (const char* buf) {
@@ -471,5 +414,4 @@ private:
     float             m_dpi = 0;
     uint64_t          m_cur_time = 0;
     std::vector<char> m_moof_buf; ///< "moof" atom modification buffer
-    std::vector<char> m_xmp_buf;  ///< top-level "uuid" atom with XMP resolution metadata
 };
