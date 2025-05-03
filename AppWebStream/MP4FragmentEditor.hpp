@@ -91,7 +91,7 @@ class MP4FragmentEditor {
     static constexpr uint32_t HEADER_SIZE = 8; // atom header size (4bytes size + 4byte name)
 
 public:
-    MP4FragmentEditor(float dpi) {
+    MP4FragmentEditor(double dpi) {
         m_dpi = dpi;
     }
 
@@ -490,7 +490,7 @@ private:
     }
 
 private:
-    float             m_dpi = 0;
+    double            m_dpi = 0;
     uint64_t          m_cur_time = 0;
     std::vector<char> m_moof_buf; ///< "moof" atom modification buffer
 };

@@ -28,7 +28,7 @@ public:
     /*NOT virtual*/ ~OutputStream();
 
     /** Configure resolution in dots per inch (DPI). */
-    void SetResolution(float dpi);
+    void SetResolution(double dpi);
 
     void SetPortOrFilename(const char * port_or_filename);
 
