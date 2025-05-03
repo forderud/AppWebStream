@@ -46,7 +46,7 @@ inline char* WriteFixed1616(char* buf, double in) {
     int32_t val = (int32_t)(in * (1 << 16));
 
     buf[0] = (val & 0xFF000000) >> 24;
-    buf[1] = (val & 0x00FF0000) >> 16;
+    buf[1] = (char)((val & 0x00FF0000) >> 16);
     buf[2] = (val & 0x0000FF00) >> 8;
     buf[3] = (val & 0x000000FF);
     return buf + 4;
@@ -55,7 +55,7 @@ inline char* WriteFixed0230(char* buf, double in) {
     int32_t val = (int32_t)(in * (1 << 30));
 
     buf[0] = (val & 0xFF000000) >> 24;
-    buf[1] = (val & 0x00FF0000) >> 16;
+    buf[1] = (char)((val & 0x00FF0000) >> 16);
     buf[2] = (val & 0x0000FF00) >> 8;
     buf[3] = (val & 0x000000FF);
     return buf + 4;
