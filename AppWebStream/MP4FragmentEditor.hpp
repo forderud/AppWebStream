@@ -517,7 +517,7 @@ private:
             // overwrite data_offset field
             payload = Serialize<uint32_t>(payload, moof_size-BASE_DATA_OFFSET_SIZE+TFDT_SIZE+8); // +8 experiementally derived
 
-            auto sample_dur = DeSerialize<uint32_t>(payload); // duration of first sample
+            auto sample_dur = DeSerialize<uint32_t>(payload); // duration of first sample (typ 1000)
 
             // update baseMediaDecodeTime for next fragment
             m_cur_time += sample_count*sample_dur;
