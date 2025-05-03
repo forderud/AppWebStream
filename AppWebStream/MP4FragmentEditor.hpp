@@ -198,11 +198,12 @@ private:
             ptr += 8;
 
             // entering "stsd" atom (see https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/movenc.c)
+            // RE: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/SampleDescriptionBox.java
             assert(IsAtomType(ptr, "stsd"));
             //uint32_t stsd_len = GetAtomSize(ptr);
             ptr += 8;
 
-            uint32_t versionFlags = DeSerialize<uint32_t>(ptr);
+            uint32_t versionFlags = DeSerialize<uint32_t>(ptr); // 8bit version followed by 24bit flags
             assert(versionFlags == 0);
             ptr += sizeof(uint32_t);
             
