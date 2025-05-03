@@ -81,18 +81,21 @@ inline uint64_t CurrentTime1904() {
 
     FILETIME epochTime{};
     {
+        // unix 1970 epoch
         SYSTEMTIME st{};
         st.wYear = 1904;
         st.wMonth = 1;
         st.wDay = 1;
-        GetSystemTime(&st);
+        // for some reason needed to adjust epoch by 7min 10sec to match time(null)
+        st.wHour = 0;
+        st.wMinute = 7;
+        st.wSecond = 10;
         SystemTimeToFileTime(&st, &epochTime);
     }
 
     ULARGE_INTEGER diff{}; // 100ns resolution
     diff.HighPart = curTime.dwHighDateTime - epochTime.dwHighDateTime;
     diff.LowPart = curTime.dwLowDateTime - epochTime.dwLowDateTime;
-    //diff.QuadPart += 3600ULL * 10000000; // add 1hour based on 1904/1/1 midnight
     return diff.QuadPart/10000000;
 #else
     time_t now = time(NULL); // unix epoch since 1970-01-01
