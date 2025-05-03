@@ -23,6 +23,7 @@ static char* Serialize(char* buf, T val) {
     return buf + sizeof(T);
 }
 
+/** Read big-endian fixed-point 16+16 float. */
 inline double ReadFixed1616(const char* buf) {
     int32_t val = 0;
     val |= buf[0] << 24;
@@ -32,6 +33,7 @@ inline double ReadFixed1616(const char* buf) {
 
     return ((double)val) / (1 << 16);
 }
+/** Read big-endian fixed-point 2+30 float. */
 inline double ReadFixed0230(const char* buf) {
     int32_t val = 0;
     val |= buf[0] << 24;
@@ -42,6 +44,7 @@ inline double ReadFixed0230(const char* buf) {
     return ((double)val) / (1 << 30);
 }
 
+/** Write big-endian fixed-point 16+16 float. */
 inline char* WriteFixed1616(char* buf, double in) {
     int32_t val = (int32_t)(in * (1 << 16));
 
@@ -51,6 +54,7 @@ inline char* WriteFixed1616(char* buf, double in) {
     buf[3] = (val & 0x000000FF);
     return buf + 4;
 }
+/** Write big-endian fixed-point 2+30 float. */
 inline char* WriteFixed0230(char* buf, double in) {
     int32_t val = (int32_t)(in * (1 << 30));
 
