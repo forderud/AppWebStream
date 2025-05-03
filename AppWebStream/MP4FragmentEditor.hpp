@@ -211,45 +211,49 @@ private:
             assert(entryCount == 1);
             ptr += sizeof(uint32_t);
 
-            // entering "avc1" atom
-            // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/sampleentry/VisualSampleEntry.java
-            assert(IsAtomType(ptr, "avc1"));
-            //uint32_t avc1_len = GetAtomSize(ptr);
-            ptr += 8;
+            {
+                // entering "avc1" atom
+                // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/sampleentry/VisualSampleEntry.java
+                assert(IsAtomType(ptr, "avc1"));
+                //uint32_t avc1_len = GetAtomSize(ptr);
+                ptr += 8;
 
-            ptr += 6; // skip first 6 bytes
+                ptr += 6; // skip first 6 bytes
 
-            //auto dataReferenceIdx = DeSerialize<uint16_t>(ptr);
-            ptr += sizeof(uint16_t);
+                //auto dataReferenceIdx = DeSerialize<uint16_t>(ptr);
+                ptr += sizeof(uint16_t);
 
-            auto reserved = DeSerialize<uint16_t>(ptr);
-            assert(reserved == 0);
-            ptr += sizeof(uint16_t);
+                auto reserved = DeSerialize<uint16_t>(ptr);
+                assert(reserved == 0);
+                ptr += sizeof(uint16_t);
 
-            reserved = DeSerialize<uint16_t>(ptr);
-            assert(reserved == 0);
-            ptr += sizeof(uint16_t);
+                reserved = DeSerialize<uint16_t>(ptr);
+                assert(reserved == 0);
+                ptr += sizeof(uint16_t);
 
-            ptr += 3 * sizeof(uint32_t); // skip 3 "predefined" values that should all be zero
+                ptr += 3 * sizeof(uint32_t); // skip 3 "predefined" values that should all be zero
 
-            //auto width = DeSerialize<uint16_t>(ptr);
-            ptr += 2;
-            //auto height = DeSerialize<uint16_t>(ptr);
-            ptr += 2;
+                //auto width = DeSerialize<uint16_t>(ptr);
+                ptr += 2;
+                //auto height = DeSerialize<uint16_t>(ptr);
+                ptr += 2;
 
-            // check existing video DPI in <integer>/<fraction> format
-            assert(DeSerialize<USHORT>(ptr + 0) == 72); // 72.00 horizontal DPI
-            assert(DeSerialize<USHORT>(ptr + 2) == 0);
-            assert(DeSerialize<USHORT>(ptr + 4) == 72); // 72.00 vertical DPI
-            assert(DeSerialize<USHORT>(ptr + 6) == 0);
+                // check existing video DPI in <integer>/<fraction> format
+                assert(DeSerialize<USHORT>(ptr + 0) == 72); // 72.00 horizontal DPI
+                assert(DeSerialize<USHORT>(ptr + 2) == 0);
+                assert(DeSerialize<USHORT>(ptr + 4) == 72); // 72.00 vertical DPI
+                assert(DeSerialize<USHORT>(ptr + 6) == 0);
 
-            // update video DPI in <integer>/<fraction> format
-            auto dpi_int = (USHORT)m_dpi;
-            auto dpi_frac = (USHORT)((m_dpi - dpi_int)*65536);
-            Serialize<USHORT>(ptr + 0, dpi_int);  // horizontal DPI (integer part)
-            Serialize<USHORT>(ptr + 2, dpi_frac); //                (fraction)
-            Serialize<USHORT>(ptr + 4, dpi_int);  // vertical DPI (integer part)
-            Serialize<USHORT>(ptr + 6, dpi_frac); //              (fraction)
+                // update video DPI in <integer>/<fraction> format
+                auto dpi_int = (USHORT)m_dpi;
+                auto dpi_frac = (USHORT)((m_dpi - dpi_int) * 65536);
+                Serialize<USHORT>(ptr + 0, dpi_int);  // horizontal DPI (integer part)
+                Serialize<USHORT>(ptr + 2, dpi_frac); //                (fraction)
+                Serialize<USHORT>(ptr + 4, dpi_int);  // vertical DPI (integer part)
+                Serialize<USHORT>(ptr + 6, dpi_frac); //              (fraction)
+
+                // ignore the remaining parameters
+            }
         }
     }
 
