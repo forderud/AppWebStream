@@ -69,6 +69,19 @@ private:
         int32_t a, b, u;
         int32_t c, d, v;
         int32_t tx, ty, w;
+
+        matrix(const char* buf) {
+            // TOOD: Implement fixed-point parsing
+            a = DeSerialize<int32_t>(buf); buf += sizeof(int32_t);
+            b = DeSerialize<int32_t>(buf); buf += sizeof(int32_t);
+            u = DeSerialize<int32_t>(buf); buf += sizeof(int32_t);
+            c = DeSerialize<int32_t>(buf); buf += sizeof(int32_t);
+            d = DeSerialize<int32_t>(buf); buf += sizeof(int32_t);
+            v = DeSerialize<int32_t>(buf); buf += sizeof(int32_t);
+            tx = DeSerialize<int32_t>(buf); buf += sizeof(int32_t);
+            ty= DeSerialize<int32_t>(buf); buf += sizeof(int32_t);
+            w = DeSerialize<int32_t>(buf); buf += sizeof(int32_t);
+        }
     };
     static_assert(sizeof(matrix) == 36);
 
@@ -132,7 +145,7 @@ private:
             ptr += sizeof(uint32_t) * 2; // reserved
 
             // matrix to map points from one coordinate space into another
-            auto mat = DeSerialize<matrix>(ptr);
+            matrix mat(ptr);
             ptr += sizeof(matrix);
 
             ptr += sizeof(uint32_t) * 6; // reserved
@@ -141,7 +154,7 @@ private:
             ptr += 4;
 
             // end of "mvhd" atom
-            assert(ptr == buf + 8 + mvhd_len);
+            assert(ptr == buffer.data() + HEADER_SIZE + mvhd_len);
 #else
             ptr += mvhd_len;
 #endif
