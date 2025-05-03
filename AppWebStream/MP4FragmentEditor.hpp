@@ -3,6 +3,26 @@
 #include <vector>
 #include <Windows.h>
 
+
+/** Deserialize & conververt from big-endian. */
+template <typename T>
+static T DeSerialize(const char* buf) {
+    T val = {};
+    for (size_t i = 0; i < sizeof(T); ++i)
+        reinterpret_cast<BYTE*>(&val)[i] = buf[sizeof(T) - 1 - i];
+
+    return val;
+}
+
+/** Serialize & conververt to big-endian. */
+template <typename T>
+static char* Serialize(char* buf, T val) {
+    for (size_t i = 0; i < sizeof(T); ++i)
+        buf[i] = reinterpret_cast<BYTE*>(&val)[sizeof(T) - 1 - i];
+
+    return buf + sizeof(T);
+}
+
 /** Process atoms within a MPEG4 MovieFragment (moof) to make the stream comply with ISO base media file format (https://www.iso.org/standard/68960.html).
     Work-around for shortcommings in the Media Foundation MPEG4 file sink (https://learn.microsoft.com/en-us/windows/win32/medfound/mpeg-4-file-sink).
     Please delete this class if a better alternative becomes available.
@@ -448,24 +468,6 @@ private:
         return TFDT_SIZE - BASE_DATA_OFFSET_SIZE; // tfdt added, tfhd shrunk
     }
 
-    /** Deserialize & conververt from big-endian. */
-    template <typename T>
-    static T DeSerialize (const char* buf) {
-        T val = {};
-        for (size_t i = 0; i < sizeof(T); ++i)
-            reinterpret_cast<BYTE*>(&val)[i] = buf[sizeof(T)-1-i];
-
-        return val;
-    }
-
-    /** Serialize & conververt to big-endian. */
-    template <typename T>
-    static char* Serialize (char* buf, T val) {
-        for (size_t i = 0; i < sizeof(T); ++i)
-            buf[i] = reinterpret_cast<BYTE*>(&val)[sizeof(T)-1-i];
-
-        return buf + sizeof(T);
-    }
 
     /** Mofified version of "memmove" that clears the abandoned bytes, as well as intermediate data.
     WARNING: Only use for contiguous/overlapping moves, or else it will clear more than excpected. */
