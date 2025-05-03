@@ -239,7 +239,7 @@ private:
                 //auto height = DeSerialize<uint16_t>(ptr);
                 ptr += 2;
 
-                // check existing video DPI in <integer>/<fraction> format
+                // check existing video DPI in fixed-point 16+16 format
                 // Resolution hardcoded to 72dpi (0x00480000) in FFMPEG encoder (https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/movenc.c)
                 // It also appear to be hardocded in the MF encoder. I've at least not found a parameter for adjusting it.
                 assert(DeSerialize<USHORT>(ptr + 0) == 72); // 72.00 horizontal DPI
@@ -247,9 +247,10 @@ private:
                 assert(DeSerialize<USHORT>(ptr + 4) == 72); // 72.00 vertical DPI
                 assert(DeSerialize<USHORT>(ptr + 6) == 0);
 
-                // update video DPI in <integer>/<fraction> format
-                auto dpi_int = (USHORT)m_dpi;
-                auto dpi_frac = (USHORT)((m_dpi - dpi_int) * 65536);
+                // update video DPI in fixed-point 16+16 format
+                auto tmp = (uint32_t)(m_dpi * 65536);
+                uint16_t dpi_int = tmp >> 16;
+                uint16_t dpi_frac = tmp & 0xFFFF;
                 Serialize<USHORT>(ptr + 0, dpi_int);  // horizontal DPI (integer part)
                 Serialize<USHORT>(ptr + 2, dpi_frac); //                (fraction)
                 Serialize<USHORT>(ptr + 4, dpi_int);  // vertical DPI (integer part)
