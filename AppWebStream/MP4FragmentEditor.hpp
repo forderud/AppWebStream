@@ -50,7 +50,7 @@ public:
         if (IsAtomType(buffer.data(), "moov")) {
             // Movie box (moov)
             assert(atom_size == buffer.size());
-            ModifyMovieBox((char*)buffer.data(), buffer.size());
+            ModifyMovieBox(buffer);
         } else if (IsAtomType(buffer.data(), "moof")) {
             // Movie Fragment (moof)
             assert(atom_size == buffer.size());
@@ -71,10 +71,10 @@ private:
     };
     static_assert(sizeof(matrix) == 36);
 
-    void ModifyMovieBox(char* buf, const size_t size) {
-        char* ptr = buf;
+    void ModifyMovieBox(std::string_view buffer) {
+        char* ptr = (char*)buffer.data();
         assert(IsAtomType(ptr, "moov"));
-        assert(GetAtomSize(ptr) == size);
+        assert(GetAtomSize(ptr) == buffer.size());
         ptr += 8; // skip size & type
 
         {
