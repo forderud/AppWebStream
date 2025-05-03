@@ -212,11 +212,17 @@ private:
             ptr += sizeof(uint32_t);
 
             // entering "avc1" atom
+            // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/sampleentry/VisualSampleEntry.java
             assert(IsAtomType(ptr, "avc1"));
             //uint32_t avc1_len = GetAtomSize(ptr);
             ptr += 8;
 
-            ptr += 28; // TODO: Document which avc1 parameters are jumped over
+            ptr += 24; // TODO: Document which avc1 parameters are jumped over
+
+            //auto width = DeSerialize<uint16_t>(ptr);
+            ptr += 2;
+            //auto height = DeSerialize<uint16_t>(ptr);
+            ptr += 2;
 
             // check existing video DPI in <integer>/<fraction> format
             assert(DeSerialize<USHORT>(ptr + 0) == 72); // 72.00 horizontal DPI
