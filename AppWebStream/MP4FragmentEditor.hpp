@@ -79,6 +79,7 @@ private:
 
         {
             // entering "mvhd" atom
+            // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/MovieHeaderBox.java
             assert(IsAtomType(ptr, "mvhd"));
             uint32_t mvhd_len = GetAtomSize(ptr);
 #ifdef ANALYZE_MVHD
@@ -198,7 +199,7 @@ private:
             ptr += HEADER_SIZE; // skip size & type
 
             // entering "stsd" atom (see https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/movenc.c)
-            // RE: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/SampleDescriptionBox.java
+            // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/SampleDescriptionBox.java
             assert(IsAtomType(ptr, "stsd"));
             //uint32_t stsd_len = GetAtomSize(ptr);
             ptr += HEADER_SIZE; // skip size & type
