@@ -704,7 +704,7 @@ private:
             *tfdt_ptr = 1; // version 1 (no other flags)
             tfdt_ptr += VERSION_FLAGS_SIZE; // skip flags
             // write tfdt/baseMediaDecodeTime
-            tfdt_ptr = Serialize<uint64_t>(tfdt_ptr, m_cur_time);
+            tfdt_ptr = Serialize<uint64_t>(tfdt_ptr, m_next_time);
 
             assert(tfdt_ptr == ptr + TFDT_SIZE);
             ptr += TFDT_SIZE;
@@ -805,6 +805,14 @@ private:
                 }
             }
 
+            m_paused = (m_cur_time / 10000) % 2; // toggle every 10 frame
+            printf("Paused: %u\n", m_paused);
+
+            if (m_paused)
+                m_next_time += 1;
+            else
+                m_next_time = m_cur_time;
+
             assert(payload == trun_ptr + trun_size);
         }
     }
@@ -813,6 +821,8 @@ private:
     double            m_dpi = 0;
     uint64_t          m_startTime = 0; // creation- & modification time
     uint32_t          m_timeScale = 0; // time units per second: 1000*fps (50000 = 50fps)
+    bool              m_paused = false;
     uint64_t          m_cur_time = 0;
+    uint64_t          m_next_time = 0;
     std::vector<char> m_moof_buf; ///< "moof" atom modification buffer
 };
