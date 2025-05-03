@@ -63,11 +63,12 @@ public:
 private:
     /* QuickTime transformation matrix.
     a,b,c,d,x,y: divided as 16.16 bits.
-    u,v,w;       divided as 2.30 bits */
+    u,v,w;       divided as 2.30 bits
+    // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/support/Matrix.java */
     struct matrix {
         int32_t a, b, u;
         int32_t c, d, v;
-        int32_t x, y, w;
+        int32_t tx, ty, w;
     };
     static_assert(sizeof(matrix) == 36);
 
@@ -130,6 +131,7 @@ private:
             ptr += sizeof(uint16_t); // reserved
             ptr += sizeof(uint32_t) * 2; // reserved
 
+            // matrix to map points from one coordinate space into another
             auto mat = DeSerialize<matrix>(ptr);
             ptr += sizeof(matrix);
 
