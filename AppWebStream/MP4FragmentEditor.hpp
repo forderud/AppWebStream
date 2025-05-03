@@ -141,6 +141,19 @@ private:
             ty= ReadFixed1616(buf); buf += sizeof(int32_t);
             w = ReadFixed0230(buf); buf += sizeof(int32_t);
         }
+
+        char* Write(char* buf) const {
+            buf = WriteFixed1616(buf, a);
+            buf = WriteFixed1616(buf, b);
+            buf = WriteFixed0230(buf, u);
+            buf = WriteFixed1616(buf, c);
+            buf = WriteFixed1616(buf, d);
+            buf = WriteFixed0230(buf, v);
+            buf = WriteFixed1616(buf, tx);
+            buf = WriteFixed1616(buf, ty);
+            buf = WriteFixed0230(buf, w);
+            return buf;
+        }
     };
 
     void ModifyMovieBox(std::string_view buffer) {
