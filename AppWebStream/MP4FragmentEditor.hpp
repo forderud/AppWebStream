@@ -103,6 +103,27 @@ private:
 
             return ((double)val)/(1 << 30);
         }
+
+        int32_t WriteFixed1616(double in) {
+            int32_t val = (int32_t)(in* (1 << 16));
+
+            int32_t result = 0;
+            result |= (val & 0xFF000000) >> 24;
+            result |= (val & 0x00FF0000) >> 8;
+            result |= (val & 0x0000FF00) << 8;
+            result |= (val & 0x000000FF) << 24;
+            return result;
+        }
+        int32_t WriteFixed0230(double in) {
+            int32_t val = (int32_t)(in * (1 << 30));
+
+            int32_t result = 0;
+            result |= (val & 0xFF000000) >> 24;
+            result |= (val & 0x00FF0000) >> 8;
+            result |= (val & 0x0000FF00) << 8;
+            result |= (val & 0x000000FF) << 24;
+            return result;
+        }
     };
 
     void ModifyMovieBox(std::string_view buffer) {
