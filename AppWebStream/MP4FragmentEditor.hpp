@@ -106,7 +106,7 @@ public:
     /** Intended to be called from IMFByteStream::BeginWrite and IMFByteStream::Write before forwarding the data to a socket.
         Will modify the "moof" atom if present.
         returns a (ptr, size) tuple pointing to a potentially modified buffer. */
-    std::string_view EditStream (std::string_view buffer) {
+    std::string_view EditStream (std::string_view buffer, bool update_moov) {
         if (buffer.size() < 5*HEADER_SIZE)
             return buffer; // too small to contain a moof (skip processing)
 
@@ -120,7 +120,8 @@ public:
         } else if (IsAtomType(buffer.data(), "moof")) {
             // Movie Fragment (moof)
             assert(atom_size == buffer.size());
-            return ModifyMovieFragment(buffer.data(), atom_size);
+            if (update_moov)
+                return ModifyMovieFragment(buffer.data(), atom_size);
         }
 
         return buffer;
