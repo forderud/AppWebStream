@@ -86,7 +86,7 @@ private:
 
     private:
         float ReadFixed1616(const char* buf) {
-            uint64_t val = 0;
+            int32_t val = 0;
             val |= buf[0] << 24;
             val |= buf[1] << 16;
             val |= buf[2] << 8;
@@ -95,13 +95,13 @@ private:
             return ((float)val)/(1 << 16);
         }
         float ReadFixed0230(const char* buf) {
-            uint64_t val = 0;
+            int32_t val = 0;
             val |= buf[0] << 24;
             val |= buf[1] << 16;
             val |= buf[2] << 8;
             val |= buf[3] << 0;
 
-            return ((float)val) /(1 << 30);
+            return ((float)val)/(1 << 30);
         }
     };
     static_assert(sizeof(matrix) == 36);
