@@ -510,7 +510,7 @@ private:
             assert(payload[3] & DATA_OFFSET_PRESENT_FLAG); // verify that dataOffsetPresent is set
             payload += FLAGS_SIZE; // skip flags
 
-            auto sample_count = DeSerialize<uint32_t>(payload);
+            auto sample_count = DeSerialize<uint32_t>(payload); // frame count (typ 1)
             assert(sample_count > 0);
             payload += sizeof(sample_count);
 
