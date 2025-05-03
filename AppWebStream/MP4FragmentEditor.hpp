@@ -290,6 +290,8 @@ private:
                 assert(IsAtomType(ptr, "tkhd"));
                 uint32_t tkhd_len = GetAtomSize(ptr);
                 ptr += tkhd_len;
+
+                // TODO: Parse create- & modify-time (encoded same as "mvhd")
             }
 
             // entring "mdia" atom
