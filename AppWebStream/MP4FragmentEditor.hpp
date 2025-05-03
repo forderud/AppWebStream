@@ -23,7 +23,8 @@ static char* Serialize(char* buf, T val) {
     return buf + sizeof(T);
 }
 
-/** Read big-endian fixed-point 16+16 float. */
+/** Read big-endian fixed-point 16+16 float.
+    REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/tools/IsoTypeReader.java */
 inline double ReadFixed1616(const char* buf) {
     int32_t val = 0;
     val |= buf[0] << 24;
@@ -33,7 +34,8 @@ inline double ReadFixed1616(const char* buf) {
 
     return ((double)val) / (1 << 16);
 }
-/** Read big-endian fixed-point 2+30 float. */
+/** Read big-endian fixed-point 2+30 float.
+    REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/tools/IsoTypeReader.java */
 inline double ReadFixed0230(const char* buf) {
     int32_t val = 0;
     val |= buf[0] << 24;
@@ -44,7 +46,8 @@ inline double ReadFixed0230(const char* buf) {
     return ((double)val) / (1 << 30);
 }
 
-/** Write big-endian fixed-point 16+16 float. */
+/** Write big-endian fixed-point 16+16 float.
+    REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/tools/IsoTypeWriter.java */
 inline char* WriteFixed1616(char* buf, double in) {
     int32_t val = (int32_t)(in * (1 << 16));
 
@@ -54,7 +57,8 @@ inline char* WriteFixed1616(char* buf, double in) {
     buf[3] = (val & 0x000000FF);
     return buf + 4;
 }
-/** Write big-endian fixed-point 2+30 float. */
+/** Write big-endian fixed-point 2+30 float.
+    REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/tools/IsoTypeWriter.java */
 inline char* WriteFixed0230(char* buf, double in) {
     int32_t val = (int32_t)(in * (1 << 30));
 
