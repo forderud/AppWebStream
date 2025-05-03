@@ -147,7 +147,7 @@ private:
             // entering "trak" atom
             assert(IsAtomType(ptr, "trak"));
             //uint32_t trak_len = GetAtomSize(ptr);
-            ptr += 8;
+            ptr += 8; // skip size & type
 
             {
                 // skip over "tkhd" atom
@@ -159,7 +159,7 @@ private:
             // entring "mdia" atom
             assert(IsAtomType(ptr, "mdia"));
             //uint32_t mdia_len = GetAtomSize(ptr);
-            ptr += 8;
+            ptr += 8; // skip size & type
 
             {
                 // skip over "mdhd" atom
@@ -177,7 +177,7 @@ private:
             // entering "minf" atom
             assert(IsAtomType(ptr, "minf"));
             //uint32_t minf_len = GetAtomSize(ptr);
-            ptr += 8;
+            ptr += 8; // skip size & type
 
             {
                 // skip over "vmhd" atom
@@ -195,13 +195,13 @@ private:
             // entering "stbl" atmom
             assert(IsAtomType(ptr, "stbl"));
             //uint32_t stbl_len = GetAtomSize(ptr);
-            ptr += 8;
+            ptr += 8; // skip size & type
 
             // entering "stsd" atom (see https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/movenc.c)
             // RE: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/SampleDescriptionBox.java
             assert(IsAtomType(ptr, "stsd"));
             //uint32_t stsd_len = GetAtomSize(ptr);
-            ptr += 8;
+            ptr += 8; // skip size & type
 
             uint32_t versionFlags = DeSerialize<uint32_t>(ptr); // 8bit version followed by 24bit flags
             assert(versionFlags == 0);
@@ -216,7 +216,7 @@ private:
                 // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/sampleentry/VisualSampleEntry.java
                 assert(IsAtomType(ptr, "avc1"));
                 //uint32_t avc1_len = GetAtomSize(ptr);
-                ptr += 8;
+                ptr += 8; // skip size & type
 
                 ptr += 6; // skip first 6 bytes
 
