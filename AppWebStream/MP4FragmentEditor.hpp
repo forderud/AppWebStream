@@ -42,25 +42,23 @@ inline double ReadFixed0230(const char* buf) {
     return ((double)val) / (1 << 30);
 }
 
-inline int32_t WriteFixed1616(double in) {
+inline char* WriteFixed1616(char* buf, double in) {
     int32_t val = (int32_t)(in * (1 << 16));
 
-    int32_t result = 0;
-    result |= (val & 0xFF000000) >> 24;
-    result |= (val & 0x00FF0000) >> 8;
-    result |= (val & 0x0000FF00) << 8;
-    result |= (val & 0x000000FF) << 24;
-    return result;
+    buf[0] = (val & 0xFF000000) >> 24;
+    buf[1] = (val & 0x00FF0000) >> 16;
+    buf[2] = (val & 0x0000FF00) >> 8;
+    buf[3] = (val & 0x000000FF);
+    return buf + 4;
 }
-inline int32_t WriteFixed0230(double in) {
+inline char* WriteFixed0230(char* buf, double in) {
     int32_t val = (int32_t)(in * (1 << 30));
 
-    int32_t result = 0;
-    result |= (val & 0xFF000000) >> 24;
-    result |= (val & 0x00FF0000) >> 8;
-    result |= (val & 0x0000FF00) << 8;
-    result |= (val & 0x000000FF) << 24;
-    return result;
+    buf[0] = (val & 0xFF000000) >> 24;
+    buf[1] = (val & 0x00FF0000) >> 16;
+    buf[2] = (val & 0x0000FF00) >> 8;
+    buf[3] = (val & 0x000000FF);
+    return buf + 4;
 }
 
 /** Process atoms within a MPEG4 MovieFragment (moof) to make the stream comply with ISO base media file format (https://www.iso.org/standard/68960.html).
