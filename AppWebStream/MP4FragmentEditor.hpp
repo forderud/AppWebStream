@@ -217,7 +217,9 @@ private:
             //uint32_t avc1_len = GetAtomSize(ptr);
             ptr += 8;
 
-            ptr += 24; // TODO: Document which avc1 parameters are jumped over
+            ptr += 12; // TODO: Document which avc1 parameters are jumped over
+
+            ptr += 3 * sizeof(uint32_t); // skip 3 "predefined" values that should all be zero
 
             //auto width = DeSerialize<uint16_t>(ptr);
             ptr += 2;
