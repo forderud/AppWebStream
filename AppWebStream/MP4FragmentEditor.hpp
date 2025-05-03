@@ -30,7 +30,7 @@ Expected atom hiearchy:
   - [tfdt] track fragment decode timebox (will be added)
   - [trun] track run (will be modified) */
 class MP4FragmentEditor {
-    static constexpr unsigned long S_HEADER_SIZE = 8;
+    static constexpr uint32_t HEADER_SIZE = 8; // atom header size (4bytes size + 4byte name)
 
 public:
     MP4FragmentEditor(float dpi) {
@@ -41,7 +41,7 @@ public:
         Will modify the "moof" atom if present.
         returns a (ptr, size) tuple pointing to a potentially modified buffer. */
     std::string_view EditStream (std::string_view buffer) {
-        if (buffer.size() < 5*S_HEADER_SIZE)
+        if (buffer.size() < 5*HEADER_SIZE)
             return buffer; // too small to contain a moof (skip processing)
 
         uint32_t atom_size = GetAtomSize(buffer.data());
@@ -268,11 +268,11 @@ private:
         char* moof_ptr = m_moof_buf.data(); // switch to internal buffer
 
         // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/MovieFragmentHeaderBox.java
-        char* mfhd_ptr = moof_ptr + S_HEADER_SIZE;
+        char* mfhd_ptr = moof_ptr + HEADER_SIZE;
         uint32_t mfhd_size = GetAtomSize(mfhd_ptr);
         if (!IsAtomType(mfhd_ptr, "mfhd")) // movie fragment header
             throw std::runtime_error("not a \"mfhd\" atom");
-        auto seq_nr = DeSerialize<uint32_t>(mfhd_ptr+S_HEADER_SIZE+4); // increases by one per fragment
+        auto seq_nr = DeSerialize<uint32_t>(mfhd_ptr+HEADER_SIZE+4); // increases by one per fragment
         seq_nr;
 
         // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/TrackFragmentBox.java
@@ -280,7 +280,7 @@ private:
         uint32_t traf_size = GetAtomSize(traf_ptr);
         if (!IsAtomType(traf_ptr, "traf")) // track fragment
             throw std::runtime_error("not a \"traf\" atom");
-        char* tfhd_ptr = traf_ptr + S_HEADER_SIZE;
+        char* tfhd_ptr = traf_ptr + HEADER_SIZE;
 
         unsigned long pos_idx = static_cast<unsigned long>(tfhd_ptr - moof_ptr);
         int rel_size = ProcessTrackFrameChildren(m_moof_buf.data()+pos_idx, size, size-pos_idx);
@@ -304,7 +304,6 @@ private:
 
     Returns the relative size of the modified child atoms (bytes shrunk or grown). */
     int ProcessTrackFrameChildren (char* tfhd_ptr, ULONG moof_size, ULONG buf_size) {
-        const unsigned long HEADER_SIZE = 8; // atom header size (4bytes size + 4byte name)
         const unsigned long FLAGS_SIZE  = 4; // atom flags size (1byte version + 3bytes with flags)
         const unsigned int BASE_DATA_OFFSET_SIZE = 8; // size of tfhd flag to remove
         const unsigned int TFDT_SIZE = 20; // size of new tfdt atom that is added
