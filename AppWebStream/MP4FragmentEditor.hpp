@@ -183,34 +183,37 @@ private:
 
             ptr += 3; // skip over "flags" field
 
+            uint64_t creationTime = 0;
+            uint64_t modificationTime = 0;
             if (version == 1) {
                 assert(mvhd_len == 120);
 
                 // seconds since Fri Jan 1 00:00:00 1904
-                auto creationTime = DeSerialize<uint64_t>(ptr);
+                creationTime = DeSerialize<uint64_t>(ptr);
                 ptr += 8;
 
-                auto modificationTime = DeSerialize<uint64_t>(ptr);
+                modificationTime = DeSerialize<uint64_t>(ptr);
                 ptr += 8;
             } else {
                 assert(mvhd_len == 108);
 
                 // seconds since Fri Jan 1 00:00:00 1904
-                auto creationTime = DeSerialize<uint32_t>(ptr);
+                creationTime = DeSerialize<uint32_t>(ptr);
                 ptr += 4;
 
-                auto modificationTime = DeSerialize<uint32_t>(ptr);
+                modificationTime = DeSerialize<uint32_t>(ptr);
                 ptr += 4;
             }
 
             auto timeScale = DeSerialize<uint32_t>(ptr); // 50000 = 50ms
             ptr += 4;
 
+            uint64_t duration = 0;
             if (version == 1) {
-                auto duration = DeSerialize<uint64_t>(ptr);
+                duration = DeSerialize<uint64_t>(ptr);
                 ptr += 8;
             } else {
-                auto duration = DeSerialize<uint32_t>(ptr);
+                duration = DeSerialize<uint32_t>(ptr);
                 ptr += 4;
             }
 
