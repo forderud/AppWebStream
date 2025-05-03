@@ -321,13 +321,8 @@ private:
                 assert(dpi == 72); // 72.00 vertical DPI
 
                 // update video DPI in fixed-point 16+16 format
-                auto tmp = (uint32_t)(m_dpi * 65536);
-                uint16_t dpi_int = tmp >> 16;
-                uint16_t dpi_frac = tmp & 0xFFFF;
-                Serialize<USHORT>(ptr + 0, dpi_int);  // horizontal DPI (integer part)
-                Serialize<USHORT>(ptr + 2, dpi_frac); //                (fraction)
-                Serialize<USHORT>(ptr + 4, dpi_int);  // vertical DPI (integer part)
-                Serialize<USHORT>(ptr + 6, dpi_frac); //              (fraction)
+                WriteFixed1616(ptr, m_dpi);    // horizontal DPI
+                WriteFixed1616(ptr + 4, m_dpi);// vertical DPI
 
                 // ignore the remaining parameters
             }
