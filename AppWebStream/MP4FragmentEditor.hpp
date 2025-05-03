@@ -66,21 +66,42 @@ private:
     u,v,w;       divided as 2.30 bits
     // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/support/Matrix.java */
     struct matrix {
-        int32_t a, b, u;
-        int32_t c, d, v;
-        int32_t tx, ty, w;
+        static constexpr uint32_t SIZE = 9 * sizeof(int32_t); // serialization size
+        float a, b, u;
+        float c, d, v;
+        float tx, ty, w;
 
         matrix(const char* buf) {
             // TOOD: Implement fixed-point parsing
-            a = DeSerialize<int32_t>(buf); buf += sizeof(int32_t);
-            b = DeSerialize<int32_t>(buf); buf += sizeof(int32_t);
-            u = DeSerialize<int32_t>(buf); buf += sizeof(int32_t);
-            c = DeSerialize<int32_t>(buf); buf += sizeof(int32_t);
-            d = DeSerialize<int32_t>(buf); buf += sizeof(int32_t);
-            v = DeSerialize<int32_t>(buf); buf += sizeof(int32_t);
-            tx = DeSerialize<int32_t>(buf); buf += sizeof(int32_t);
-            ty= DeSerialize<int32_t>(buf); buf += sizeof(int32_t);
-            w = DeSerialize<int32_t>(buf); buf += sizeof(int32_t);
+            a = ReadFixed1616(buf); buf += sizeof(int32_t);
+            b = ReadFixed1616(buf); buf += sizeof(int32_t);
+            u = ReadFixed0230(buf); buf += sizeof(int32_t);
+            c = ReadFixed1616(buf); buf += sizeof(int32_t);
+            d = ReadFixed1616(buf); buf += sizeof(int32_t);
+            v = ReadFixed0230(buf); buf += sizeof(int32_t);
+            tx = ReadFixed1616(buf); buf += sizeof(int32_t);
+            ty= ReadFixed1616(buf); buf += sizeof(int32_t);
+            w = ReadFixed0230(buf); buf += sizeof(int32_t);
+        }
+
+    private:
+        float ReadFixed1616(const char* buf) {
+            uint64_t val = 0;
+            val |= buf[0] << 24;
+            val |= buf[1] << 16;
+            val |= buf[2] << 8;
+            val |= buf[3] << 0;
+
+            return ((float)val)/(1 << 16);
+        }
+        float ReadFixed0230(const char* buf) {
+            uint64_t val = 0;
+            val |= buf[0] << 24;
+            val |= buf[1] << 16;
+            val |= buf[2] << 8;
+            val |= buf[3] << 0;
+
+            return ((float)val) /(1 << 30);
         }
     };
     static_assert(sizeof(matrix) == 36);
@@ -146,7 +167,7 @@ private:
 
             // matrix to map points from one coordinate space into another
             matrix mat(ptr);
-            ptr += sizeof(matrix);
+            ptr += matrix::SIZE;
 
             ptr += sizeof(uint32_t) * 6; // reserved
 
