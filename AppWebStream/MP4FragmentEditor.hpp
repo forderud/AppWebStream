@@ -121,10 +121,10 @@ private:
                 ptr += 4;
             }
 
-            auto rate = DeSerialize<uint32_t>(ptr); // preferred playback rate
+            auto rate = DeSerialize<uint32_t>(ptr); // preferred playback rate (16+16 fraction)
             ptr += 4;
 
-            auto volume = DeSerialize<int16_t>(ptr); // master volume of file
+            auto volume = DeSerialize<int16_t>(ptr); // master volume of file (8+8 fraction)
             ptr += 2;
 
             ptr += sizeof(uint16_t); // reserved
