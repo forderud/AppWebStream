@@ -215,19 +215,21 @@ private:
             //uint32_t avc1_len = GetAtomSize(ptr);
             ptr += 8;
 
-            // parse existing video DPI in <integer>/<fraction> format
-            assert(DeSerialize<USHORT>(ptr + 28) == 72); // horizontal DPI (integer part)
-            assert(DeSerialize<USHORT>(ptr + 30) == 0);  //                (fraction)
-            assert(DeSerialize<USHORT>(ptr + 32) == 72); // vertical DPI (integer part)
-            assert(DeSerialize<USHORT>(ptr + 34) == 0);  //              (fraction)
+            ptr += 28; // TODO: Document which avc1 parameters are jumped over
 
-            // update video DPI
+            // check existing video DPI in <integer>/<fraction> format
+            assert(DeSerialize<USHORT>(ptr + 0) == 72); // 72.00 horizontal DPI
+            assert(DeSerialize<USHORT>(ptr + 2) == 0);
+            assert(DeSerialize<USHORT>(ptr + 4) == 72); // 72.00 vertical DPI
+            assert(DeSerialize<USHORT>(ptr + 6) == 0);
+
+            // update video DPI in <integer>/<fraction> format
             auto dpi_int = (USHORT)m_dpi;
             auto dpi_frac = (USHORT)((m_dpi - dpi_int)*65536);
-            Serialize<USHORT>(ptr + 28, dpi_int);
-            Serialize<USHORT>(ptr + 30, dpi_frac);
-            Serialize<USHORT>(ptr + 32, dpi_int);
-            Serialize<USHORT>(ptr + 34, dpi_frac);
+            Serialize<USHORT>(ptr + 0, dpi_int);  // horizontal DPI (integer part)
+            Serialize<USHORT>(ptr + 2, dpi_frac); //                (fraction)
+            Serialize<USHORT>(ptr + 4, dpi_int);  // vertical DPI (integer part)
+            Serialize<USHORT>(ptr + 6, dpi_frac); //              (fraction)
         }
     }
 
