@@ -304,7 +304,7 @@ private:
         }
     }
 
-    const uint64_t           m_frame_duration = 0; // video frame duration in 100-nanosecond units
+    const uint64_t           m_frame_duration = 0; // frame duration in 100-nanosecond units
     int64_t                  m_time_stamp = 0;
 
     CComPtr<IMFMediaSink>    m_media_sink;
