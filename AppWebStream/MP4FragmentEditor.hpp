@@ -109,7 +109,7 @@ private:
 
             ptr += sizeof(uint32_t) * 6; // reserved
 
-            auto nextTrackId = DeSerialize<uint32_t>(ptr);
+            //auto nextTrackId = DeSerialize<uint32_t>(ptr); // (typ 2)
             ptr += 4;
 
             // end of "mvhd" atom
