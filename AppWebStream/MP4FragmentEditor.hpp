@@ -55,7 +55,9 @@ public:
             ModifyMovieBox(buffer);
         } else if (IsAtomType(buffer.data(), "moof")) {
             // Movie Fragment (moof)
+#ifndef ENABLE_FFMPEG
             assert(atom_size == buffer.size());
+#endif
             if (update_moov)
                 return ModifyMovieFragment(buffer.data(), atom_size);
         }
