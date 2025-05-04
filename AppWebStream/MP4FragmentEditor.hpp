@@ -302,15 +302,12 @@ private:
 
     Returns the relative size of the modified child atoms (bytes shrunk or grown). */
     int ProcessTrackFrameChildren (char* tfhd_ptr, ULONG moof_size, ULONG buf_size) {
-        if (buf_size < 2*HEADER_SIZE+8)
-            return 0; // too small to contain tfhd & trun atoms
+        assert(buf_size >= 2 * HEADER_SIZE + 8);
 
         // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/TrackFragmentHeaderBox.java
         uint32_t tfhd_size = GetAtomSize(tfhd_ptr);
         {
-            if (!IsAtomType(tfhd_ptr, "tfhd")) // track fragment header
-                return 0; // not a "tfhd" atom
-
+            assert(IsAtomType(tfhd_ptr, "tfhd")); // track fragment header
             // process tfhd content
             char* payload = tfhd_ptr + HEADER_SIZE;
             auto version = DeSerialize<uint8_t>(payload);
@@ -330,8 +327,7 @@ private:
                 uint32_t flags = DeSerialize<uint24_t>(payload);
                 // 1: set default-base-is-moof flag
                 flags |= MOV_TFHD_DEFAULT_BASE_IS_MOOF;
-                if (!(flags & MOV_TFHD_BASE_DATA_OFFSET))
-                    return 0; // base-data-offset not set
+                assert(flags & MOV_TFHD_BASE_DATA_OFFSET);
                 // 2: remove base-data-offset flag
                 flags &= ~MOV_TFHD_BASE_DATA_OFFSET;
                 Serialize<uint24_t>(payload, flags); // write back changes
