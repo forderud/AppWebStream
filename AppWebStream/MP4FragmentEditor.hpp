@@ -93,8 +93,9 @@ private:
                 duration = DeSerialize<uint32_t>(ptr);
                 ptr += 4;
             }
+            
 
-            auto rate = DeSerialize<uint32_t>(ptr); // preferred playback rate (16+16 fraction)
+            double rate = ReadFixed1616(ptr); // preferred playback rate (16+16 fraction)
             ptr += 4;
 
             auto volume = DeSerialize<int16_t>(ptr); // master volume of file (8+8 fraction)
