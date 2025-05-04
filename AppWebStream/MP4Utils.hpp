@@ -21,6 +21,15 @@ static char* Serialize(char* buf, T val) {
     return buf + sizeof(T);
 }
 
+/** Read big-endian fixed-point 8+8 float.
+    REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/tools/IsoTypeReader.java */
+inline double ReadFixed88(const char* buf) {
+    int16_t val = 0;
+    val |= buf[0] << 8;
+    val |= buf[1] << 0;
+
+    return ((double)val) / (1 << 8);
+}
 /** Read big-endian fixed-point 16+16 float.
     REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/tools/IsoTypeReader.java */
 inline double ReadFixed1616(const char* buf) {
