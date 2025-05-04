@@ -333,9 +333,9 @@ private:
         MemMove(ptr+TFDT_SIZE-BASE_DATA_OFFSET_SIZE/*dst*/, ptr/*src*/, buf_size-tfhd_size/*size*/);
 
         {
-            char* tfdt_ptr = ptr;
-            // insert an empty "tfdt" atom (20bytes)
+            // insert new "tfdt" atom (20bytes)
             // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/TrackFragmentBaseMediaDecodeTimeBox.java
+            char* tfdt_ptr = ptr;
             Serialize<uint32_t>(tfdt_ptr, TFDT_SIZE);
             memcpy(tfdt_ptr+4/*dst*/, "tfdt", 4); // track fragment base media decode timebox
             tfdt_ptr += HEADER_SIZE;
@@ -346,6 +346,7 @@ private:
         }
 
         {
+            // modify "trun" atom
             // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/TrackRunBox.java
             char* trun_ptr = ptr + TFDT_SIZE;
             uint32_t trun_size = GetAtomSize(trun_ptr);
