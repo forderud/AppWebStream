@@ -75,7 +75,6 @@ private:
             // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/MovieHeaderBox.java
             assert(IsAtomType(ptr, "mvhd"));
             uint32_t mvhd_len = GetAtomSize(ptr);
-#ifdef ANALYZE_MVHD
             ptr += HEADER_SIZE; // skip size & type
 
             uint8_t version = 0;
@@ -115,9 +114,6 @@ private:
 
             // end of "mvhd" atom
             assert(ptr == buffer.data() + HEADER_SIZE + mvhd_len);
-#else
-            ptr += mvhd_len;
-#endif
         }
         {
             // entering "trak" atom
