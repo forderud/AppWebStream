@@ -36,6 +36,7 @@ class MP4FragmentEditor {
 public:
     MP4FragmentEditor(double dpi) {
         m_dpi = dpi;
+        m_startTime = CurrentTime1904();
     }
 
     /** Intended to be called from IMFByteStream::BeginWrite and IMFByteStream::Write before forwarding the data to a socket.
@@ -89,18 +90,22 @@ private:
 
                 // seconds since Fri Jan 1 00:00:00 1904
                 creationTime = DeSerialize<uint64_t>(ptr);
+                //Serialize<uint64_t>(ptr, m_startTime);
                 ptr += 8;
 
                 modificationTime = DeSerialize<uint64_t>(ptr);
+                //Serialize<uint64_t>(ptr, m_startTime);
                 ptr += 8;
             } else {
                 assert(mvhd_len == 108);
 
                 // seconds since Fri Jan 1 00:00:00 1904
                 creationTime = DeSerialize<uint32_t>(ptr);
+                //Serialize<uint32_t>(ptr, (uint32_t)m_startTime);
                 ptr += 4;
 
                 modificationTime = DeSerialize<uint32_t>(ptr);
+                //Serialize<uint32_t>(ptr, (uint32_t)m_startTime);
                 ptr += 4;
             }
 
@@ -418,6 +423,7 @@ private:
 
 private:
     double            m_dpi = 0;
+    uint64_t          m_startTime = 0; // creation- & modification time
     uint64_t          m_cur_time = 0;
     std::vector<char> m_moof_buf; ///< "moof" atom modification buffer
 };
