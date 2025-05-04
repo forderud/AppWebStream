@@ -82,7 +82,7 @@ private:
             uint64_t modificationTime = 0;
             std::tie(version, creationTime, modificationTime, ptr) = ParseVersionCreateModifyTime(ptr, m_startTime);
 
-            m_timeScale = DeSerialize<uint32_t>(ptr); // 50000 = 50ms
+            m_timeScale = DeSerialize<uint32_t>(ptr); // 50000 = 50fps
             ptr += 4;
 
             uint64_t duration = 0;
@@ -439,7 +439,7 @@ private:
 private:
     double            m_dpi = 0;
     uint64_t          m_startTime = 0; // creation- & modification time
-    uint32_t          m_timeScale = 0; // 50000 = 50ms
+    uint32_t          m_timeScale = 0; // 50000 = 50fps
     uint64_t          m_cur_time = 0;
     std::vector<char> m_moof_buf; ///< "moof" atom modification buffer
 };
