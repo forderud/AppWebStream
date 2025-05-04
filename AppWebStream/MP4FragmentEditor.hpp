@@ -334,10 +334,11 @@ private:
 
             Serialize<uint32_t>(tfhd_ptr, tfhd_size-BASE_DATA_OFFSET_SIZE); // shrink atom size
 
-            payload += 4;          // skip track-ID field (4bytes)
+            //auto track_id = DeSerialize<uint32_t>(payload);
+            payload += sizeof(uint32_t);          // skip track-ID field (4bytes)
 
             // move remaining tfhd fields over data_offset
-            size_t remaining_size = tfhd_size-HEADER_SIZE-FLAGS_SIZE-4 - BASE_DATA_OFFSET_SIZE;
+            size_t remaining_size = tfhd_size-HEADER_SIZE-FLAGS_SIZE-sizeof(uint32_t)-BASE_DATA_OFFSET_SIZE;
             MemMove(payload/*dst*/, payload+BASE_DATA_OFFSET_SIZE/*src*/, remaining_size/*size*/);
         }
         // pointer to right after shrunken tfhd atom
