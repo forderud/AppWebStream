@@ -388,23 +388,24 @@ private:
         if (version == 1) {
             // seconds since Fri Jan 1 00:00:00 1904
             creationTime = DeSerialize<uint64_t>(ptr);
-            //Serialize<uint64_t>(ptr, newTime);
+            Serialize<uint64_t>(ptr, newTime);
             ptr += 8;
 
             modificationTime = DeSerialize<uint64_t>(ptr);
-            //Serialize<uint64_t>(ptr, newTime);
+            Serialize<uint64_t>(ptr, newTime);
             ptr += 8;
         } else {
             // seconds since Fri Jan 1 00:00:00 1904
             creationTime = DeSerialize<uint32_t>(ptr);
-            //Serialize<uint32_t>(ptr, (uint32_t)newTime);
+            Serialize<uint32_t>(ptr, (uint32_t)newTime);
             ptr += 4;
 
             modificationTime = DeSerialize<uint32_t>(ptr);
-            //Serialize<uint32_t>(ptr, (uint32_t)newTime);
+            Serialize<uint32_t>(ptr, (uint32_t)newTime);
             ptr += 4;
         }
 
+        // return preexisting creation & modification times
         return std::tie(version, creationTime, modificationTime, ptr);
     }
 
