@@ -108,8 +108,18 @@ static HRESULT EncodeFrame (VideoEncoder & encoder, window_dc & wnd_dc) {
         return E_FAIL;
     }
 
+    static uint32_t frame_idx = 0;
+    frame_idx++;
+
+    bool paused = (frame_idx / 5) % 2;
+    printf("paused: %u\n", paused);
+
     // encode frame
-    return encoder.WriteFrameEnd();
+    uint64_t duration = encoder.GetDefaultFrameDuration();
+    if (!paused)
+        duration += duration/2; // 50% increase
+
+    return encoder.WriteFrameEnd(duration);
 }
 
 
