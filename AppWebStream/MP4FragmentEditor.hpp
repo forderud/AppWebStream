@@ -354,12 +354,23 @@ private:
             if (!IsAtomType(trun_ptr, "trun")) // track run box
                 throw std::runtime_error("not a \"trun\" atom");
             char* payload = trun_ptr + HEADER_SIZE;
-            assert(payload[0] == 1);   // check version
-            const BYTE SAMPLE_DURATION_PRESENT_FLAG = 0x01; // stored at offset 2
-            const BYTE DATA_OFFSET_PRESENT_FLAG = 0x01;     // stored at offset 3
-            assert(payload[2] & SAMPLE_DURATION_PRESENT_FLAG); // verify that sampleDurationPresent is set
-            assert(payload[3] == DATA_OFFSET_PRESENT_FLAG); // verify that dataOffsetPresent is set
-            payload += FLAGS_SIZE; // skip flags
+
+            auto version = DeSerialize<uint8_t>(payload);
+            payload += sizeof(uint8_t);
+            assert(version == 1);   // check version
+
+            // from https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/isom.h#L404
+            constexpr uint32_t MOV_TRUN_DATA_OFFSET = 0x01;
+            //constexpr uint32_t MOV_TRUN_FIRST_SAMPLE_FLAGS = 0x04;
+            constexpr uint32_t MOV_TRUN_SAMPLE_DURATION = 0x100;
+            constexpr uint32_t MOV_TRUN_SAMPLE_SIZE = 0x200;
+            constexpr uint32_t MOV_TRUN_SAMPLE_FLAGS = 0x400;
+            constexpr uint32_t MOV_TRUN_SAMPLE_CTS = 0x800;
+
+            uint32_t flags = DeSerialize<uint24_t>(payload);
+            // verify that dataOffset, sampleDuration, sampleSize, sampleFlags & sampleCts are set
+            assert(flags == (MOV_TRUN_DATA_OFFSET | MOV_TRUN_SAMPLE_DURATION | MOV_TRUN_SAMPLE_SIZE | MOV_TRUN_SAMPLE_FLAGS | MOV_TRUN_SAMPLE_CTS));
+            payload += sizeof(uint24_t);
 
             auto sample_count = DeSerialize<uint32_t>(payload); // frame count (typ 1)
             assert(sample_count > 0);
