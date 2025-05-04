@@ -94,11 +94,10 @@ private:
                 ptr += 4;
             }
             
-
-            double rate = ReadFixed1616(ptr); // preferred playback rate (16+16 fraction)
+            //double rate = ReadFixed1616(ptr); // preferred playback rate (16+16 fraction) (typ 1.0)
             ptr += 4;
 
-            double volume = ReadFixed88(ptr); // master volume of file (8+8 fraction)
+            //double volume = ReadFixed88(ptr); // master volume of file (8+8 fraction) (typ 1.0)
             ptr += 2;
 
             ptr += sizeof(uint16_t); // reserved
