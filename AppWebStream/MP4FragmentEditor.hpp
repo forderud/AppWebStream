@@ -153,11 +153,39 @@ private:
 
             {
                 // skip over "tkhd" atom
+                // REF: https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/mov.c#L5478
                 assert(IsAtomType(ptr, "tkhd"));
                 uint32_t tkhd_len = GetAtomSize(ptr);
-                ptr += tkhd_len;
 
-                // TODO: Parse create- & modify-time (encoded same as "mvhd")
+                char* tkhd_ptr = ptr + HEADER_SIZE;
+                auto version = DeSerialize<uint8_t>(tkhd_ptr);
+                tkhd_ptr += 1;
+
+                tkhd_ptr += 3; // skip over "flags" field
+
+                uint64_t creationTime = 0;
+                uint64_t modificationTime = 0;
+                if (version == 1) {
+                    // seconds since Fri Jan 1 00:00:00 1904
+                    creationTime = DeSerialize<uint64_t>(tkhd_ptr);
+                    //Serialize<uint64_t>(tkhd_ptr, m_startTime);
+                    tkhd_ptr += 8;
+
+                    modificationTime = DeSerialize<uint64_t>(tkhd_ptr);
+                    //Serialize<uint64_t>(tkhd_ptr, m_startTime);
+                    tkhd_ptr += 8;
+                } else {
+                    // seconds since Fri Jan 1 00:00:00 1904
+                    creationTime = DeSerialize<uint32_t>(tkhd_ptr);
+                    //Serialize<uint32_t>(tkhd_ptr, (uint32_t)m_startTime);
+                    tkhd_ptr += 4;
+
+                    modificationTime = DeSerialize<uint32_t>(tkhd_ptr);
+                    //Serialize<uint32_t>(tkhd_ptr, (uint32_t)m_startTime);
+                    tkhd_ptr += 4;
+                }
+
+                ptr += tkhd_len;
             }
 
             // entring "mdia" atom
@@ -167,6 +195,7 @@ private:
 
             {
                 // skip over "mdhd" atom
+                // REF: https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/mov.c#L1864
                 assert(IsAtomType(ptr, "mdhd"));
                 uint32_t mdhd_len = GetAtomSize(ptr);
                 ptr += mdhd_len;
