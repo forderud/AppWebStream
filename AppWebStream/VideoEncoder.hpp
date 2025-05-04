@@ -304,7 +304,7 @@ private:
         }
     }
 
-    const unsigned long long m_frame_duration = 0;
+    const unsigned long long m_frame_duration = 0; // video frame duration in 100-nanosecond units
     long long                m_time_stamp = 0;
 
     CComPtr<IMFMediaSink>    m_media_sink;
