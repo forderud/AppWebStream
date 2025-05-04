@@ -84,8 +84,10 @@ public:
 
     virtual ~VideoEncoder () = default;
 
+    virtual uint64_t GetDefaultFrameDuration() const = 0;
+
     virtual R8G8B8A8* WriteFrameBegin () = 0;
-    virtual HRESULT   WriteFrameEnd () = 0;
+    virtual HRESULT   WriteFrameEnd (uint64_t duration = 0) = 0;
 
     HRESULT WriteFrame (const R8G8B8A8* src_data, bool swap_rb) {
         R8G8B8A8 * buffer_ptr = WriteFrameBegin();
@@ -198,6 +200,10 @@ public:
         COM_CHECK(MFShutdown());
     }
 
+    uint64_t GetDefaultFrameDuration() const override {
+        return m_frame_duration;
+    }
+
     R8G8B8A8* WriteFrameBegin () override {
         const DWORD frame_size = 4*Align(m_width)*Align(m_height);
 
@@ -211,7 +217,7 @@ public:
         return buffer_ptr;
     }
 
-    HRESULT WriteFrameEnd () override {
+    HRESULT WriteFrameEnd (uint64_t duration = 0) override {
         const DWORD frame_size = 4*Align(m_width)*Align(m_height);
 
         COM_CHECK(m_buffer->Unlock());
@@ -226,7 +232,11 @@ public:
 
         // Set the time stamp and the duration.
         COM_CHECK(sample->SetSampleTime(m_time_stamp));
-        COM_CHECK(sample->SetSampleDuration(m_frame_duration));
+
+        if (!duration)
+            duration = m_frame_duration; // use default
+
+        COM_CHECK(sample->SetSampleDuration(duration));
 
         // send sample to Sink Writer.
         HRESULT hr = m_sink_writer->WriteSample(m_stream_index, sample); // fails on I/O error
@@ -237,7 +247,7 @@ public:
         COM_CHECK(m_sink_writer->NotifyEndOfSegment(m_stream_index));
 
         // increment time
-        m_time_stamp += m_frame_duration;
+        m_time_stamp += duration;
         return S_OK;
     }
 
@@ -373,11 +383,16 @@ public:
         avformat_free_context(m_out_ctx);
     }
 
+    uint64_t GetDefaultFrameDuration() const override {
+        return 0;
+    }
+
     R8G8B8A8* WriteFrameBegin () override {
         return m_rgb_buf.data();
     }
 
-    HRESULT   WriteFrameEnd () override {
+    HRESULT   WriteFrameEnd (uint64_t duration) override {
+        assert(duration == 0);
         return WriteFrameImpl(true);
     }
 
