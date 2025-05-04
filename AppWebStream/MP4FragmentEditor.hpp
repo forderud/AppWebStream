@@ -32,6 +32,7 @@ Expected atom hiearchy:
   - [trun] track run (will be modified) */
 class MP4FragmentEditor {
     static constexpr uint32_t HEADER_SIZE = 8; // atom header size (4bytes size + 4byte name)
+    static constexpr uint32_t FLAGS_SIZE = 4;  // atom flags size (1byte version + 3bytes with flags)
 
 public:
     MP4FragmentEditor(double dpi, uint64_t startTime1904) {
@@ -294,7 +295,6 @@ private:
 
     Returns the relative size of the modified child atoms (bytes shrunk or grown). */
     int ProcessTrackFrameChildren (char* tfhd_ptr, ULONG moof_size, ULONG buf_size) {
-        const unsigned long FLAGS_SIZE  = 4; // atom flags size (1byte version + 3bytes with flags)
         const unsigned int BASE_DATA_OFFSET_SIZE = 8; // size of tfhd flag to remove
         const unsigned int TFDT_SIZE = 20; // size of new tfdt atom that is added
 
