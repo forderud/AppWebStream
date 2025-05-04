@@ -34,9 +34,9 @@ class MP4FragmentEditor {
     static constexpr uint32_t HEADER_SIZE = 8; // atom header size (4bytes size + 4byte name)
 
 public:
-    MP4FragmentEditor(double dpi) {
+    MP4FragmentEditor(double dpi, uint64_t startTime1904) {
         m_dpi = dpi;
-        m_startTime = CurrentTime1904();
+        m_startTime = startTime1904;
     }
 
     /** Intended to be called from IMFByteStream::BeginWrite and IMFByteStream::Write before forwarding the data to a socket.

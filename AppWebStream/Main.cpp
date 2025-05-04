@@ -145,7 +145,7 @@ int main (int argc, char *argv[]) {
     // create H.264/MPEG4 encoder
     printf("Window handle: %08llx\n", (size_t)win_handle);
     auto os = CreateLocalInstance<OutputStream>();
-    os->SetResolution(96.0); // video DPI
+    os->Initialize(96.0, CurrentTime1904()); // DPI & start time
 #ifdef ENABLE_FFMPEG
     os->SetPortOrFilename(port_filename); // blocking call
     VideoEncoderFF encoder(dims, FPS, os);

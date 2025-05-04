@@ -123,8 +123,8 @@ OutputStream::~OutputStream() {
 }
 
 
-void OutputStream::SetResolution(double dpi) {
-    m_stream_editor = std::make_unique<MP4FragmentEditor>(dpi);
+void OutputStream::Initialize(double dpi, uint64_t startTime1904) {
+    m_stream_editor = std::make_unique<MP4FragmentEditor>(dpi, startTime1904);
 }
 
 
