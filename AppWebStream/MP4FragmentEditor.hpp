@@ -306,20 +306,34 @@ private:
                 return 0; // not a "tfhd" atom
 
             // process tfhd content
-            const BYTE DEFAULT_BASE_IS_MOOF_FLAG = 0x02; // stored at offset 1
-            const BYTE BASE_DATA_OFFSET_FLAG     = 0x01; // stored at offset 3
             char* payload = tfhd_ptr + HEADER_SIZE;
-            // 1: set default-base-is-moof flag
-            payload[1] |=  DEFAULT_BASE_IS_MOOF_FLAG;
+            auto version = DeSerialize<uint8_t>(payload);
+            assert(version == 0);
+            payload += sizeof(uint8_t);
 
-            if (!(payload[3] & BASE_DATA_OFFSET_FLAG))
-                return 0; // base-data-offset not set
+            {
+                // modify flags
+                constexpr uint32_t MOV_TFHD_BASE_DATA_OFFSET = 0x01;
+                //constexpr uint32_t MOV_TFHD_STSD_ID = 0x02;
+                //constexpr uint32_t MOV_TFHD_DEFAULT_DURATION = 0x08;
+                //constexpr uint32_t MOV_TFHD_DEFAULT_SIZE = 0x10;
+                //constexpr uint32_t MOV_TFHD_DEFAULT_FLAGS = 0x20;
+                //constexpr uint32_t MOV_TFHD_DURATION_IS_EMPTY = 0x010000;
+                constexpr uint32_t MOV_TFHD_DEFAULT_BASE_IS_MOOF = 0x020000;
 
-            // 2: remove base-data-offset flag
-            payload[3] &= ~BASE_DATA_OFFSET_FLAG;
+                uint32_t flags = DeSerialize<uint24_t>(payload);
+                // 1: set default-base-is-moof flag
+                flags |= MOV_TFHD_DEFAULT_BASE_IS_MOOF;
+                if (!(flags & MOV_TFHD_BASE_DATA_OFFSET))
+                    return 0; // base-data-offset not set
+                // 2: remove base-data-offset flag
+                flags &= ~MOV_TFHD_BASE_DATA_OFFSET;
+                Serialize<uint24_t>(payload, flags); // write back changes
+                payload += sizeof(uint24_t);
+            }
+
             Serialize<uint32_t>(tfhd_ptr, tfhd_size-BASE_DATA_OFFSET_SIZE); // shrink atom size
 
-            payload += FLAGS_SIZE; // skip "flags" field
             payload += 4;          // skip track-ID field (4bytes)
 
             // move remaining tfhd fields over data_offset
