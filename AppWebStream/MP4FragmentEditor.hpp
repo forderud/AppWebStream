@@ -358,7 +358,7 @@ private:
             const BYTE SAMPLE_DURATION_PRESENT_FLAG = 0x01; // stored at offset 2
             const BYTE DATA_OFFSET_PRESENT_FLAG = 0x01;     // stored at offset 3
             assert(payload[2] & SAMPLE_DURATION_PRESENT_FLAG); // verify that sampleDurationPresent is set
-            assert(payload[3] & DATA_OFFSET_PRESENT_FLAG); // verify that dataOffsetPresent is set
+            assert(payload[3] == DATA_OFFSET_PRESENT_FLAG); // verify that dataOffsetPresent is set
             payload += FLAGS_SIZE; // skip flags
 
             auto sample_count = DeSerialize<uint32_t>(payload); // frame count (typ 1)
