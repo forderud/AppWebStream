@@ -362,7 +362,7 @@ private:
 
             auto sample_count = DeSerialize<uint32_t>(payload); // frame count (typ 1)
             assert(sample_count > 0);
-            payload += sizeof(sample_count);
+            payload += sizeof(uint32_t);
 
             // overwrite data_offset field
             payload = Serialize<uint32_t>(payload, moof_size-BASE_DATA_OFFSET_SIZE+TFDT_SIZE+8); // +8 experiementally derived
