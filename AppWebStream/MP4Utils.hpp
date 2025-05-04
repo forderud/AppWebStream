@@ -2,7 +2,15 @@
 #include <Windows.h>
 
 struct uint24_t {
-    uint8_t raw[3];
+    uint8_t raw[3]{};
+
+    uint24_t() = default;
+
+    uint24_t(uint32_t val) {
+        raw[0] = (val >> 0) & 0xFF;
+        raw[1] = (val >> 8) & 0xFF;
+        raw[2] = (val >> 16) & 0xFF;
+    }
 
     operator uint32_t () const {
         // no endianess conversion here, since it's already done in the (De)Serialize function
