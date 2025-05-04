@@ -10,6 +10,7 @@
     <ClInclude Include="WebSocket.hpp" />
     <ClInclude Include="OutputStream.hpp" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="MP4Utils.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="WebStream.html" />

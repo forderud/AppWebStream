@@ -91,6 +91,7 @@
   <ItemGroup>
     <ClInclude Include="MP4FragmentEditor.hpp" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="MP4Utils.hpp" />
     <ClInclude Include="VideoEncoder.hpp" />
     <ClInclude Include="WebSocket.hpp" />
     <ClInclude Include="OutputStream.hpp" />
