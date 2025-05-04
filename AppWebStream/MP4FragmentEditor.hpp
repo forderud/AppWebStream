@@ -350,7 +350,6 @@ private:
             // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/TrackRunBox.java
             char* trun_ptr = ptr + TFDT_SIZE;
             uint32_t trun_size = GetAtomSize(trun_ptr);
-            trun_size;
             if (!IsAtomType(trun_ptr, "trun")) // track run box
                 throw std::runtime_error("not a \"trun\" atom");
             char* payload = trun_ptr + HEADER_SIZE;
@@ -379,10 +378,24 @@ private:
             // overwrite data_offset field
             payload = Serialize<uint32_t>(payload, moof_size-BASE_DATA_OFFSET_SIZE+TFDT_SIZE+8); // +8 experiementally derived
 
-            auto sample_dur = DeSerialize<uint32_t>(payload); // duration of first sample (typ 1000)
+            for (uint32_t i = 0; i < sample_count; i++) {
+                auto sample_dur = DeSerialize<uint32_t>(payload); // duration of first sample (typ 1000)
+                payload += sizeof(uint32_t);
 
-            // update baseMediaDecodeTime for next fragment
-            m_cur_time += sample_count*sample_dur;
+                // update baseMediaDecodeTime for next fragment
+                m_cur_time += sample_count*sample_dur;
+
+                //auto sample_size = DeSerialize<uint32_t>(payload);
+                payload += sizeof(uint32_t);
+
+                //auto sample_flags = DeSerialize<uint32_t>(payload);
+                payload += sizeof(uint32_t);
+
+                //auto sample_ct = DeSerialize<int32_t>(payload);
+                payload += sizeof(int32_t);
+            }
+
+            assert(payload == trun_ptr + trun_size);
         }
 
         return TFDT_SIZE - BASE_DATA_OFFSET_SIZE; // tfdt added, tfhd shrunk
