@@ -1,6 +1,19 @@
 #pragma once
 #include <Windows.h>
 
+struct uint24_t {
+    uint8_t raw[3];
+
+    operator uint32_t () const {
+        // no endianess conversion here, since it's already done in the (De)Serialize function
+        uint32_t val = 0;
+        val |= raw[0] << 0;
+        val |= raw[1] << 8;
+        val |= raw[2] << 16;
+        return val;
+    }
+};
+static_assert(sizeof(uint24_t) == 3);
 
 /** Deserialize & conververt from big-endian. */
 template <typename T>
