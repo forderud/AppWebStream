@@ -126,7 +126,7 @@ private:
             ptr += HEADER_SIZE; // skip size & type
 
             {
-                // skip over "tkhd" atom
+                // partially parse "tkhd" atom
                 // REF: https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/mov.c#L5478
                 assert(IsAtomType(ptr, "tkhd"));
                 uint32_t tkhd_len = GetAtomSize(ptr);
@@ -147,13 +147,18 @@ private:
             ptr += HEADER_SIZE; // skip size & type
 
             {
-                // skip over "mdhd" atom
+                // partially parse "mdhd" atom
                 // REF: https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/mov.c#L1864
                 assert(IsAtomType(ptr, "mdhd"));
                 uint32_t mdhd_len = GetAtomSize(ptr);
-                ptr += mdhd_len;
+                char* mdhd_ptr = ptr + HEADER_SIZE;
 
-                // TODO: Parse create- & modify-time (encoded same as "mvhd")
+                uint8_t version = 0;
+                uint64_t creationTime = 0;
+                uint64_t modificationTime = 0;
+                std::tie(version, creationTime, modificationTime, mdhd_ptr) = ParseVersionCreateModifyTime(mdhd_ptr, m_startTime);
+
+                ptr += mdhd_len;
             }
             {
                 // skip over "hdlr" atom
