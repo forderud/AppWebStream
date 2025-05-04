@@ -198,9 +198,13 @@ private:
             //uint32_t stsd_len = GetAtomSize(ptr);
             ptr += HEADER_SIZE; // skip size & type
 
-            uint32_t versionFlags = DeSerialize<uint32_t>(ptr); // 8bit version followed by 24bit flags
-            assert(versionFlags == 0);
-            ptr += sizeof(uint32_t);
+            auto version = DeSerialize<uint8_t>(ptr);
+            assert(version == 0);
+            ptr += sizeof(uint8_t);
+
+            uint32_t flags = DeSerialize<uint24_t>(ptr);
+            assert(flags == 0);
+            ptr += sizeof(uint24_t);
             
             uint32_t entryCount = DeSerialize<uint32_t>(ptr);
             assert(entryCount == 1);
