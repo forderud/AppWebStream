@@ -424,7 +424,8 @@ private:
         auto version = DeSerialize<uint8_t>(ptr);
         ptr += 1;
 
-        ptr += 3; // skip over "flags" field
+        //uint32_t flags = DeSerialize<uint24_t>(ptr);
+        ptr += sizeof(uint24_t);
 
         // seconds since Fri Jan 1 00:00:00 1904
         uint64_t creationTime = 0;
