@@ -366,7 +366,8 @@ public:
         // REF: https://ffmpeg.org/ffmpeg-formats.html#Options-8 (-movflags arguments)
         // REF: https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/movenc.c
         AVDictionary *opt = nullptr;
-        av_dict_set(&opt, "movflags", "empty_moov+default_base_moof+frag_every_frame", 0); // fragmented MP4
+        int ret = av_dict_set(&opt, "movflags", "empty_moov+default_base_moof+frag_every_frame", 0); // fragmented MP4
+        assert(ret >= 0);
 
         // open the video codecs and allocate the necessary encode buffers
         m_frame = open_video(video_codec, opt, m_enc, m_stream->codecpar);
