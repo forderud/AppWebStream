@@ -402,7 +402,9 @@ private:
             assert(sample_count > 0);
             payload += sizeof(uint32_t);
 
-            // overwrite data_offset field
+            // overwrite data_offset field (https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-sstr/6d796f37-b4f0-475f-becd-13f1c86c2d1f)
+            // offset from the beginning of the MoofBox field
+            // DataOffset field MUST be the sum of the lengths of the MoofBox and all the fields in the MdatBox field
             payload = Serialize<uint32_t>(payload, moof_size-BASE_DATA_OFFSET_SIZE+TFDT_SIZE+8); // +8 experiementally derived
 
             for (uint32_t i = 0; i < sample_count; i++) {
