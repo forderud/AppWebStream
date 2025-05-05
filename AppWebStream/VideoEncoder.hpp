@@ -338,7 +338,15 @@ public:
         m_out_ctx->pb = avio_alloc_context(m_out_buf.data(), static_cast<int>(m_out_buf.size()), 1/*writable*/, socket, nullptr/*read*/, WritePackage, nullptr/*seek*/);
         //out_ctx->flags |= AVFMT_FLAG_CUSTOM_IO;
 
-        WriteHeader(opt);
+#ifndef NDEBUG
+        // log encoder info to console
+        av_dump_format(m_out_ctx, 0, nullptr, 1);
+#endif
+
+        // Write the stream header, if any
+        ret = avformat_write_header(m_out_ctx, &opt);
+        if (ret < 0)
+            throw std::runtime_error("avformat_write_header failed");
     }
 
     ~VideoEncoderFF() {
@@ -354,18 +362,6 @@ public:
 
         avio_context_free(&m_out_ctx->pb);
         avformat_free_context(m_out_ctx);
-    }
-
-    void WriteHeader (AVDictionary *opt) {
-#ifndef NDEBUG
-        // log encoder info to console
-        av_dump_format(m_out_ctx, 0, nullptr, 1);
-#endif
-
-        // Write the stream header, if any
-        int ret = avformat_write_header(m_out_ctx, &opt);
-        if (ret < 0)
-            throw std::runtime_error("avformat_write_header failed");
     }
 
     R8G8B8A8* WriteFrameBegin () override {
