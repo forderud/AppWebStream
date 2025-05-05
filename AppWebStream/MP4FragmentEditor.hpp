@@ -302,7 +302,7 @@ private:
         char* tfhd_ptr = traf_ptr + HEADER_SIZE;
 
         unsigned long tfhd_idx = static_cast<unsigned long>(tfhd_ptr - moof_ptr);
-        ProcessTrackFrameChildren(m_moof_buf.data()+tfhd_idx, moof_size, moof_size-tfhd_idx);
+        ProcessTrackFrameChildren(m_moof_buf.data()+tfhd_idx, moof_size-tfhd_idx, moof_size);
 
         // update "moof" parent atom size after size change
         Serialize<uint32_t>(moof_ptr, moof_size - BASE_DATA_OFFSET_SIZE + TFDT_SIZE);
@@ -322,7 +322,7 @@ private:
       - modify data_offset
 
     Returns the relative size of the modified child atoms (bytes shrunk or grown). */
-    void ProcessTrackFrameChildren (char* tfhd_ptr, const ULONG moof_size, const ULONG buf_size) {
+    void ProcessTrackFrameChildren (char* tfhd_ptr, const ULONG buf_size, const ULONG moof_size) {
         assert(buf_size >= 2 * HEADER_SIZE + 8);
 
         // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/TrackFragmentHeaderBox.java
