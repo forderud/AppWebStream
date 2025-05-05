@@ -368,6 +368,8 @@ public:
         AVDictionary *opt = nullptr;
         int ret = av_dict_set(&opt, "movflags", "empty_moov+default_base_moof+frag_every_frame", 0); // fragmented MP4
         assert(ret >= 0);
+        ret = av_dict_set(&opt, "fflags", "nobuffer", 0); // reduce latency introduced by buffering during initial input streams analysis
+        assert(ret >= 0);
 
         // open the video codecs and allocate the necessary encode buffers
         m_frame = open_video(video_codec, opt, m_enc, m_stream->codecpar);
