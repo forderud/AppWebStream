@@ -429,7 +429,7 @@ public:
                     R8G8B8A8 rgb = m_rgb_buf[y* m_enc->width + x];
                     // convert to YUV
                     unsigned char Y=0, U=0, V=0;
-                    YUVfromRGB(rgb, Y, U, V);
+                    RGB_to_YCbCr(rgb, Y, U, V);
                     // write Y value
                     m_frame->data[0][y* m_frame->linesize[0] + x] = Y;
                     // write subsambled Cb,Cr values
@@ -568,12 +568,12 @@ private:
         return frame;
     }
 
-    /** "Homemade" RGB to YUV conversion. Please replace with more authoritative alternative if/when possible.
+    /** Manual RGB to YCbCr conversion. Please replace with more authoritative alternative if/when possible.
         REF: http://www.fourcc.org/fccyvrgb.php */
-    static void YUVfromRGB (const R8G8B8A8 rgb, unsigned char& Y, unsigned char& U, unsigned char& V) {
+    static void RGB_to_YCbCr (const R8G8B8A8 rgb, unsigned char& Y, unsigned char& Cb, unsigned char& Cr) {
         Y = static_cast<unsigned char>( 0.257f*rgb.r + 0.504f*rgb.g + 0.098f*rgb.b +  16);
-        U = static_cast<unsigned char>(-0.148f*rgb.r - 0.291f*rgb.g + 0.439f*rgb.b + 128);
-        V = static_cast<unsigned char>( 0.439f*rgb.r - 0.368f*rgb.g - 0.071f*rgb.b + 128);
+        Cb = static_cast<unsigned char>(-0.148f*rgb.r - 0.291f*rgb.g + 0.439f*rgb.b + 128);
+        Cr = static_cast<unsigned char>( 0.439f*rgb.r - 0.368f*rgb.g - 0.071f*rgb.b + 128);
     }
 
     unsigned int         m_fps = 0;
