@@ -370,6 +370,8 @@ public:
         assert(ret >= 0);
         ret = av_dict_set(&opt, "fflags", "nobuffer+flush_packets", 0); // reduce latency
         assert(ret >= 0);
+        ret = av_dict_set(&opt, "mpegts", "omit_video_pes_length", 0); // reduce latency
+        assert(ret >= 0);
 
         // open the video codecs and allocate the necessary encode buffers
         m_frame = open_video(video_codec, opt, m_enc, m_stream->codecpar);
