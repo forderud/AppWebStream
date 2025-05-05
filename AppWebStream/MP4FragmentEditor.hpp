@@ -32,7 +32,7 @@ Expected atom hiearchy:
   - [trun] track run (will be modified) */
 class MP4FragmentEditor {
     static constexpr uint32_t HEADER_SIZE = 8; // atom header size (4bytes size + 4byte name)
-    static constexpr uint32_t FLAGS_SIZE = 4;  // atom flags size (1byte version + 3bytes with flags)
+    static constexpr uint32_t VERSION_FLAGS_SIZE = 4;  // version & flags size (1byte version + 3bytes flags)
 
     static constexpr uint32_t BASE_DATA_OFFSET_SIZE = 8; // size of tfhd flag to remove
     static constexpr uint32_t TFDT_SIZE = 20;    // size of new tfdt atom that is added
@@ -349,7 +349,7 @@ private:
             payload += sizeof(uint32_t);          // skip track-ID field (4bytes)
 
             // move remaining tfhd fields over data_offset
-            size_t remaining_size = tfhd_size-HEADER_SIZE-FLAGS_SIZE-sizeof(uint32_t)-BASE_DATA_OFFSET_SIZE;
+            size_t remaining_size = tfhd_size-HEADER_SIZE-VERSION_FLAGS_SIZE-sizeof(uint32_t)-BASE_DATA_OFFSET_SIZE;
             MemMove(payload/*dst*/, payload+BASE_DATA_OFFSET_SIZE/*src*/, remaining_size/*size*/);
         }
         // pointer to right after shrunken tfhd atom
@@ -368,7 +368,7 @@ private:
             tfdt_ptr += HEADER_SIZE;
 
             *tfdt_ptr = 1; // version 1 (no other flags)
-            tfdt_ptr += FLAGS_SIZE; // skip flags
+            tfdt_ptr += VERSION_FLAGS_SIZE; // skip flags
             // write tfdt/baseMediaDecodeTime
             tfdt_ptr = Serialize<uint64_t>(tfdt_ptr, m_cur_time);
 
