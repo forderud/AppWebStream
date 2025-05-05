@@ -144,8 +144,8 @@ public:
         CComPtr<IMFAttributes> attribs;
         COM_CHECK(MFCreateAttributes(&attribs, 0));
         COM_CHECK(attribs->SetGUID(MF_TRANSCODE_CONTAINERTYPE, MFTranscodeContainerType_FMPEG4));
-        COM_CHECK(attribs->SetUINT32(MF_LOW_LATENCY, TRUE));
-        COM_CHECK(attribs->SetUINT32(MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS, TRUE));
+        COM_CHECK(attribs->SetUINT32(MF_LOW_LATENCY, TRUE)); // zero frame encoding latency
+        COM_CHECK(attribs->SetUINT32(MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS, TRUE)); // GPU accelerated encoding
 
         // create sink writer with specified output format
         IMFMediaTypePtr mediaTypeOut = MediaTypeutput(fps, bit_rate);
