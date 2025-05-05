@@ -321,7 +321,7 @@ private:
             payload += sizeof(uint8_t);
 
             {
-                // modify flags
+                // "tfhd" atom flags (from https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/isom.h)
                 constexpr uint32_t MOV_TFHD_BASE_DATA_OFFSET = 0x01;
                 //constexpr uint32_t MOV_TFHD_STSD_ID = 0x02;
                 //constexpr uint32_t MOV_TFHD_DEFAULT_DURATION = 0x08;
@@ -385,7 +385,7 @@ private:
             payload += sizeof(uint8_t);
             assert(version == 1);   // check version
 
-            // from https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/isom.h#L404
+            // "trun" atom flags (from https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/isom.h)
             constexpr uint32_t MOV_TRUN_DATA_OFFSET = 0x01;
             //constexpr uint32_t MOV_TRUN_FIRST_SAMPLE_FLAGS = 0x04;
             constexpr uint32_t MOV_TRUN_SAMPLE_DURATION = 0x100;
