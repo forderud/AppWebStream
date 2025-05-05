@@ -273,7 +273,7 @@ private:
                 throw std::runtime_error("not a \"mfhd\" atom");
             ptr += HEADER_SIZE;
 
-            ptr += 4; // skip first field
+            ptr += 4; // skip version & flags
 
             auto seq_nr = DeSerialize<uint32_t>(ptr); // increases by one per fragment
             seq_nr;
