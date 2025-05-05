@@ -331,6 +331,11 @@ public:
         assert(ret >= 0);
         ret = av_dict_set(&opt, "mpegts", "omit_video_pes_length", 0); // must also set val=0, don't know if this helps
         assert(ret >= 0);
+#if 0
+        ret = av_opt_set_int(m_out_ctx->priv_data, "omit_video_pes_length", 0, 0); // fails with AVERROR_OPTION_NOT_FOUND (0xabafb008)
+        if (ret)
+            throw std::runtime_error("omit_video_pes_length failed");
+#endif
 
         // open the video codecs and allocate the necessary encode buffers
         m_frame = open_video(video_codec, opt, m_enc, m_stream->codecpar);
