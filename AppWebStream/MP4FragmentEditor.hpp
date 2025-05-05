@@ -271,11 +271,15 @@ private:
             uint32_t mfhd_size = GetAtomSize(ptr);
             if (!IsAtomType(ptr, "mfhd")) // movie fragment header
                 throw std::runtime_error("not a \"mfhd\" atom");
-            auto seq_nr = DeSerialize<uint32_t>(ptr+HEADER_SIZE+4); // increases by one per fragment
-            seq_nr;
+            ptr += HEADER_SIZE;
 
-            // jump to next atom (don't inspect all mfhd fields)
-            ptr += mfhd_size;
+            ptr += 4; // skip first field
+
+            auto seq_nr = DeSerialize<uint32_t>(ptr); // increases by one per fragment
+            seq_nr;
+            ptr += sizeof(uint32_t);
+
+            assert(ptr == moof_ptr + HEADER_SIZE + mfhd_size);
         }
 
         // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/TrackFragmentBox.java
