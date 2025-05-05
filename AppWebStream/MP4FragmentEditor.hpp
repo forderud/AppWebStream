@@ -70,8 +70,14 @@ public:
                 return ModifyMovieFragment(buffer.data(), atom_size);
             else
                 return buffer;
+        } else if (IsAtomType(buffer.data(), "mdat")) {
+            uint32_t atom_size = GetAtomSize(buffer.data());
+            // don't check buffer size, since the encoded pixel payload arrives in a later call
+
+            // Media Data (mdat) - only header data
+            return buffer;
         } else {
-            // leave other atoms unchanged
+            // leave other atoms and encoded pixels unchanged
             return buffer;
         }
     }
