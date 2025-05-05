@@ -370,7 +370,7 @@ public:
         assert(ret >= 0);
         ret = av_dict_set(&opt, "fflags", "nobuffer+flush_packets", 0); // don't know if this helps
         assert(ret >= 0);
-        ret = av_dict_set(&opt, "mpegts", "omit_video_pes_length", 0); // don't know if this helps
+        ret = av_dict_set(&opt, "mpegts", "omit_video_pes_length", 0); // must also set val=0, don't know if this helps
         assert(ret >= 0);
 
         // open the video codecs and allocate the necessary encode buffers
