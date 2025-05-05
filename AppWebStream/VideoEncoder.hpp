@@ -517,7 +517,7 @@ private:
             enc->pix_fmt  = AV_PIX_FMT_YUV420P; // default pix_fmt
 
             int res = av_opt_set(enc->priv_data, "tune", "zerolatency", 0);
-            if (res < 0)
+            if (res)
                 throw std::runtime_error("zerolatency tuning failed");
 
             // Some formats want stream headers to be separate
