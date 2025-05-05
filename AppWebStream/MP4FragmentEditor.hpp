@@ -314,7 +314,7 @@ private:
       - modify data_offset
 
     Returns the relative size of the modified child atoms (bytes shrunk or grown). */
-    int ProcessTrackFrameChildren (char* tfhd_ptr, ULONG moof_size, ULONG buf_size) {
+    int ProcessTrackFrameChildren (char* tfhd_ptr, const ULONG moof_size, const ULONG buf_size) {
         assert(buf_size >= 2 * HEADER_SIZE + 8);
 
         // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/TrackFragmentHeaderBox.java
@@ -409,11 +409,13 @@ private:
             assert(sample_count > 0);
             payload += sizeof(uint32_t);
 
-            // overwrite data_offset field (https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-sstr/6d796f37-b4f0-475f-becd-13f1c86c2d1f)
-            // offset from the beginning of the MoofBox field
-            // DataOffset field MUST be the sum of the lengths of the MoofBox and all the fields in the MdatBox field
-            payload = Serialize<uint32_t>(payload, moof_size-BASE_DATA_OFFSET_SIZE+TFDT_SIZE+8); // +8 experiementally derived
-
+            {
+                // overwrite data_offset field (https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-sstr/6d796f37-b4f0-475f-becd-13f1c86c2d1f)
+                // offset from the beginning of the "moof" field
+                // DataOffset field MUST be the sum of the lengths of the "moof" and all the fields in the "mdat" field
+                uint32_t new_moof_size = moof_size - BASE_DATA_OFFSET_SIZE + TFDT_SIZE;
+                payload = Serialize<uint32_t>(payload, new_moof_size + HEADER_SIZE); // add "mdat" header size
+            }
             for (uint32_t i = 0; i < sample_count; i++) {
                 auto sample_dur = DeSerialize<uint32_t>(payload); // duration of first sample (typ 1000)
                 payload += sizeof(uint32_t);
