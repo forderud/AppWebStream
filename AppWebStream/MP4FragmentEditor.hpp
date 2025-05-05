@@ -29,7 +29,9 @@ Expected atom hiearchy:
 * [traf] track fragment
   - [tfhd] track fragment header (will be modified)
   - [tfdt] track fragment decode timebox (will be added)
-  - [trun] track run (will be modified) */
+  - [trun] track run (will be modified)
+[mdat] fragment with H.264 video data
+*/
 class MP4FragmentEditor {
     static constexpr uint32_t HEADER_SIZE = 8; // atom header size (4bytes size + 4byte name)
     static constexpr uint32_t VERSION_FLAGS_SIZE = 4;  // version & flags size (1byte version + 3bytes flags)
@@ -71,7 +73,7 @@ public:
             else
                 return buffer;
         } else if (IsAtomType(buffer.data(), "mdat")) {
-            uint32_t atom_size = GetAtomSize(buffer.data());
+            //uint32_t atom_size = GetAtomSize(buffer.data());
             // don't check buffer size, since the encoded pixel payload arrives in a later call
 
             // Media Data (mdat) - only header data
