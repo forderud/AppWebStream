@@ -134,26 +134,6 @@ protected:
 /** Media-Foundation-based H.264 video encoder. */
 class VideoEncoderMF : public VideoEncoder {
 public:
-    /** File-based video encoding. */
-    VideoEncoderMF (unsigned short dimensions[2], unsigned int fps, const wchar_t * filename) : VideoEncoderMF(dimensions, fps) {
-        const unsigned int bit_rate = static_cast<unsigned int>(0.78f*fps*Align(m_width)*Align(m_height)); // yields 40Mb/s for 1920x1080@25fps (max blu-ray quality)
-
-        CComPtr<IMFAttributes> attribs;
-        COM_CHECK(MFCreateAttributes(&attribs, 0));
-        COM_CHECK(attribs->SetGUID(MF_TRANSCODE_CONTAINERTYPE, MFTranscodeContainerType_MPEG4));
-        COM_CHECK(attribs->SetUINT32(MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS, TRUE));
-
-        // create sink writer with specified output format
-        COM_CHECK(MFCreateSinkWriterFromURL(filename, nullptr, attribs, &m_sink_writer));
-        IMFMediaTypePtr mediaTypeOut = MediaTypeutput(fps, bit_rate);
-        COM_CHECK(m_sink_writer->AddStream(mediaTypeOut, &m_stream_index));
-
-        // connect input to output
-        IMFMediaTypePtr mediaTypeIn = MediaTypeInput(fps);
-        COM_CHECK(m_sink_writer->SetInputMediaType(m_stream_index, mediaTypeIn, nullptr));
-        COM_CHECK(m_sink_writer->BeginWriting());
-    }
-
     /** Stream-based video encoding. */
     VideoEncoderMF (unsigned short dimensions[2], unsigned int fps, IMFByteStream * stream) : VideoEncoderMF(dimensions, fps) {
         const unsigned int bit_rate = static_cast<unsigned int>(0.78f*fps*m_width*m_height); // yields 40Mb/s for 1920x1080@25fps
@@ -337,25 +317,6 @@ public:
             throw std::runtime_error("avformat_alloc_output_context2 failure");
 
         m_rgb_buf.resize(Align(m_width)*Align(m_height));
-    }
-
-    VideoEncoderFF (unsigned short dimensions[2], unsigned int fps, const wchar_t * _filename) : VideoEncoderFF(dimensions, fps) {
-        // Add the video streams using the default format codecs and initialize the codecs
-        const AVCodec * video_codec = nullptr;
-        std::tie(video_codec, m_stream, m_enc) = add_stream(m_out_ctx->oformat->video_codec);
-
-        // open the video codecs and allocate the necessary encode buffers
-        m_frame = open_video(video_codec, nullptr, m_enc, m_stream->codecpar);
-
-        // open the output file
-        assert(!(m_out_ctx->oformat->flags & AVFMT_NOFILE));
-        auto filename = ToAscii(_filename);
-        int ret = avio_open(&m_out_ctx->pb, filename.c_str(), AVIO_FLAG_WRITE);
-        if (ret < 0) {
-            throw std::runtime_error("avio_open failure");
-        }
-
-        WriteHeader(nullptr);
     }
 
     VideoEncoderFF (unsigned short dimensions[2], unsigned int fps, IMFByteStream * socket) : VideoEncoderFF(dimensions, fps) {
