@@ -84,9 +84,7 @@ private:
             ptr += HEADER_SIZE; // skip size & type
 
             uint8_t version = 0;
-            uint64_t creationTime = 0;
-            uint64_t modificationTime = 0;
-            std::tie(version, creationTime, modificationTime, ptr) = ParseVersionCreateModifyTime(ptr, m_startTime);
+            std::tie(version, ptr) = ParseVersionCreateModifyTime(ptr, m_startTime);
 
             m_timeScale = DeSerialize<uint32_t>(ptr); // 50000 = 50fps
             ptr += 4;
@@ -136,9 +134,7 @@ private:
                 char* tkhd_ptr = ptr + HEADER_SIZE;
 
                 uint8_t version = 0;
-                uint64_t creationTime = 0;
-                uint64_t modificationTime = 0;
-                std::tie(version, creationTime, modificationTime, tkhd_ptr) = ParseVersionCreateModifyTime(tkhd_ptr, m_startTime);
+                std::tie(version, tkhd_ptr) = ParseVersionCreateModifyTime(tkhd_ptr, m_startTime);
 
                 ptr += tkhd_len;
             }
@@ -156,9 +152,7 @@ private:
                 char* mdhd_ptr = ptr + HEADER_SIZE;
 
                 uint8_t version = 0;
-                uint64_t creationTime = 0;
-                uint64_t modificationTime = 0;
-                std::tie(version, creationTime, modificationTime, mdhd_ptr) = ParseVersionCreateModifyTime(mdhd_ptr, m_startTime);
+                std::tie(version, mdhd_ptr) = ParseVersionCreateModifyTime(mdhd_ptr, m_startTime);
 
                 ptr += mdhd_len;
             }
@@ -431,7 +425,7 @@ private:
         return TFDT_SIZE - BASE_DATA_OFFSET_SIZE; // tfdt added, tfhd shrunk
     }
 
-    static std::tuple<uint8_t, uint64_t, uint64_t, char*> ParseVersionCreateModifyTime(char* ptr, uint64_t newTime) {
+    static std::tuple<uint8_t, char*> ParseVersionCreateModifyTime(char* ptr, uint64_t newTime) {
         auto version = DeSerialize<uint8_t>(ptr);
         ptr += 1;
 
@@ -460,7 +454,7 @@ private:
         }
 
         // return preexisting creation & modification times
-        return std::tie(version, creationTime, modificationTime, ptr);
+        return std::tie(version, ptr);
     }
 
     /** Mofified version of "memmove" that clears the abandoned bytes, as well as intermediate data.
