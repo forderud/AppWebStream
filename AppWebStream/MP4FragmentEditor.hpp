@@ -47,8 +47,8 @@ public:
         Will modify the "moof" atom if present.
         returns a (ptr, size) tuple pointing to a potentially modified buffer. */
     std::string_view EditStream (std::string_view buffer, bool update_moov) {
-        if (buffer.size() < 5*HEADER_SIZE)
-            return buffer; // too small to contain a moof (skip processing)
+        if (buffer.size() < HEADER_SIZE)
+            return buffer; // buffer too small for MPEG atom header parsing
 
         if (IsAtomType(buffer.data(), "moov")) {
             uint32_t atom_size = GetAtomSize(buffer.data());
@@ -57,6 +57,7 @@ public:
             // Movie box (moov)
             assert(atom_size == buffer.size());
             ModifyMovieBox(buffer);
+            return buffer;
         } else if (IsAtomType(buffer.data(), "moof")) {
             uint32_t atom_size = GetAtomSize(buffer.data());
             assert(atom_size <= buffer.size());
@@ -67,9 +68,12 @@ public:
 #endif
             if (update_moov)
                 return ModifyMovieFragment(buffer.data(), atom_size);
+            else
+                return buffer;
+        } else {
+            // leave other atoms unchanged
+            return buffer;
         }
-
-        return buffer;
     }
 
 private:
