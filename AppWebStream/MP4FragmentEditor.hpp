@@ -282,10 +282,12 @@ private:
         uint32_t traf_size = GetAtomSize(traf_ptr);
         if (!IsAtomType(traf_ptr, "traf")) // track fragment
             throw std::runtime_error("not a \"traf\" atom");
+
+        // "tfhd" atom immediately follows
         char* tfhd_ptr = traf_ptr + HEADER_SIZE;
 
-        unsigned long pos_idx = static_cast<unsigned long>(tfhd_ptr - moof_ptr);
-        int rel_size = ProcessTrackFrameChildren(m_moof_buf.data()+pos_idx, size, size-pos_idx);
+        unsigned long tfhd_idx = static_cast<unsigned long>(tfhd_ptr - moof_ptr);
+        int rel_size = ProcessTrackFrameChildren(m_moof_buf.data()+tfhd_idx, size, size-tfhd_idx);
         if (rel_size) {
             // update "moof" parent atom size after size change
             Serialize<uint32_t>(moof_ptr, size+rel_size);
