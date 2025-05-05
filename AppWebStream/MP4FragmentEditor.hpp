@@ -278,7 +278,7 @@ private:
         }
 
         // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/TrackFragmentBox.java
-        char* traf_ptr = ptr;
+        char* const traf_ptr = ptr;
         uint32_t traf_size = GetAtomSize(traf_ptr);
         if (!IsAtomType(traf_ptr, "traf")) // track fragment
             throw std::runtime_error("not a \"traf\" atom");
