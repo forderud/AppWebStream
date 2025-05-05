@@ -513,7 +513,7 @@ private:
             * identical to 1. */
             enc->time_base = { 1, static_cast<int>(m_fps) };
 
-            //enc->gop_size = 12; // group of pictures size
+            //enc->gop_size = 0; // group of pictures size
             enc->pix_fmt  = AV_PIX_FMT_YUV420P; // default pix_fmt
 
             int res = av_opt_set(enc->priv_data, "tune", "zerolatency", 0);
