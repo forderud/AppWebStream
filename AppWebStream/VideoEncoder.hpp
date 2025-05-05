@@ -423,22 +423,21 @@ public:
 
             assert(m_enc->pix_fmt == AV_PIX_FMT_YUV420P);
 
-            // RGB to YUV conversion
+            // RGB to YCbCR conversion
             for (int y = 0; y < m_height; y++) {
                 for (int x = 0; x < m_width; x++) {
                     R8G8B8A8 rgb = m_rgb_buf[y* m_enc->width + x];
-                    // convert to YUV
-                    unsigned char Y=0, U=0, V=0;
-                    RGB_to_YCbCr(rgb, Y, U, V);
+                    unsigned char Y=0, Cb=0, Cr=0;
+                    RGB_to_YCbCr(rgb, Y, Cb, Cr);
                     // write Y value
                     m_frame->data[0][y* m_frame->linesize[0] + x] = Y;
                     // write subsambled Cb,Cr values
                     if (((x % 2) == 0) && ((y % 2) == 0)) {
-                        m_frame->data[1][y/2* m_frame->linesize[1] + x/2] = V/4;
-                        m_frame->data[2][y/2* m_frame->linesize[2] + x/2] = U/4;
+                        m_frame->data[1][y/2* m_frame->linesize[1] + x/2] = Cr/4;
+                        m_frame->data[2][y/2* m_frame->linesize[2] + x/2] = Cb/4;
                     } else {
-                        m_frame->data[1][y/2* m_frame->linesize[1] + x/2] += V/4;
-                        m_frame->data[2][y/2* m_frame->linesize[2] + x/2] += U/4;
+                        m_frame->data[1][y/2* m_frame->linesize[1] + x/2] += Cr/4;
+                        m_frame->data[2][y/2* m_frame->linesize[2] + x/2] += Cb/4;
                     }
                 }
             }
