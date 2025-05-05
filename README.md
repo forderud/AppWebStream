@@ -30,7 +30,7 @@ Metadata implementation status:
 * The handcrafted HTTP communication should be replaced by a HTTP library.
 
 #### Media Foundation details
-* **0 frame latency**, except for the first 4 frames (1st frame in, 1st frame out, 2nd frame in, 2nd frame out, 3rd frame in, 3rd frame out, ...)
+* **0 frame latency**, except for the first 4 frames (frame N in, frame N out, frame N+1 in, frame N+1 out, frame N+2 in, frame N+2 out, ...)
 * The MPEG4 container is manually modified as suggested in https://stackoverflow.com/questions/49429954/mfcreatefmpeg4mediasink-does-not-generate-mse-compatible-mp4 to make it Media Source Extensions (MSE) compatible for streaming.
 
 The FFMPEG-based encoder is not affected by this issue.
