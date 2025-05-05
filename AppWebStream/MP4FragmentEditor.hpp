@@ -50,14 +50,17 @@ public:
         if (buffer.size() < 5*HEADER_SIZE)
             return buffer; // too small to contain a moof (skip processing)
 
-        uint32_t atom_size = GetAtomSize(buffer.data());
-        assert(atom_size <= buffer.size());
-
         if (IsAtomType(buffer.data(), "moov")) {
+            uint32_t atom_size = GetAtomSize(buffer.data());
+            assert(atom_size <= buffer.size());
+
             // Movie box (moov)
             assert(atom_size == buffer.size());
             ModifyMovieBox(buffer);
         } else if (IsAtomType(buffer.data(), "moof")) {
+            uint32_t atom_size = GetAtomSize(buffer.data());
+            assert(atom_size <= buffer.size());
+
             // Movie Fragment (moof)
 #ifndef ENABLE_FFMPEG
             assert(atom_size == buffer.size());
