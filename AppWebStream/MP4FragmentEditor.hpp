@@ -274,11 +274,12 @@ private:
             auto seq_nr = DeSerialize<uint32_t>(ptr+HEADER_SIZE+4); // increases by one per fragment
             seq_nr;
 
+            // jump to next atom (don't inspect all mfhd fields)
             ptr += mfhd_size;
         }
 
         // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/TrackFragmentBox.java
-        char* traf_ptr = ptr; // jump to next atom (don't inspect mfhd fields)
+        char* traf_ptr = ptr;
         uint32_t traf_size = GetAtomSize(traf_ptr);
         if (!IsAtomType(traf_ptr, "traf")) // track fragment
             throw std::runtime_error("not a \"traf\" atom");
