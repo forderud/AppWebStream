@@ -410,7 +410,7 @@ private:
                 payload += sizeof(uint32_t);
 
                 // update baseMediaDecodeTime for next fragment
-                m_cur_time += sample_count*sample_dur;
+                m_cur_time += sample_dur;
 
                 //auto sample_size = DeSerialize<uint32_t>(payload);
                 payload += sizeof(uint32_t);
