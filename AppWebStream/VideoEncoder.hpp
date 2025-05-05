@@ -329,6 +329,8 @@ public:
     }
 
     VideoEncoderFF (unsigned short dimensions[2], unsigned int fps) : VideoEncoder(dimensions), m_fps(fps) {
+        //av_log_set_level(AV_LOG_VERBOSE);
+
         /* allocate the output media context */
         avformat_alloc_output_context2(&m_out_ctx, nullptr, "mp4", nullptr);
         if (!m_out_ctx)
