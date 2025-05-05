@@ -329,10 +329,6 @@ public:
     }
 
     VideoEncoderFF (unsigned short dimensions[2], unsigned int fps) : VideoEncoder(dimensions), m_fps(fps) {
-#if LIBAVFORMAT_VERSION_MAJOR < 58
-        av_register_all();
-#endif
-
         /* allocate the output media context */
         avformat_alloc_output_context2(&m_out_ctx, nullptr, "mp4", nullptr);
         if (!m_out_ctx)
