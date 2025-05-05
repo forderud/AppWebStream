@@ -157,6 +157,7 @@ public:
         COM_CHECK(m_sink_writer->SetInputMediaType(m_stream_index, mediaTypeIn, nullptr));
 
         {
+#if 0
             // access H.264 encoder directly (https://msdn.microsoft.com/en-us/library/windows/desktop/dd797816.aspx)
             CComPtr<ICodecAPI> codec;
             COM_CHECK(m_sink_writer->GetServiceForStream(m_stream_index, GUID_NULL, IID_ICodecAPI, (void**)&codec));
@@ -176,6 +177,7 @@ public:
             // query number of bidirectional (B) frames between intra (I) & predicted (P) frames
             CComVariant b_picture_count;
             COM_CHECK(codec->GetValue(&CODECAPI_AVEncMPVDefaultBPictureCount, &b_picture_count));
+#endif
         }
 
         COM_CHECK(m_sink_writer->BeginWriting());
