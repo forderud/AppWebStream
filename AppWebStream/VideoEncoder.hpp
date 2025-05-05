@@ -149,7 +149,7 @@ public:
 
         // create sink writer with specified output format
         IMFMediaTypePtr mediaTypeOut = MediaTypeutput(fps, bit_rate);
-        COM_CHECK(MFCreateFMPEG4MediaSink(stream, mediaTypeOut, nullptr, &m_media_sink)); // "fragmented" MPEG4 does not require seekable byte-stream
+        COM_CHECK(MFCreateFMPEG4MediaSink(stream, mediaTypeOut, nullptr, &m_media_sink));
         COM_CHECK(MFCreateSinkWriterFromMediaSink(m_media_sink, attribs, &m_sink_writer));
 
         // connect input to output
