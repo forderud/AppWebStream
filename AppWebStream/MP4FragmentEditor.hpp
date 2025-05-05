@@ -264,17 +264,21 @@ private:
         memcpy(m_moof_buf.data()/*dst*/, buf, size);
 
         char* moof_ptr = m_moof_buf.data(); // switch to internal buffer
+        char* ptr = moof_ptr + HEADER_SIZE;
 
-        // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/MovieFragmentHeaderBox.java
-        char* mfhd_ptr = moof_ptr + HEADER_SIZE;
-        uint32_t mfhd_size = GetAtomSize(mfhd_ptr);
-        if (!IsAtomType(mfhd_ptr, "mfhd")) // movie fragment header
-            throw std::runtime_error("not a \"mfhd\" atom");
-        auto seq_nr = DeSerialize<uint32_t>(mfhd_ptr+HEADER_SIZE+4); // increases by one per fragment
-        seq_nr;
+        {
+            // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/MovieFragmentHeaderBox.java
+            uint32_t mfhd_size = GetAtomSize(ptr);
+            if (!IsAtomType(ptr, "mfhd")) // movie fragment header
+                throw std::runtime_error("not a \"mfhd\" atom");
+            auto seq_nr = DeSerialize<uint32_t>(ptr+HEADER_SIZE+4); // increases by one per fragment
+            seq_nr;
+
+            ptr += mfhd_size;
+        }
 
         // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/TrackFragmentBox.java
-        char* traf_ptr = mfhd_ptr + mfhd_size; // jump to next atom (don't inspect mfhd fields)
+        char* traf_ptr = ptr; // jump to next atom (don't inspect mfhd fields)
         uint32_t traf_size = GetAtomSize(traf_ptr);
         if (!IsAtomType(traf_ptr, "traf")) // track fragment
             throw std::runtime_error("not a \"traf\" atom");
