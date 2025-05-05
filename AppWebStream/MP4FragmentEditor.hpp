@@ -308,7 +308,7 @@ private:
             Serialize<uint32_t>(moof_ptr, size+rel_size);
             Serialize<uint32_t>(traf_ptr, traf_size+rel_size);
         }
-        return std::string_view(moof_ptr, size + rel_size);
+        return std::string_view(m_moof_buf.data(), m_moof_buf.size());
     }
 
 
