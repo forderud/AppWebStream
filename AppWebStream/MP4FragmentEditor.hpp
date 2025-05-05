@@ -251,15 +251,16 @@ private:
 
     /** REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/MovieFragmentBox.java */
     std::string_view ModifyMovieFragment (const char* buf, const ULONG size) {
+        assert(IsAtomType(buf, "moof"));
         assert(GetAtomSize(buf) == size);
 
         // copy to temporary buffer before modifying & extending atoms
         m_moof_buf.resize(size - BASE_DATA_OFFSET_SIZE + TFDT_SIZE);
         memcpy(m_moof_buf.data()/*dst*/, buf, size);
+        char* const moof_ptr = m_moof_buf.data(); // switch to internal buffer
 
-        char* moof_ptr = m_moof_buf.data(); // switch to internal buffer
+        // "mfhd" atom immediately follows
         char* ptr = moof_ptr + HEADER_SIZE;
-
         {
             // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/MovieFragmentHeaderBox.java
             uint32_t mfhd_size = GetAtomSize(ptr);
@@ -286,7 +287,7 @@ private:
         unsigned long pos_idx = static_cast<unsigned long>(tfhd_ptr - moof_ptr);
         int rel_size = ProcessTrackFrameChildren(m_moof_buf.data()+pos_idx, size, size-pos_idx);
         if (rel_size) {
-            // size have changed - update size of parent atoms
+            // update "moof" parent atom size after size change
             Serialize<uint32_t>(moof_ptr, size+rel_size);
             Serialize<uint32_t>(traf_ptr, traf_size+rel_size);
         }
