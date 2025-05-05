@@ -222,6 +222,11 @@ public:
         if (cs == INVALID_SOCKET)
             return std::unique_ptr<ClientSock>(); // aborted
 
+#if 0
+        DWORD val = 1;
+        int err = setsockopt(cs, IPPROTO_TCP, TCP_NODELAY, (char*)&val, sizeof(DWORD));    // 1 - on, 0 - off
+        assert(!err);
+#endif
         // client is now connected
         return std::make_unique<ClientSock>(cs);
     }
