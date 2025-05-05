@@ -302,12 +302,12 @@ private:
         char* tfhd_ptr = traf_ptr + HEADER_SIZE;
 
         unsigned long tfhd_idx = static_cast<unsigned long>(tfhd_ptr - moof_ptr);
-        int rel_size = ProcessTrackFrameChildren(m_moof_buf.data()+tfhd_idx, size, size-tfhd_idx);
-        if (rel_size) {
-            // update "moof" parent atom size after size change
-            Serialize<uint32_t>(moof_ptr, size+rel_size);
-            Serialize<uint32_t>(traf_ptr, traf_size+rel_size);
-        }
+        ProcessTrackFrameChildren(m_moof_buf.data()+tfhd_idx, size, size-tfhd_idx);
+
+        // update "moof" parent atom size after size change
+        Serialize<uint32_t>(moof_ptr, size - BASE_DATA_OFFSET_SIZE + TFDT_SIZE);
+        Serialize<uint32_t>(traf_ptr, traf_size - BASE_DATA_OFFSET_SIZE + TFDT_SIZE);
+
         return std::string_view(m_moof_buf.data(), m_moof_buf.size());
     }
 
@@ -322,7 +322,7 @@ private:
       - modify data_offset
 
     Returns the relative size of the modified child atoms (bytes shrunk or grown). */
-    int ProcessTrackFrameChildren (char* tfhd_ptr, const ULONG moof_size, const ULONG buf_size) {
+    void ProcessTrackFrameChildren (char* tfhd_ptr, const ULONG moof_size, const ULONG buf_size) {
         assert(buf_size >= 2 * HEADER_SIZE + 8);
 
         // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/TrackFragmentHeaderBox.java
@@ -443,8 +443,6 @@ private:
 
             assert(payload == trun_ptr + trun_size);
         }
-
-        return TFDT_SIZE - BASE_DATA_OFFSET_SIZE; // tfdt added, tfhd shrunk
     }
 
     static std::tuple<uint8_t, char*> ParseVersionCreateModifyTime(char* ptr, uint64_t newTime) {
