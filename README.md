@@ -9,7 +9,7 @@ Intended usage:
 * Independent implementation for compatibility testing.
 
 ### Getting started
-![screenshot](screenshot.png)
+![screenshot](screenshot.jpg)
 * Open project in Visual Studio
 * Build project
 * Start `WebAppStream.exe port [window handle]`. You can use Spy++ (included with Visual Studio) to determine window handles.
