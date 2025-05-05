@@ -306,7 +306,7 @@ public:
         return buf_size;
     }
 
-    VideoEncoderFF (unsigned short dimensions[2], unsigned int fps) : VideoEncoder(dimensions), m_fps(fps) {
+    VideoEncoderFF (unsigned short dimensions[2], unsigned int fps, IMFByteStream * socket) : VideoEncoder(dimensions), m_fps(fps) {
         //av_log_set_level(AV_LOG_VERBOSE);
 
         /* allocate the output media context */
@@ -315,9 +315,7 @@ public:
             throw std::runtime_error("avformat_alloc_output_context2 failure");
 
         m_rgb_buf.resize(Align(m_width)*Align(m_height));
-    }
 
-    VideoEncoderFF (unsigned short dimensions[2], unsigned int fps, IMFByteStream * socket) : VideoEncoderFF(dimensions, fps) {
         // Add the video streams using the default format codecs and initialize the codecs
         const AVCodec * video_codec = nullptr;
         std::tie(video_codec, m_stream, m_enc) = add_stream(m_out_ctx->oformat->video_codec);
