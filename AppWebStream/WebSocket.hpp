@@ -222,7 +222,7 @@ public:
         if (cs == INVALID_SOCKET)
             return std::unique_ptr<ClientSock>(); // aborted
 
-                                                  // client is now connected
+        // client is now connected
         return std::make_unique<ClientSock>(cs);
     }
 
