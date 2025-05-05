@@ -401,7 +401,7 @@ public:
 
     void WriteHeader (AVDictionary *opt) {
 #ifndef NDEBUG
-        // write info to console
+        // log encoder info to console
         av_dump_format(m_out_ctx, 0, nullptr, 1);
 #endif
 
