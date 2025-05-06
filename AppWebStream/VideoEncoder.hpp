@@ -336,6 +336,8 @@ public:
         if (ret)
             throw std::runtime_error("omit_video_pes_length failed");
 #endif
+        ret = av_dict_set_int(&opt, "movie_timescale", 1000*m_fps, 0); // match MediaFoundation timescale
+        assert(ret >= 0);
 
         // open the video codecs and allocate the necessary encode buffers
         m_frame = open_video(video_codec, opt, m_enc, m_stream->codecpar);
