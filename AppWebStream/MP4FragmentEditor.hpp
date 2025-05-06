@@ -272,10 +272,12 @@ private:
         if (add_tfdt)
             new_buf_size = buf_size - BASE_DATA_OFFSET_SIZE + TFDT_SIZE;
 
-        // copy to temporary buffer before modifying & extending atoms
-        m_moof_buf.resize(new_buf_size);
-        memcpy(m_moof_buf.data()/*dst*/, buf, buf_size);
-        char* const moof_ptr = m_moof_buf.data(); // switch to internal buffer
+        if (add_tfdt) {
+            // copy to temporary buffer to make room for "tfdt" atom insertion
+            m_moof_buf.resize(new_buf_size);
+            memcpy(m_moof_buf.data()/*dst*/, buf, buf_size);
+        }
+        char* const moof_ptr = add_tfdt ? m_moof_buf.data() : (char*)buf;
 
         // "mfhd" atom immediately follows
         char* ptr = moof_ptr + HEADER_SIZE;
