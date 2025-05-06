@@ -345,15 +345,17 @@ private:
                 // "tfhd" atom flags (from https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/isom.h)
                 constexpr uint32_t MOV_TFHD_BASE_DATA_OFFSET = 0x01;
                 //constexpr uint32_t MOV_TFHD_STSD_ID = 0x02;
-                //constexpr uint32_t MOV_TFHD_DEFAULT_DURATION = 0x08;
-                //constexpr uint32_t MOV_TFHD_DEFAULT_SIZE = 0x10;
-                //constexpr uint32_t MOV_TFHD_DEFAULT_FLAGS = 0x20;
+                constexpr uint32_t MOV_TFHD_DEFAULT_DURATION = 0x08;
+                constexpr uint32_t MOV_TFHD_DEFAULT_SIZE = 0x10;
+                constexpr uint32_t MOV_TFHD_DEFAULT_FLAGS = 0x20;
                 //constexpr uint32_t MOV_TFHD_DURATION_IS_EMPTY = 0x010000;
                 constexpr uint32_t MOV_TFHD_DEFAULT_BASE_IS_MOOF = 0x020000;
 
                 uint32_t flags = DeSerialize<uint24_t>(payload);
-#ifndef ENABLE_FFMPEG
-                assert(flags & MOV_TFHD_BASE_DATA_OFFSET);
+#ifdef ENABLE_FFMPEG
+                assert(flags == (MOV_TFHD_DEFAULT_DURATION | MOV_TFHD_DEFAULT_SIZE | MOV_TFHD_DEFAULT_FLAGS | MOV_TFHD_DEFAULT_BASE_IS_MOOF)); // 0x00020038
+#else
+                assert(flags == MOV_TFHD_BASE_DATA_OFFSET);
 #endif
                 if (add_tfdt) {
                     // 1: set default-base-is-moof flag
