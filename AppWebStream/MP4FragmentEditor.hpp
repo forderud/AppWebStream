@@ -438,7 +438,7 @@ private:
                 //auto sample_flags = DeSerialize<uint32_t>(payload);
                 payload += sizeof(uint32_t);
 
-                //auto sample_ct = DeSerialize<int32_t>(payload);
+                //auto sample_cto = DeSerialize<int32_t>(payload); // uint32_t for version==0, int32_t for version > 0
                 payload += sizeof(int32_t);
             }
 
