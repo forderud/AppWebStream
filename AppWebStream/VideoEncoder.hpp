@@ -512,7 +512,7 @@ private:
             frame->height = c->height;
 
             // allocate the buffers for the frame data
-            int ret = av_frame_get_buffer(frame, 32);
+            ret = av_frame_get_buffer(frame, 32);
             if (ret < 0)
                 throw std::runtime_error("Could not allocate frame data");
         }
