@@ -386,12 +386,13 @@ private:
             tfdt_ptr = Serialize<uint64_t>(tfdt_ptr, m_cur_time);
 
             assert(tfdt_ptr == ptr + TFDT_SIZE);
+            ptr += TFDT_SIZE;
         }
 
         {
             // modify "trun" atom
             // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/TrackRunBox.java
-            char* trun_ptr = ptr + TFDT_SIZE;
+            char* trun_ptr = ptr;
             uint32_t trun_size = GetAtomSize(trun_ptr);
             if (!IsAtomType(trun_ptr, "trun")) // track run box
                 throw std::runtime_error("not a \"trun\" atom");
