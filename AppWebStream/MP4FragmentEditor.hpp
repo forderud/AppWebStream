@@ -67,7 +67,7 @@ public:
             // Movie Fragment (moof)
 #ifndef ENABLE_FFMPEG
             assert(atom_size == buffer.size());
-            return ModifyMovieFragment(buffer.data(), atom_size);
+            return ModifyMovieFragment(buffer.data(), (ULONG)buffer.size());
 #else
             return buffer;
 #endif
@@ -264,13 +264,13 @@ private:
     }
 
     /** REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/MovieFragmentBox.java */
-    std::string_view ModifyMovieFragment (const char* buf, const ULONG moof_size) {
+    std::string_view ModifyMovieFragment (const char* buf, const ULONG buf_size) {
         assert(IsAtomType(buf, "moof"));
-        assert(GetAtomSize(buf) == moof_size);
+        assert(GetAtomSize(buf) <= buf_size);
 
         // copy to temporary buffer before modifying & extending atoms
-        m_moof_buf.resize(moof_size - BASE_DATA_OFFSET_SIZE + TFDT_SIZE);
-        memcpy(m_moof_buf.data()/*dst*/, buf, moof_size);
+        m_moof_buf.resize(buf_size - BASE_DATA_OFFSET_SIZE + TFDT_SIZE);
+        memcpy(m_moof_buf.data()/*dst*/, buf, buf_size);
         char* const moof_ptr = m_moof_buf.data(); // switch to internal buffer
 
         // "mfhd" atom immediately follows
@@ -301,8 +301,8 @@ private:
         char* tfhd_ptr = traf_ptr + HEADER_SIZE;
 
         unsigned long tfhd_idx = static_cast<unsigned long>(tfhd_ptr - moof_ptr);
-        uint32_t new_moof_size = moof_size - BASE_DATA_OFFSET_SIZE + TFDT_SIZE;
-        ProcessTrackFrameChildren(m_moof_buf.data()+tfhd_idx, moof_size-tfhd_idx, new_moof_size);
+        uint32_t new_moof_size = buf_size - BASE_DATA_OFFSET_SIZE + TFDT_SIZE;
+        ProcessTrackFrameChildren(m_moof_buf.data()+tfhd_idx, buf_size-tfhd_idx, new_moof_size);
 
         // update "moof" parent atom size after size change
         Serialize<uint32_t>(moof_ptr, new_moof_size);
