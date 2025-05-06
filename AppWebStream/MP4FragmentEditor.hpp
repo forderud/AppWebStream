@@ -268,11 +268,12 @@ private:
         assert(IsAtomType(buf, "moof"));
         assert(GetAtomSize(buf) <= buf_size);
 
-        // copy to temporary buffer before modifying & extending atoms
+        uint32_t new_buf_size = buf_size;
         if (add_tfdt)
-            m_moof_buf.resize(buf_size - BASE_DATA_OFFSET_SIZE + TFDT_SIZE);
-        else
-            m_moof_buf.resize(buf_size);
+            new_buf_size = buf_size - BASE_DATA_OFFSET_SIZE + TFDT_SIZE;
+
+        // copy to temporary buffer before modifying & extending atoms
+        m_moof_buf.resize(new_buf_size);
         memcpy(m_moof_buf.data()/*dst*/, buf, buf_size);
         char* const moof_ptr = m_moof_buf.data(); // switch to internal buffer
 
@@ -305,14 +306,13 @@ private:
 
         if (add_tfdt) {
             unsigned long tfhd_idx = static_cast<unsigned long>(tfhd_ptr - moof_ptr);
-            uint32_t new_moof_size = buf_size - BASE_DATA_OFFSET_SIZE + TFDT_SIZE;
-            ProcessTrackFrameChildren(moof_ptr+tfhd_idx, buf_size-tfhd_idx, new_moof_size);
+            ProcessTrackFrameChildren(moof_ptr+tfhd_idx, buf_size-tfhd_idx, new_buf_size);
 
             // update "moof" parent atom size after size change
-            Serialize<uint32_t>(moof_ptr, new_moof_size);
+            Serialize<uint32_t>(moof_ptr, new_buf_size);
             Serialize<uint32_t>(traf_ptr, traf_size - BASE_DATA_OFFSET_SIZE + TFDT_SIZE);
         }
-        return std::string_view(moof_ptr, m_moof_buf.size());
+        return std::string_view(moof_ptr, new_buf_size);
     }
 
 
