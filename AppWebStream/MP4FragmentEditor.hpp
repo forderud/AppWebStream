@@ -346,9 +346,11 @@ private:
                 // "tfhd" atom flags (from https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/isom.h)
                 constexpr uint32_t MOV_TFHD_BASE_DATA_OFFSET = 0x01;
                 //constexpr uint32_t MOV_TFHD_STSD_ID = 0x02;
+#ifdef ENABLE_FFMPEG
                 constexpr uint32_t MOV_TFHD_DEFAULT_DURATION = 0x08;
                 constexpr uint32_t MOV_TFHD_DEFAULT_SIZE = 0x10;
                 constexpr uint32_t MOV_TFHD_DEFAULT_FLAGS = 0x20;
+#endif
                 //constexpr uint32_t MOV_TFHD_DURATION_IS_EMPTY = 0x010000;
                 constexpr uint32_t MOV_TFHD_DEFAULT_BASE_IS_MOOF = 0x020000;
 
