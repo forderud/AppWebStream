@@ -491,22 +491,6 @@ private:
         return std::tie(codec, stream, enc);
     }
 
-    static AVFrame *alloc_frame (enum AVPixelFormat pix_fmt, int width, int height) {
-        AVFrame* picture = av_frame_alloc();
-        assert(picture);
-
-        picture->format = pix_fmt;
-        picture->width  = width;
-        picture->height = height;
-
-        // allocate the buffers for the frame data
-        int ret = av_frame_get_buffer(picture, 32);
-        if (ret < 0)
-            throw std::runtime_error("Could not allocate frame data");
-
-        return picture;
-    }
-
     static AVFrame* open_video (const AVCodec *codec, const AVDictionary *opt_arg, /*in/out*/AVCodecContext *c, /*in/out*/AVCodecParameters *codecpar) {
         AVDictionary *opt = nullptr;
         av_dict_copy(&opt, opt_arg, 0);
@@ -518,11 +502,20 @@ private:
             throw std::runtime_error("Could not open video codec");
 
         /* allocate and init a re-usable frame */
-        AVFrame* frame = alloc_frame(c->pix_fmt, c->width, c->height);
-        if (!frame)
-            throw std::runtime_error("Could not allocate video frame");
+        AVFrame* frame = av_frame_alloc();
+        {
+            assert(frame);
 
-        assert(c->pix_fmt == AV_PIX_FMT_YUV420P);
+            assert(c->pix_fmt == AV_PIX_FMT_YUV420P);
+            frame->format = c->pix_fmt;
+            frame->width = c->width;
+            frame->height = c->height;
+
+            // allocate the buffers for the frame data
+            int ret = av_frame_get_buffer(frame, 32);
+            if (ret < 0)
+                throw std::runtime_error("Could not allocate frame data");
+        }
 
         // copy the stream parameters to the muxer
         ret = avcodec_parameters_from_context(codecpar, c);
