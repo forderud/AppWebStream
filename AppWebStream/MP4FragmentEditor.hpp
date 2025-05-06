@@ -490,7 +490,7 @@ private:
                 }
 
                 if (flags & MOV_TRUN_SAMPLE_CTS) {
-                    //auto sample_cto = DeSerialize<int32_t>(payload); // uint32_t for version==0, int32_t for version > 0
+                    //auto sample_composition_time_offset = DeSerialize<int32_t>(payload); // uint32_t for version==0, int32_t for version > 0
                     payload += sizeof(int32_t);
                 }
             }
