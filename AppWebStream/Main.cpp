@@ -93,10 +93,10 @@ static HRESULT EncodeFrame (VideoEncoder & encoder, window_dc & wnd_dc) {
             return E_FAIL;
         bmp_info.bmiHeader.biBitCount    = 32;     // request 32bit RGBA image 
         bmp_info.bmiHeader.biCompression = BI_RGB; // disable compression
-#ifndef ENABLE_FFMPEG
-        bmp_info.bmiHeader.biHeight = abs(bmp_info.bmiHeader.biHeight); // request bottom-up bitmap, with origin in lower-left corner
-#else
+#ifdef ENABLE_FFMPEG
         bmp_info.bmiHeader.biHeight = -abs(bmp_info.bmiHeader.biHeight); // request bitmap with origin in top-left corner
+#else
+        bmp_info.bmiHeader.biHeight = abs(bmp_info.bmiHeader.biHeight); // request bottom-up bitmap, with origin in lower-left corner
 #endif
     }
 
