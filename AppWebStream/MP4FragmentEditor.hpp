@@ -65,11 +65,11 @@ public:
             assert(atom_size <= buffer.size());
 
             // Movie Fragment (moof)
-#ifndef ENABLE_FFMPEG
+#ifdef ENABLE_FFMPEG
+            return ModifyMovieFragment(buffer.data(), (ULONG)buffer.size(), false);
+#else
             assert(atom_size == buffer.size());
             return ModifyMovieFragment(buffer.data(), (ULONG)buffer.size(), true);
-#else
-            return ModifyMovieFragment(buffer.data(), (ULONG)buffer.size(), false);
 #endif
         } else if (IsAtomType(buffer.data(), "mdat")) {
             //uint32_t atom_size = GetAtomSize(buffer.data());
@@ -100,6 +100,7 @@ private:
             uint8_t version = 0;
             std::tie(version, ptr) = ParseVersionCreateModifyTime(ptr, m_startTime);
 
+            // read timescale
             m_timeScale = DeSerialize<uint32_t>(ptr); // 1000*fps
             ptr += 4;
 
