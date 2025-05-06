@@ -306,10 +306,10 @@ private:
         // "tfhd" atom immediately follows
         char* tfhd_ptr = traf_ptr + HEADER_SIZE;
 
-        if (add_tfdt) {
-            unsigned long tfhd_idx = static_cast<unsigned long>(tfhd_ptr - moof_ptr);
-            ProcessTrackFrameChildren(moof_ptr+tfhd_idx, buf_size-tfhd_idx, new_buf_size);
+        unsigned long tfhd_idx = static_cast<unsigned long>(tfhd_ptr - moof_ptr);
+        ProcessTrackFrameChildren(moof_ptr+tfhd_idx, buf_size-tfhd_idx, new_buf_size, add_tfdt);
 
+        if (add_tfdt) {
             // update "moof" parent atom size after size change
             Serialize<uint32_t>(moof_ptr, new_buf_size);
             Serialize<uint32_t>(traf_ptr, traf_size - BASE_DATA_OFFSET_SIZE + TFDT_SIZE);
@@ -328,7 +328,7 @@ private:
       - modify data_offset
 
     Returns the relative size of the modified child atoms (bytes shrunk or grown). */
-    void ProcessTrackFrameChildren (char* tfhd_ptr, const ULONG buf_size, const ULONG new_moof_size) {
+    void ProcessTrackFrameChildren (char* tfhd_ptr, const ULONG buf_size, const ULONG new_moof_size, bool add_tfdt) {
         assert(buf_size >= 2 * HEADER_SIZE + 8);
 
         // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/TrackFragmentHeaderBox.java
@@ -352,31 +352,41 @@ private:
                 constexpr uint32_t MOV_TFHD_DEFAULT_BASE_IS_MOOF = 0x020000;
 
                 uint32_t flags = DeSerialize<uint24_t>(payload);
+#ifndef ENABLE_FFMPEG
                 assert(flags & MOV_TFHD_BASE_DATA_OFFSET);
-                // 1: set default-base-is-moof flag
-                flags |= MOV_TFHD_DEFAULT_BASE_IS_MOOF;
-                // 2: remove base-data-offset flag
-                flags &= ~MOV_TFHD_BASE_DATA_OFFSET;
-                Serialize<uint24_t>(payload, flags); // write back changes
+#endif
+                if (add_tfdt) {
+                    // 1: set default-base-is-moof flag
+                    flags |= MOV_TFHD_DEFAULT_BASE_IS_MOOF;
+                    // 2: remove base-data-offset flag
+                    flags &= ~MOV_TFHD_BASE_DATA_OFFSET;
+                    Serialize<uint24_t>(payload, flags); // write back changes
+                }
                 payload += sizeof(uint24_t);
             }
 
-            Serialize<uint32_t>(tfhd_ptr, tfhd_size-BASE_DATA_OFFSET_SIZE); // shrink atom size
+            if (add_tfdt)
+                Serialize<uint32_t>(tfhd_ptr, tfhd_size-BASE_DATA_OFFSET_SIZE); // shrink atom size
 
             //auto track_id = DeSerialize<uint32_t>(payload);
             payload += sizeof(uint32_t);          // skip track-ID field (4bytes)
 
-            // move remaining tfhd fields over data_offset
-            size_t remaining_size = tfhd_size-HEADER_SIZE-VERSION_FLAGS_SIZE-sizeof(uint32_t)-BASE_DATA_OFFSET_SIZE;
-            MemMove(payload/*dst*/, payload+BASE_DATA_OFFSET_SIZE/*src*/, remaining_size/*size*/);
+            if (add_tfdt) {
+                // move remaining tfhd fields over data_offset
+                size_t remaining_size = tfhd_size-HEADER_SIZE-VERSION_FLAGS_SIZE-sizeof(uint32_t)-BASE_DATA_OFFSET_SIZE;
+                MemMove(payload/*dst*/, payload+BASE_DATA_OFFSET_SIZE/*src*/, remaining_size/*size*/);
+            }
         }
         // pointer to right after shrunken tfhd atom
-        char* ptr = tfhd_ptr + tfhd_size-BASE_DATA_OFFSET_SIZE;
+        char* ptr = tfhd_ptr + tfhd_size;
+        if (add_tfdt) {
+            ptr -= BASE_DATA_OFFSET_SIZE;
 
-        // move "trun" atom to make room for a new "tfhd"
-        MemMove(ptr+TFDT_SIZE-BASE_DATA_OFFSET_SIZE/*dst*/, ptr/*src*/, buf_size-tfhd_size/*size*/);
+            // move "trun" atom to make room for a new "tfhd"
+            MemMove(ptr+TFDT_SIZE-BASE_DATA_OFFSET_SIZE/*dst*/, ptr/*src*/, buf_size-tfhd_size/*size*/);
+        }
 
-        {
+        if (add_tfdt) {
             // insert new "tfdt" atom (20bytes)
             // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/TrackFragmentBaseMediaDecodeTimeBox.java
             char* tfdt_ptr = ptr;
@@ -392,6 +402,16 @@ private:
 
             assert(tfdt_ptr == ptr + TFDT_SIZE);
             ptr += TFDT_SIZE;
+        } else {
+            // inspect existing tfdt atom
+            assert(IsAtomType(ptr, "tfdt"));
+            uint32_t tfdt_size = GetAtomSize(ptr);
+
+            // check baseMediaDecodeTime
+            auto baseMediaDecodeTime = DeSerialize<uint64_t>(ptr + HEADER_SIZE + VERSION_FLAGS_SIZE);
+            assert(baseMediaDecodeTime == m_cur_time);
+
+            ptr += tfdt_size;
         }
 
         {
@@ -405,7 +425,11 @@ private:
 
             auto version = DeSerialize<uint8_t>(payload);
             payload += sizeof(uint8_t);
+#ifdef ENABLE_FFMPEG
+            assert(version == 0);   // check version
+#else
             assert(version == 1);   // check version
+#endif
 
             // "trun" atom flags (from https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/isom.h)
             constexpr uint32_t MOV_TRUN_DATA_OFFSET = 0x01;
@@ -417,7 +441,11 @@ private:
 
             uint32_t flags = DeSerialize<uint24_t>(payload);
             // verify that dataOffset, sampleDuration, sampleSize, sampleFlags & sampleCts are set
+#ifdef ENABLE_FFMPEG
+            assert((flags == MOV_TRUN_DATA_OFFSET) || (flags == (MOV_TRUN_DATA_OFFSET|MOV_TRUN_FIRST_SAMPLE_FLAGS)));
+#else
             assert(flags == (MOV_TRUN_DATA_OFFSET | MOV_TRUN_SAMPLE_DURATION | MOV_TRUN_SAMPLE_SIZE | MOV_TRUN_SAMPLE_FLAGS | MOV_TRUN_SAMPLE_CTS));
+#endif
             payload += sizeof(uint24_t);
 
             auto sample_count = DeSerialize<uint32_t>(payload); // frame count (typ 1)
@@ -428,7 +456,8 @@ private:
                 // overwrite data_offset field (https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-sstr/6d796f37-b4f0-475f-becd-13f1c86c2d1f)
                 // offset from the beginning of the "moof" field
                 // DataOffset field MUST be the sum of the lengths of the "moof" and all the fields in the "mdat" field
-                Serialize<int32_t>(payload, new_moof_size + HEADER_SIZE); // add "mdat" header size
+                if (add_tfdt)
+                    Serialize<int32_t>(payload, new_moof_size + HEADER_SIZE); // add "mdat" header size
                 payload += sizeof(int32_t);
             }
 
