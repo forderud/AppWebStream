@@ -352,9 +352,9 @@ private:
                 constexpr uint32_t MOV_TFHD_DEFAULT_BASE_IS_MOOF = 0x020000;
 
                 uint32_t flags = DeSerialize<uint24_t>(payload);
+                assert(flags & MOV_TFHD_BASE_DATA_OFFSET);
                 // 1: set default-base-is-moof flag
                 flags |= MOV_TFHD_DEFAULT_BASE_IS_MOOF;
-                assert(flags & MOV_TFHD_BASE_DATA_OFFSET);
                 // 2: remove base-data-offset flag
                 flags &= ~MOV_TFHD_BASE_DATA_OFFSET;
                 Serialize<uint24_t>(payload, flags); // write back changes
