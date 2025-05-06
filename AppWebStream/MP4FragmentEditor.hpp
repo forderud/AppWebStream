@@ -407,13 +407,20 @@ private:
             ptr += TFDT_SIZE;
         } else {
             // inspect existing tfdt atom
-            assert(IsAtomType(ptr, "tfdt"));
-            uint32_t tfdt_size = GetAtomSize(ptr);
+            char* tfdt_ptr = ptr;
+            assert(IsAtomType(tfdt_ptr, "tfdt"));
+            uint32_t tfdt_size = GetAtomSize(tfdt_ptr);
+            tfdt_ptr += HEADER_SIZE;
+
+            assert(*tfdt_ptr == 1); // check version
+            tfdt_ptr += VERSION_FLAGS_SIZE;
 
             // check baseMediaDecodeTime
-            auto baseMediaDecodeTime = DeSerialize<uint64_t>(ptr + HEADER_SIZE + VERSION_FLAGS_SIZE);
+            auto baseMediaDecodeTime = DeSerialize<uint64_t>(tfdt_ptr);
             assert(baseMediaDecodeTime == m_cur_time);
+            tfdt_ptr += sizeof(uint64_t);
 
+            assert(tfdt_ptr == ptr + tfdt_size);
             ptr += tfdt_size;
         }
 
