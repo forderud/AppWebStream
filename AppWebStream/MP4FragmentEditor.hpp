@@ -423,7 +423,8 @@ private:
                 // overwrite data_offset field (https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-sstr/6d796f37-b4f0-475f-becd-13f1c86c2d1f)
                 // offset from the beginning of the "moof" field
                 // DataOffset field MUST be the sum of the lengths of the "moof" and all the fields in the "mdat" field
-                payload = Serialize<uint32_t>(payload, new_moof_size + HEADER_SIZE); // add "mdat" header size
+                Serialize<uint32_t>(payload, new_moof_size + HEADER_SIZE); // add "mdat" header size
+                payload += sizeof(uint32_t);
             }
             for (uint32_t i = 0; i < sample_count; i++) {
                 auto sample_dur = DeSerialize<uint32_t>(payload); // frame duration (typ 1000)
