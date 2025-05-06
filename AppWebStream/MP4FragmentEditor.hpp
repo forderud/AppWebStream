@@ -67,9 +67,9 @@ public:
             // Movie Fragment (moof)
 #ifndef ENABLE_FFMPEG
             assert(atom_size == buffer.size());
-            return ModifyMovieFragment(buffer.data(), (ULONG)buffer.size());
+            return ModifyMovieFragment(buffer.data(), (ULONG)buffer.size(), true);
 #else
-            return buffer;
+            return ModifyMovieFragment(buffer.data(), (ULONG)buffer.size(), false);
 #endif
         } else if (IsAtomType(buffer.data(), "mdat")) {
             //uint32_t atom_size = GetAtomSize(buffer.data());
@@ -264,12 +264,15 @@ private:
     }
 
     /** REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/MovieFragmentBox.java */
-    std::string_view ModifyMovieFragment (const char* buf, const ULONG buf_size) {
+    std::string_view ModifyMovieFragment (const char* buf, const ULONG buf_size, bool add_tfdt) {
         assert(IsAtomType(buf, "moof"));
         assert(GetAtomSize(buf) <= buf_size);
 
         // copy to temporary buffer before modifying & extending atoms
-        m_moof_buf.resize(buf_size - BASE_DATA_OFFSET_SIZE + TFDT_SIZE);
+        if (add_tfdt)
+            m_moof_buf.resize(buf_size - BASE_DATA_OFFSET_SIZE + TFDT_SIZE);
+        else
+            m_moof_buf.resize(buf_size);
         memcpy(m_moof_buf.data()/*dst*/, buf, buf_size);
         char* const moof_ptr = m_moof_buf.data(); // switch to internal buffer
 
@@ -300,14 +303,15 @@ private:
         // "tfhd" atom immediately follows
         char* tfhd_ptr = traf_ptr + HEADER_SIZE;
 
-        unsigned long tfhd_idx = static_cast<unsigned long>(tfhd_ptr - moof_ptr);
-        uint32_t new_moof_size = buf_size - BASE_DATA_OFFSET_SIZE + TFDT_SIZE;
-        ProcessTrackFrameChildren(m_moof_buf.data()+tfhd_idx, buf_size-tfhd_idx, new_moof_size);
+        if (add_tfdt) {
+            unsigned long tfhd_idx = static_cast<unsigned long>(tfhd_ptr - moof_ptr);
+            uint32_t new_moof_size = buf_size - BASE_DATA_OFFSET_SIZE + TFDT_SIZE;
+            ProcessTrackFrameChildren(m_moof_buf.data()+tfhd_idx, buf_size-tfhd_idx, new_moof_size);
 
-        // update "moof" parent atom size after size change
-        Serialize<uint32_t>(moof_ptr, new_moof_size);
-        Serialize<uint32_t>(traf_ptr, traf_size - BASE_DATA_OFFSET_SIZE + TFDT_SIZE);
-
+            // update "moof" parent atom size after size change
+            Serialize<uint32_t>(moof_ptr, new_moof_size);
+            Serialize<uint32_t>(traf_ptr, traf_size - BASE_DATA_OFFSET_SIZE + TFDT_SIZE);
+        }
         return std::string_view(m_moof_buf.data(), m_moof_buf.size());
     }
 
