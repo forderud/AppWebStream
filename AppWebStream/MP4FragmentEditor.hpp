@@ -404,7 +404,7 @@ private:
 
             // "trun" atom flags (from https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/isom.h)
             constexpr uint32_t MOV_TRUN_DATA_OFFSET = 0x01;
-            //constexpr uint32_t MOV_TRUN_FIRST_SAMPLE_FLAGS = 0x04;
+            constexpr uint32_t MOV_TRUN_FIRST_SAMPLE_FLAGS = 0x04;
             constexpr uint32_t MOV_TRUN_SAMPLE_DURATION = 0x100;
             constexpr uint32_t MOV_TRUN_SAMPLE_SIZE = 0x200;
             constexpr uint32_t MOV_TRUN_SAMPLE_FLAGS = 0x400;
@@ -419,7 +419,7 @@ private:
             assert(sample_count > 0);
             payload += sizeof(uint32_t);
 
-            if (flags | MOV_TRUN_DATA_OFFSET) {
+            if (flags & MOV_TRUN_DATA_OFFSET) {
                 // overwrite data_offset field (https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-sstr/6d796f37-b4f0-475f-becd-13f1c86c2d1f)
                 // offset from the beginning of the "moof" field
                 // DataOffset field MUST be the sum of the lengths of the "moof" and all the fields in the "mdat" field
@@ -427,8 +427,12 @@ private:
                 payload += sizeof(uint32_t);
             }
 
+            if (flags & MOV_TRUN_FIRST_SAMPLE_FLAGS) {
+                payload += sizeof(uint32_t);
+            }
+
             for (uint32_t i = 0; i < sample_count; i++) {
-                if (flags | MOV_TRUN_SAMPLE_DURATION) {
+                if (flags & MOV_TRUN_SAMPLE_DURATION) {
                     auto sample_dur = DeSerialize<uint32_t>(payload); // frame duration (typ 1000)
                     payload += sizeof(uint32_t);
 
@@ -438,17 +442,17 @@ private:
                     m_cur_time += 1000; // increment with hardcoded value
                 }
 
-                if (flags | MOV_TRUN_SAMPLE_SIZE) {
+                if (flags & MOV_TRUN_SAMPLE_SIZE) {
                     //auto sample_size = DeSerialize<uint32_t>(payload);
                     payload += sizeof(uint32_t);
                 }
 
-                if (flags | MOV_TRUN_SAMPLE_FLAGS) {
+                if (flags & MOV_TRUN_SAMPLE_FLAGS) {
                     //auto sample_flags = DeSerialize<uint32_t>(payload);
                     payload += sizeof(uint32_t);
                 }
 
-                if (flags | MOV_TRUN_SAMPLE_CTS) {
+                if (flags & MOV_TRUN_SAMPLE_CTS) {
                     //auto sample_cto = DeSerialize<int32_t>(payload); // uint32_t for version==0, int32_t for version > 0
                     payload += sizeof(int32_t);
                 }
