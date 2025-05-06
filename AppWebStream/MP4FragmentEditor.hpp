@@ -101,7 +101,7 @@ private:
             uint8_t version = 0;
             std::tie(version, ptr) = ParseVersionCreateModifyTime(ptr, m_startTime);
 
-            m_timeScale = DeSerialize<uint32_t>(ptr); // 50000 = 50fps
+            m_timeScale = DeSerialize<uint32_t>(ptr); // 1000*fps
             ptr += 4;
 
             uint64_t duration = 0;
@@ -426,7 +426,7 @@ private:
                 payload = Serialize<uint32_t>(payload, new_moof_size + HEADER_SIZE); // add "mdat" header size
             }
             for (uint32_t i = 0; i < sample_count; i++) {
-                auto sample_dur = DeSerialize<uint32_t>(payload); // duration of first sample (typ 1000)
+                auto sample_dur = DeSerialize<uint32_t>(payload); // frame duration (typ 1000)
                 payload += sizeof(uint32_t);
 
                 // update baseMediaDecodeTime in next fragment
@@ -509,7 +509,7 @@ private:
 private:
     double            m_dpi = 0;
     uint64_t          m_startTime = 0; // creation- & modification time
-    uint32_t          m_timeScale = 0; // 50000 = 50fps
+    uint32_t          m_timeScale = 0; // unit: 1000*fps (50000 = 50fps)
     uint64_t          m_cur_time = 0;
     std::vector<char> m_moof_buf; ///< "moof" atom modification buffer
 };
