@@ -525,12 +525,11 @@ private:
         return frame;
     }
 
-    /** Manual RGB to YCbCr conversion. Please replace with more authoritative alternative if/when possible.
-        REF: http://www.fourcc.org/fccyvrgb.php */
-    static void RGB_to_YCbCr (const R8G8B8A8 rgb, unsigned char& Y, unsigned char& Cb, unsigned char& Cr) {
-        Y = static_cast<unsigned char>( 0.257f*rgb.r + 0.504f*rgb.g + 0.098f*rgb.b +  16);
-        Cb = static_cast<unsigned char>(-0.148f*rgb.r - 0.291f*rgb.g + 0.439f*rgb.b + 128);
-        Cr = static_cast<unsigned char>( 0.439f*rgb.r - 0.368f*rgb.g - 0.071f*rgb.b + 128);
+    /** Manual RGB to YCbCr conversion, based on rgb_to_yuv in https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/movenc.c */
+    static void RGB_to_YCbCr(const R8G8B8A8 rgb, unsigned char& Y, unsigned char& Cb, unsigned char& Cr) {
+        Y = av_clip_uint8((  16000 + 257*rgb.r + 504*rgb.g +  98*rgb.b)/1000);
+        Cb = av_clip_uint8((128000 - 148*rgb.r - 291*rgb.g + 439*rgb.b)/1000);
+        Cr = av_clip_uint8((128000 + 439*rgb.r - 368*rgb.g -  71*rgb.b)/1000);
     }
 
     unsigned int         m_fps = 0;
