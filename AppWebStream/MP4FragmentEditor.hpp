@@ -476,7 +476,7 @@ private:
                     // update baseMediaDecodeTime for next fragment
                     m_cur_time += sample_dur;
                 } else {
-                    m_cur_time += 256; // matches FFmpeg counting
+                    m_cur_time += 1024; // almost matches MediaFoundation
                 }
 
                 if (flags & MOV_TRUN_SAMPLE_SIZE) {

@@ -408,7 +408,7 @@ public:
             }
 
             m_frame->pts = m_next_pts;
-            m_next_pts++; // increment next pts
+            m_next_pts += 4; // gives sample_dur=4*256=1024 to almost match MediaFoundation
         }
 
         // encode frame
