@@ -306,13 +306,13 @@ private:
         if (add_tfdt) {
             unsigned long tfhd_idx = static_cast<unsigned long>(tfhd_ptr - moof_ptr);
             uint32_t new_moof_size = buf_size - BASE_DATA_OFFSET_SIZE + TFDT_SIZE;
-            ProcessTrackFrameChildren(m_moof_buf.data()+tfhd_idx, buf_size-tfhd_idx, new_moof_size);
+            ProcessTrackFrameChildren(moof_ptr+tfhd_idx, buf_size-tfhd_idx, new_moof_size);
 
             // update "moof" parent atom size after size change
             Serialize<uint32_t>(moof_ptr, new_moof_size);
             Serialize<uint32_t>(traf_ptr, traf_size - BASE_DATA_OFFSET_SIZE + TFDT_SIZE);
         }
-        return std::string_view(m_moof_buf.data(), m_moof_buf.size());
+        return std::string_view(moof_ptr, m_moof_buf.size());
     }
 
 
