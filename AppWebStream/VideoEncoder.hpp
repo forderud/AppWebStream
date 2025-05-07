@@ -492,14 +492,16 @@ private:
     }
 
     static AVFrame* open_video (const AVCodec *codec, const AVDictionary *opt_arg, /*in/out*/AVCodecContext *c, /*in/out*/AVCodecParameters *codecpar) {
-        AVDictionary *opt = nullptr;
-        av_dict_copy(&opt, opt_arg, 0);
+        {
+            AVDictionary* opt_cpy = nullptr;
+            av_dict_copy(/*out*/&opt_cpy, /*in*/opt_arg, 0);
 
-        /* open the codec */
-        int ret = avcodec_open2(c, codec, &opt);
-        av_dict_free(&opt);
-        if (ret < 0)
-            throw std::runtime_error("Could not open video codec");
+            /* open the codec */
+            int ret = avcodec_open2(c, codec, &opt_cpy);
+            av_dict_free(&opt_cpy);
+            if (ret < 0)
+                throw std::runtime_error("Could not open video codec");
+        }
 
         /* allocate and init a re-usable frame */
         AVFrame* frame = av_frame_alloc();
@@ -512,13 +514,13 @@ private:
             frame->height = c->height;
 
             // allocate the buffers for the frame data
-            ret = av_frame_get_buffer(frame, 32);
+            int ret = av_frame_get_buffer(frame, 32);
             if (ret < 0)
                 throw std::runtime_error("Could not allocate frame data");
         }
 
         // copy the stream parameters to the muxer
-        ret = avcodec_parameters_from_context(/*out*/codecpar, /*in*/c);
+        int ret = avcodec_parameters_from_context(/*out*/codecpar, /*in*/c);
         if (ret < 0)
             throw std::runtime_error("Could not copy the stream parameters");
 
