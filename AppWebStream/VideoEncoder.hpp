@@ -327,6 +327,8 @@ public:
         AVDictionary *opt = nullptr;
         int ret = av_dict_set(&opt, "movflags", "empty_moov+default_base_moof+frag_every_frame", 0); // fragmented MP4
         assert(ret >= 0);
+        ret = av_dict_set_int(&opt, "movie_timescale", 1000*m_fps, 0); // match MediaFoundation timescale
+        assert(ret >= 0);
         ret = av_dict_set(&opt, "fflags", "nobuffer+flush_packets", 0); // don't know if this helps
         assert(ret >= 0);
         ret = av_dict_set(&opt, "mpegts", "omit_video_pes_length", 0); // must also set val=0, don't know if this helps
@@ -336,8 +338,6 @@ public:
         if (ret)
             throw std::runtime_error("omit_video_pes_length failed");
 #endif
-        ret = av_dict_set_int(&opt, "movie_timescale", 1000*m_fps, 0); // match MediaFoundation timescale
-        assert(ret >= 0);
 
         // open the video codecs and allocate the necessary encode buffers
         m_frame = open_video(video_codec, opt, m_enc, m_stream->codecpar);
