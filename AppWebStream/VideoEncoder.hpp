@@ -518,7 +518,7 @@ private:
         }
 
         // copy the stream parameters to the muxer
-        ret = avcodec_parameters_from_context(codecpar, c);
+        ret = avcodec_parameters_from_context(/*out*/codecpar, /*in*/c);
         if (ret < 0)
             throw std::runtime_error("Could not copy the stream parameters");
 
