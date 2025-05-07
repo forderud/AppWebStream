@@ -497,7 +497,7 @@ private:
             av_dict_copy(/*out*/&opt_cpy, /*in*/opt_arg, 0);
 
             /* open the codec */
-            int ret = avcodec_open2(c, codec, &opt_cpy);
+            int ret = avcodec_open2(c, /*in*/codec, &opt_cpy);
             av_dict_free(&opt_cpy);
             if (ret < 0)
                 throw std::runtime_error("Could not open video codec");
