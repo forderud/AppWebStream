@@ -15,6 +15,8 @@
 _COM_SMARTPTR_TYPEDEF(IMFAttributes, __uuidof(IMFAttributes));
 _COM_SMARTPTR_TYPEDEF(IMFSourceReader, __uuidof(IMFSourceReader));
 _COM_SMARTPTR_TYPEDEF(IMFMediaType, __uuidof(IMFMediaType));
+_COM_SMARTPTR_TYPEDEF(IMFSample, __uuidof(IMFSample));
+
 
 EXTERN_GUID(WMMEDIATYPE_Video, 0x73646976, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71); // from https://learn.microsoft.com/en-us/windows/win32/wmformat/media-type-identifiers
 
@@ -116,6 +118,66 @@ HRESULT ConfigureDecoder(IMFSourceReader* pReader, DWORD dwStreamIndex) {
     return hr;
 }
 
+HRESULT ProcessFrames(IMFSourceReader* pReader) {
+    HRESULT hr = S_OK;
+    IMFSamplePtr pSample;
+    unsigned int cSamples = 0;
+
+    bool quit = false;
+    while (!quit) {
+        DWORD streamIndex, flags;
+        LONGLONG llTimeStamp;
+
+        hr = pReader->ReadSample(
+            MF_SOURCE_READER_ANY_STREAM,    // Stream index.
+            0,                              // Flags.
+            &streamIndex,                   // Receives the actual stream index. 
+            &flags,                         // Receives status flags.
+            &llTimeStamp,                   // Receives the time stamp.
+            &pSample                        // Receives the sample or NULL.
+        );
+        if (FAILED(hr))
+            break;
+
+        wprintf(L"Stream %d (%I64d)\n", streamIndex, llTimeStamp);
+        if (flags & MF_SOURCE_READERF_ENDOFSTREAM) {
+            wprintf(L"\tEnd of stream\n");
+            quit = true;
+        }
+        if (flags & MF_SOURCE_READERF_NEWSTREAM) {
+            wprintf(L"\tNew stream\n");
+        }
+        if (flags & MF_SOURCE_READERF_NATIVEMEDIATYPECHANGED) {
+            wprintf(L"\tNative type changed\n");
+        }
+        if (flags & MF_SOURCE_READERF_CURRENTMEDIATYPECHANGED) {
+            wprintf(L"\tCurrent type changed\n");
+        }
+        if (flags & MF_SOURCE_READERF_STREAMTICK) {
+            wprintf(L"\tStream tick\n");
+        }
+
+        if (flags & MF_SOURCE_READERF_NATIVEMEDIATYPECHANGED) {
+            // The format changed. Reconfigure the decoder.
+            hr = ConfigureDecoder(pReader, streamIndex);
+            if (FAILED(hr))
+            {
+                break;
+            }
+        }
+
+        if (pSample)
+            ++cSamples;
+    }
+
+    if (FAILED(hr)) {
+        wprintf(L"ProcessSamples FAILED, hr = 0x%x\n", hr);
+    } else {
+        wprintf(L"Processed %u samples\n", cSamples);
+    }
+    return hr;
+}
+
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
@@ -144,6 +206,8 @@ int main(int argc, char* argv[]) {
     EnumerateMediaTypes(reader);
     DWORD streamIdx = 0; // TODO: Use parsed value
     ConfigureDecoder(reader, streamIdx);
+
+    ProcessFrames(reader);
 
     // TODO:
     // * Process frames as they arrive.
