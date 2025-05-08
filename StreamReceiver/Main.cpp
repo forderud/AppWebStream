@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <mfapi.h>
 #include <mfidl.h>
+#include <mferror.h>
 #include <mfreadwrite.h>
 #include "ComUtil.hpp"
 
@@ -13,6 +14,54 @@
 // define smart-pointers with "Ptr" suffix
 _COM_SMARTPTR_TYPEDEF(IMFAttributes, __uuidof(IMFAttributes));
 _COM_SMARTPTR_TYPEDEF(IMFSourceReader, __uuidof(IMFSourceReader));
+_COM_SMARTPTR_TYPEDEF(IMFMediaType, __uuidof(IMFMediaType));
+
+
+
+HRESULT EnumerateTypesForStream(IMFSourceReader* pReader, DWORD dwStreamIndex) {
+    HRESULT hr = S_OK;
+    DWORD dwMediaTypeIndex = 0;
+
+    while (SUCCEEDED(hr)) {
+        IMFMediaTypePtr type;
+        hr = pReader->GetNativeMediaType(dwStreamIndex, dwMediaTypeIndex, &type);
+        if (hr == MF_E_NO_MORE_TYPES) {
+            hr = S_OK;
+            break;
+        }
+        
+        if (SUCCEEDED(hr)) {
+            // Examine the media type
+            printf("Stream detected...\n");
+            GUID guid{};
+            COM_CHECK(type->GetMajorType(&guid));
+            wchar_t guid_str[39] = {};
+            int ok = StringFromGUID2(guid, guid_str, (int)std::size(guid_str));
+            assert(ok);
+            wprintf(L"* MajorType: %s\n", guid_str);
+            wprintf(L"\n");
+        }
+
+        ++dwMediaTypeIndex;
+    }
+    return hr;
+}
+
+HRESULT EnumerateMediaTypes(IMFSourceReader* pReader) {
+    HRESULT hr = S_OK;
+    DWORD dwStreamIndex = 0;
+
+    while (SUCCEEDED(hr)) {
+        hr = EnumerateTypesForStream(pReader, dwStreamIndex);
+        if (hr == MF_E_INVALIDSTREAMNUMBER) {
+            hr = S_OK;
+            break;
+        }
+
+        ++dwStreamIndex;
+    }
+    return hr;
+}
 
 
 int main(int argc, char* argv[]) {
@@ -38,6 +87,8 @@ int main(int argc, char* argv[]) {
     IMFSourceReaderPtr reader;
     // TODO: Replace with MFCreateSourceReaderFromByteStream or MFCreateSourceReaderFromMediaSource for explicit socket handling to allow parsing of the underlying bitstream
     COM_CHECK(MFCreateSourceReaderFromURL(url, attribs, &reader));
+
+    EnumerateMediaTypes(reader);
 
     // TODO:
     // * Process frames as they arrive.
