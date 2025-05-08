@@ -24,8 +24,8 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      inkscape:zoom="1.0467522"
-     inkscape:cx="395.50906"
-     inkscape:cy="408.88377"
+     inkscape:cx="395.50908"
+     inkscape:cy="408.88378"
      inkscape:window-width="1799"
      inkscape:window-height="1208"
      inkscape:window-x="2492"
@@ -73,11 +73,11 @@
        id="text2"><tspan
          sodipodi:role="line"
          id="tspan2"
-         style="stroke-width:0.265"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Arial;-inkscape-font-specification:Arial;stroke-width:0.265"
          x="10.110637"
          y="48.531067">AppWebStream</tspan></text>
     <rect
-       style="fill:#800000;stroke-width:0.264999;stroke-dasharray:none"
+       style="fill:#333333;stroke-width:0.264999;stroke-dasharray:none"
        id="rect2-8"
        width="50.805958"
        height="20.726809"
@@ -95,7 +95,7 @@
          x="12.848395"
          y="72.902222">&lt;other app&gt;</tspan></text>
     <rect
-       style="fill:#800000;stroke-width:0.264999;stroke-dasharray:none"
+       style="fill:#225500;stroke-width:0.264999;stroke-dasharray:none"
        id="rect2-1"
        width="50.805958"
        height="20.726809"
@@ -113,7 +113,7 @@
          x="108.43984"
          y="51.492622">VLC</tspan></text>
     <rect
-       style="fill:#800000;stroke-width:0.264999;stroke-dasharray:none"
+       style="fill:#225500;stroke-width:0.264999;stroke-dasharray:none"
        id="rect2-7"
        width="50.805958"
        height="20.726809"
@@ -149,7 +149,7 @@
          x="94.03344"
          y="75.830421">StreamReceiver</tspan></text>
     <rect
-       style="fill:#800000;stroke-width:0.264999;stroke-dasharray:none"
+       style="fill:#333333;stroke-width:0.264999;stroke-dasharray:none"
        id="rect2-6"
        width="50.805958"
        height="20.726809"
