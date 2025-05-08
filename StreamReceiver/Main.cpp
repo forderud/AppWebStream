@@ -18,13 +18,13 @@ _COM_SMARTPTR_TYPEDEF(IMFMediaType, __uuidof(IMFMediaType));
 
 EXTERN_GUID(WMMEDIATYPE_Video, 0x73646976, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71); // from https://learn.microsoft.com/en-us/windows/win32/wmformat/media-type-identifiers
 
-HRESULT EnumerateTypesForStream(IMFSourceReader* pReader, DWORD dwStreamIndex) {
+HRESULT EnumerateTypesForStream(IMFSourceReader* pReader, DWORD streamIdx) {
     HRESULT hr = S_OK;
     DWORD dwMediaTypeIndex = 0;
 
     while (SUCCEEDED(hr)) {
         IMFMediaTypePtr type;
-        hr = pReader->GetNativeMediaType(dwStreamIndex, dwMediaTypeIndex, &type);
+        hr = pReader->GetNativeMediaType(streamIdx, dwMediaTypeIndex, &type);
         if (hr == MF_E_NO_MORE_TYPES) {
             hr = S_OK;
             break;
@@ -33,6 +33,7 @@ HRESULT EnumerateTypesForStream(IMFSourceReader* pReader, DWORD dwStreamIndex) {
         if (SUCCEEDED(hr)) {
             // Examine the media type
             printf("Stream detected...\n");
+            printf("* index: %u\n", streamIdx);
             GUID guid{};
             COM_CHECK(type->GetMajorType(&guid));
             if (guid == WMMEDIATYPE_Video) {
@@ -69,6 +70,53 @@ HRESULT EnumerateMediaTypes(IMFSourceReader* pReader) {
 }
 
 
+HRESULT ConfigureDecoder(IMFSourceReader* pReader, DWORD dwStreamIndex) {
+    // Find the native format of the stream.
+    IMFMediaTypePtr pNativeType;
+    HRESULT hr = pReader->GetNativeMediaType(dwStreamIndex, 0, &pNativeType);
+    if (FAILED(hr))
+        return hr;
+
+    // Find the major type.
+    GUID majorType{};
+    hr = pNativeType->GetGUID(MF_MT_MAJOR_TYPE, &majorType);
+    if (FAILED(hr))
+        return hr;
+
+    // Define the output type.
+    IMFMediaTypePtr pType;
+    hr = MFCreateMediaType(&pType);
+    if (FAILED(hr))
+        return hr;
+
+    hr = pType->SetGUID(MF_MT_MAJOR_TYPE, majorType);
+    if (FAILED(hr))
+        return hr;
+
+    // Select a subtype.
+    GUID subtype{};
+    if (majorType == MFMediaType_Video) {
+        subtype = MFVideoFormat_RGB32;
+    } else if (majorType == MFMediaType_Audio) {
+        subtype = MFAudioFormat_PCM;
+    } else {
+        // Unrecognized type. Skip.
+        return hr;
+    }
+
+    hr = pType->SetGUID(MF_MT_SUBTYPE, subtype);
+    if (FAILED(hr))
+        return hr;
+
+    // Set the uncompressed format.
+    hr = pReader->SetCurrentMediaType(dwStreamIndex, NULL, pType);
+    if (FAILED(hr))
+        return hr;
+
+    return hr;
+}
+
+
 int main(int argc, char* argv[]) {
     if (argc < 2) {
         printf("Usage: StreamReceiver.exe URL (e.g. StreamReceiver.exe http://localhost:8080/movie.mp4)\n");
@@ -94,6 +142,8 @@ int main(int argc, char* argv[]) {
     COM_CHECK(MFCreateSourceReaderFromURL(url, attribs, &reader));
 
     EnumerateMediaTypes(reader);
+    DWORD streamIdx = 0; // TODO: Use parsed value
+    ConfigureDecoder(reader, streamIdx);
 
     // TODO:
     // * Process frames as they arrive.
