@@ -48,6 +48,7 @@ HRESULT EnumerateTypesForStream(IMFSourceReader& reader, DWORD streamIdx) {
             }
 
             wprintf(L"\n");
+            return S_OK;
         }
 
         ++dwMediaTypeIndex;
@@ -55,20 +56,20 @@ HRESULT EnumerateTypesForStream(IMFSourceReader& reader, DWORD streamIdx) {
     return hr;
 }
 
-HRESULT EnumerateMediaTypes(IMFSourceReader& reader) {
+DWORD GetFirstVideoStream (IMFSourceReader& reader) {
     HRESULT hr = S_OK;
-    DWORD dwStreamIndex = 0;
+    DWORD streamIdx = 0;
 
     while (SUCCEEDED(hr)) {
-        hr = EnumerateTypesForStream(reader, dwStreamIndex);
-        if (hr == MF_E_INVALIDSTREAMNUMBER) {
-            hr = S_OK;
-            break;
-        }
+        hr = EnumerateTypesForStream(reader, streamIdx);
+        if (SUCCEEDED(hr))
+            return streamIdx;
 
-        ++dwStreamIndex;
+        ++streamIdx;
     }
-    return hr;
+
+    printf("ERROR: Unable to detect any video stream.\n");
+    abort();
 }
 
 
@@ -198,8 +199,7 @@ int main(int argc, char* argv[]) {
     // If needed, replace with MFCreateSourceReaderFromByteStream or MFCreateSourceReaderFromMediaSource for explicit socket handling to allow parsing of the underlying bitstream
     COM_CHECK(MFCreateSourceReaderFromURL(url, attribs, &reader));
 
-    EnumerateMediaTypes(reader);
-    DWORD streamIdx = 0; // TODO: Use parsed value
+    DWORD streamIdx = GetFirstVideoStream(reader);
     ConfigureDecoder(reader, streamIdx);
 
     ProcessFrames(reader);
