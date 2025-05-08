@@ -9,7 +9,7 @@ Intended usage:
 * Independent implementation for compatibility testing.
 
 
-### Testing combinarions
+### Testing combinations
 The `AppWebStream` and `StreamReceiver` projects in this repo can be used together with web browsers and VLC to test both other apps ability to _transmit_ and _receive_ streamed MPEG4 videos:  
 ![interop](interop.svg)
 
