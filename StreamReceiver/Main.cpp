@@ -129,7 +129,7 @@ HRESULT ProcessFrames(IMFSourceReader* pReader) {
         LONGLONG llTimeStamp;
 
         hr = pReader->ReadSample(
-            MF_SOURCE_READER_ANY_STREAM,    // Stream index.
+            (DWORD)MF_SOURCE_READER_ANY_STREAM,    // Stream index.
             0,                              // Flags.
             &streamIndex,                   // Receives the actual stream index. 
             &flags,                         // Receives status flags.
