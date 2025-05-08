@@ -1,6 +1,6 @@
 #define WIN32_LEAN_AND_MEAN
 #include <atomic>
-#include <comdef.h>
+#include <comdef.h> // for _com_error
 #include <Mfapi.h>
 #include "OutputStream.hpp"
 #include "WebSocket.hpp"
