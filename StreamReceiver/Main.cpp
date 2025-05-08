@@ -195,7 +195,7 @@ int main(int argc, char* argv[]) {
     }
 
     IMFSourceReaderPtr reader;
-    // TODO: Replace with MFCreateSourceReaderFromByteStream or MFCreateSourceReaderFromMediaSource for explicit socket handling to allow parsing of the underlying bitstream
+    // If needed, replace with MFCreateSourceReaderFromByteStream or MFCreateSourceReaderFromMediaSource for explicit socket handling to allow parsing of the underlying bitstream
     COM_CHECK(MFCreateSourceReaderFromURL(url, attribs, &reader));
 
     EnumerateMediaTypes(reader);
