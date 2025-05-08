@@ -30,7 +30,7 @@ struct R8G8B8A8 {
 #pragma comment(lib, "mfuuid.lib")
 #pragma comment(lib, "Strmiids.lib")
 
-
+// define smart-pointers with "Ptr" suffix
 _COM_SMARTPTR_TYPEDEF(IMFSinkWriter,  __uuidof(IMFSinkWriter));
 _COM_SMARTPTR_TYPEDEF(IMFMediaBuffer, __uuidof(IMFMediaBuffer));
 _COM_SMARTPTR_TYPEDEF(IMFSample,      __uuidof(IMFSample));
