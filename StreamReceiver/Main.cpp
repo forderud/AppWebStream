@@ -116,6 +116,10 @@ HRESULT ConfigureDecoder(IMFSourceReader& reader, DWORD dwStreamIndex) {
     if (FAILED(hr))
         return hr;
 
+    uint32_t width = 0, height = 0;
+    COM_CHECK(MFGetAttributeSize(pNativeType, MF_MT_FRAME_SIZE, &width, &height));
+    printf("Frame resolution: %u x %u\n", width, height);
+
     return hr;
 }
 
@@ -160,7 +164,6 @@ void ProcessFrames(IMFSourceReader& reader) {
         }
 
         // TODO:
-        // * Print frame resolution
         // * Figure out how to extract per-frame DPI
 
         if (frame)
