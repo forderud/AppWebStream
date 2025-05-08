@@ -118,7 +118,7 @@ HRESULT ConfigureDecoder(IMFSourceReader* pReader, DWORD dwStreamIndex) {
     return hr;
 }
 
-void ProcessFrames(IMFSourceReader* pReader) {
+void ProcessFrames(IMFSourceReader& reader) {
     HRESULT hr = S_OK;
     unsigned int frameCount = 0;
 
@@ -127,7 +127,7 @@ void ProcessFrames(IMFSourceReader* pReader) {
         DWORD streamIdx = 0, flags = 0;
         LONGLONG timeStamp = 0;
         IMFSamplePtr frame;
-        hr = pReader->ReadSample(
+        hr = reader.ReadSample(
             (DWORD)MF_SOURCE_READER_ANY_STREAM, /*flags*/0, &streamIdx, &flags, &timeStamp, &frame);
         if (FAILED(hr))
             break;
@@ -153,7 +153,7 @@ void ProcessFrames(IMFSourceReader* pReader) {
 
         if (flags & MF_SOURCE_READERF_NATIVEMEDIATYPECHANGED) {
             // The format changed. Reconfigure the decoder.
-            hr = ConfigureDecoder(pReader, streamIdx);
+            hr = ConfigureDecoder(&reader, streamIdx);
             if (FAILED(hr))
                 break;
         }
