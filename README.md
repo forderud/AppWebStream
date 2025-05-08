@@ -22,7 +22,7 @@ The `AppWebStream` and `StreamReceiver` projects in this repo can be used togeth
 
 To build with FFMPG, you first need to download & unzip FFMPEG binaries to a folder pointed to by the `FFMPEG_ROOT` environment variable. Then, set the `ENABLE_FFMPEG` preprocessor define before building.
 
-### Implementation limitation
+### Implementation limitations
 
 #### Video metadata
 Metadata implementation status:
