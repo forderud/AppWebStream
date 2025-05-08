@@ -5,7 +5,6 @@
 #include <cassert>
 #include <Windows.h>
 #include <mfapi.h>
-#include <atlbase.h>
 #include "ComUtil.hpp"
 
 /** 32bit color value. */

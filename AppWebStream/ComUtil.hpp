@@ -1,6 +1,8 @@
 #pragma once
 #include <windows.h>
 #include <comdef.h> // for _com_error
+#include <atlbase.h>
+#include <atlcom.h>
 
 
 /** Converts unicode string to ASCII */
@@ -22,4 +24,18 @@ static void COM_CHECK(HRESULT hr) {
         const wchar_t* msg = err.ErrorMessage(); // weak ptr.
         throw std::runtime_error(ToAscii(msg));
     }
+}
+
+/** Convenience function to create a locally implemented COM instance without the overhead of CoCreateInstance.
+The COM class does not need to be registred for construction to succeed. However, lack of registration can
+cause problems if transporting the class out-of-process. */
+template <class T>
+static CComPtr<T> CreateLocalInstance() {
+    // create an object (with ref. count zero)
+    CComObject<T>* tmp = nullptr;
+    if (FAILED(CComObject<T>::CreateInstance(&tmp)))
+        throw std::runtime_error("CreateInstance failed");
+
+    // move into smart-ptr (will incr. ref. count to one)
+    return CComPtr<T>(static_cast<T*>(tmp));
 }

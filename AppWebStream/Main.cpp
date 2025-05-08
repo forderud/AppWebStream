@@ -58,22 +58,6 @@ struct offscreen_bmp {
     HGDIOBJ prev = nullptr;
 };
 
-
-/** Convenience function to create a locally implemented COM instance without the overhead of CoCreateInstance.
-The COM class does not need to be registred for construction to succeed. However, lack of registration can
-cause problems if transporting the class out-of-process. */
-template <class T>
-static CComPtr<T> CreateLocalInstance () {
-    // create an object (with ref. count zero)
-    CComObject<T> * tmp = nullptr;
-    if (FAILED(CComObject<T>::CreateInstance(&tmp)))
-        throw std::runtime_error("CreateInstance failed");
-
-    // move into smart-ptr (will incr. ref. count to one)
-    return CComPtr<T>(static_cast<T*>(tmp));
-}
-
-
 static HRESULT EncodeFrame (VideoEncoder & encoder, window_dc & wnd_dc) {
     // create offscreen bitmap with device context
     // make bitmap width compatible with VideoEncoder, so that image buffer pointers can be shared
