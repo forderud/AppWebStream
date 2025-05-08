@@ -10,6 +10,7 @@
 
 #pragma comment(lib, "Mfplat.lib")
 #pragma comment(lib, "Mfreadwrite.lib")
+#pragma comment(lib, "mfuuid.lib")
 
 
 /** Converts unicode string to ASCII */
@@ -50,8 +51,15 @@ int main(int argc, char* argv[]) {
 
     // connect to the MPEG4 H.264 stream
     IMFAttributesPtr attribs;
+    {
+        // DOC: https://learn.microsoft.com/en-us/windows/win32/medfound/source-reader-attributes
+        COM_CHECK(MFCreateAttributes(&attribs, 0));
+        COM_CHECK(attribs->SetUINT32(MF_LOW_LATENCY, TRUE)); // low latency mode
+        COM_CHECK(attribs->SetUINT32(MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS, TRUE)); // GPU accelerated
+    }
+
     IMFSourceReaderPtr reader;
-    // TODO: Replace with MFCreateSourceReaderFromByteStream for explicit socket handling to allow parsing of the underlying bitstream
+    // TODO: Replace with MFCreateSourceReaderFromByteStream or MFCreateSourceReaderFromMediaSource for explicit socket handling to allow parsing of the underlying bitstream
     COM_CHECK(MFCreateSourceReaderFromURL(url, attribs, &reader));
 
     // TODO:
