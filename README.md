@@ -47,6 +47,7 @@ The video stream adheres to the MPEG4 standard, so it should be supported by all
 * Microsoft Edge
 * Firefox
 * VLC media player (open stream as `http://localhost:port/movie.mp4`)
+* StreamReceiver project (in this repo)
 
 Unsupported clients:
 * Doesn't yet work on iOS, due to incomplete `ManagedMediaSource` support ([issue #25](../../issues/25)).
