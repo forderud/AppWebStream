@@ -118,28 +118,28 @@ HRESULT ConfigureDecoder(IMFSourceReader* pReader, DWORD dwStreamIndex) {
     return hr;
 }
 
-HRESULT ProcessFrames(IMFSourceReader* pReader) {
+void ProcessFrames(IMFSourceReader* pReader) {
     HRESULT hr = S_OK;
     IMFSamplePtr pSample;
     unsigned int cSamples = 0;
 
     bool quit = false;
     while (!quit) {
-        DWORD streamIndex, flags;
-        LONGLONG llTimeStamp;
+        DWORD streamIdx = 0, flags = 0;
+        LONGLONG timeStamp = 0;
 
         hr = pReader->ReadSample(
             (DWORD)MF_SOURCE_READER_ANY_STREAM,    // Stream index.
             0,                              // Flags.
-            &streamIndex,                   // Receives the actual stream index. 
+            &streamIdx,                   // Receives the actual stream index. 
             &flags,                         // Receives status flags.
-            &llTimeStamp,                   // Receives the time stamp.
+            &timeStamp,                   // Receives the time stamp.
             &pSample                        // Receives the sample or NULL.
         );
         if (FAILED(hr))
             break;
 
-        wprintf(L"Stream %d (%I64d)\n", streamIndex, llTimeStamp);
+        wprintf(L"Stream %d (%I64d)\n", streamIdx, timeStamp);
         if (flags & MF_SOURCE_READERF_ENDOFSTREAM) {
             wprintf(L"\tEnd of stream\n");
             quit = true;
@@ -159,11 +159,9 @@ HRESULT ProcessFrames(IMFSourceReader* pReader) {
 
         if (flags & MF_SOURCE_READERF_NATIVEMEDIATYPECHANGED) {
             // The format changed. Reconfigure the decoder.
-            hr = ConfigureDecoder(pReader, streamIndex);
+            hr = ConfigureDecoder(pReader, streamIdx);
             if (FAILED(hr))
-            {
                 break;
-            }
         }
 
         if (pSample)
@@ -175,7 +173,6 @@ HRESULT ProcessFrames(IMFSourceReader* pReader) {
     } else {
         wprintf(L"Processed %u samples\n", cSamples);
     }
-    return hr;
 }
 
 
