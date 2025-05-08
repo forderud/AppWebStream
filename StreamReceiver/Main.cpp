@@ -127,8 +127,6 @@ void ProcessFrames(IMFSourceReader& reader) {
     HRESULT hr = S_OK;
     unsigned int frameCount = 0;
 
-    //TODO: retrieve MPEG4 CreationTime or ModificationTime parameter and log it to console (check if MF_PD_LAST_MODIFIED_TIME)
-
     bool quit = false;
     while (!quit) {
         DWORD streamIdx = 0, flags = 0;
@@ -140,6 +138,13 @@ void ProcessFrames(IMFSourceReader& reader) {
             break;
 
         wprintf(L"Stream idx: %u\n", streamIdx);
+
+        //TODO: retrieve MPEG4 CreationTime or ModificationTime parameter and log it to console
+#if 0
+        PROPVARIANT val{};
+        PropVariantClear(&val);
+        COM_CHECK(reader.GetPresentationAttribute(streamIdx, MF_PD_LAST_MODIFIED_TIME, &val)); // fails with "The requested attribute was not found."
+#endif
 
         wprintf(L"Frame time: %f ms\n", timeStamp*0.1f/1000); // convert to milliseconds
 
