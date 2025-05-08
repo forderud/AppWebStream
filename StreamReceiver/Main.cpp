@@ -20,13 +20,13 @@ _COM_SMARTPTR_TYPEDEF(IMFSample, __uuidof(IMFSample));
 
 EXTERN_GUID(WMMEDIATYPE_Video, 0x73646976, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71); // from https://learn.microsoft.com/en-us/windows/win32/wmformat/media-type-identifiers
 
-HRESULT EnumerateTypesForStream(IMFSourceReader* pReader, DWORD streamIdx) {
+HRESULT EnumerateTypesForStream(IMFSourceReader& reader, DWORD streamIdx) {
     HRESULT hr = S_OK;
     DWORD dwMediaTypeIndex = 0;
 
     while (SUCCEEDED(hr)) {
         IMFMediaTypePtr type;
-        hr = pReader->GetNativeMediaType(streamIdx, dwMediaTypeIndex, &type);
+        hr = reader.GetNativeMediaType(streamIdx, dwMediaTypeIndex, &type);
         if (hr == MF_E_NO_MORE_TYPES) {
             hr = S_OK;
             break;
@@ -55,12 +55,12 @@ HRESULT EnumerateTypesForStream(IMFSourceReader* pReader, DWORD streamIdx) {
     return hr;
 }
 
-HRESULT EnumerateMediaTypes(IMFSourceReader* pReader) {
+HRESULT EnumerateMediaTypes(IMFSourceReader& reader) {
     HRESULT hr = S_OK;
     DWORD dwStreamIndex = 0;
 
     while (SUCCEEDED(hr)) {
-        hr = EnumerateTypesForStream(pReader, dwStreamIndex);
+        hr = EnumerateTypesForStream(reader, dwStreamIndex);
         if (hr == MF_E_INVALIDSTREAMNUMBER) {
             hr = S_OK;
             break;
@@ -72,10 +72,10 @@ HRESULT EnumerateMediaTypes(IMFSourceReader* pReader) {
 }
 
 
-HRESULT ConfigureDecoder(IMFSourceReader* pReader, DWORD dwStreamIndex) {
+HRESULT ConfigureDecoder(IMFSourceReader& reader, DWORD dwStreamIndex) {
     // Find the native format of the stream.
     IMFMediaTypePtr pNativeType;
-    HRESULT hr = pReader->GetNativeMediaType(dwStreamIndex, 0, &pNativeType);
+    HRESULT hr = reader.GetNativeMediaType(dwStreamIndex, 0, &pNativeType);
     if (FAILED(hr))
         return hr;
 
@@ -111,7 +111,7 @@ HRESULT ConfigureDecoder(IMFSourceReader* pReader, DWORD dwStreamIndex) {
         return hr;
 
     // Set the uncompressed format.
-    hr = pReader->SetCurrentMediaType(dwStreamIndex, NULL, pType);
+    hr = reader.SetCurrentMediaType(dwStreamIndex, NULL, pType);
     if (FAILED(hr))
         return hr;
 
@@ -153,7 +153,7 @@ void ProcessFrames(IMFSourceReader& reader) {
 
         if (flags & MF_SOURCE_READERF_NATIVEMEDIATYPECHANGED) {
             // The format changed. Reconfigure the decoder.
-            hr = ConfigureDecoder(&reader, streamIdx);
+            hr = ConfigureDecoder(reader, streamIdx);
             if (FAILED(hr))
                 break;
         }
