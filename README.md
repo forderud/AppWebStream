@@ -8,6 +8,10 @@ Intended usage:
 * Starting point for developing a production-quality implementation.
 * Independent implementation for compatibility testing.
 
+
+### Testing combinarions
+![interop](interop.svg)
+
 ### Getting started
 ![screenshot](screenshot.jpg)
 * Open project in Visual Studio
