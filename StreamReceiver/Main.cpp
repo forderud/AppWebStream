@@ -48,7 +48,7 @@ int main(int argc, char* argv[]) {
 
     _bstr_t url = argv[1];
 
-    // TODO: Connect to MPEG4 H.264 stream
+    // connect to the MPEG4 H.264 stream
     IMFAttributesPtr attribs;
     IMFSourceReaderPtr reader;
     // TODO: Replace with MFCreateSourceReaderFromByteStream for explicit socket handling to allow parsing of the underlying bitstream
