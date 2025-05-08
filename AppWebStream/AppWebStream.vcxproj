@@ -83,6 +83,7 @@
     <ClCompile Include="OutputStream.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ComUtil.hpp" />
     <ClInclude Include="MP4FragmentEditor.hpp" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="MP4Utils.hpp" />

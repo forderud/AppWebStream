@@ -6,6 +6,7 @@
 #include <Windows.h>
 #include <mfapi.h>
 #include <atlbase.h>
+#include "ComUtil.hpp"
 
 /** 32bit color value. */
 struct R8G8B8A8 {
@@ -22,7 +23,6 @@ struct R8G8B8A8 {
 #include <Codecapi.h>
 #include <Dshow.h>
 #include <mferror.h>
-#include <comdef.h>  // COM smart-ptr with "Ptr" suffix
 
 #pragma comment(lib, "mf.lib")
 #pragma comment(lib, "mfreadwrite.lib")
@@ -55,19 +55,6 @@ extern "C" {
 
 #endif
 
-
-/** Converts unicode string to ASCII */
-static inline std::string ToAscii (const std::wstring& w_str) {
-#pragma warning(push)
-#pragma warning(disable: 4996) // function or variable may be unsafe
-    size_t N = w_str.size();
-    std::string s_str;
-    s_str.resize(N);
-    wcstombs(const_cast<char*>(s_str.data()), w_str.c_str(), N);
-
-    return s_str;
-#pragma warning(pop)
-}
 
 class VideoEncoder {
 public:
@@ -269,19 +256,6 @@ private:
         COM_CHECK(MFSetAttributeRatio(mediaTypeOut, MF_MT_FRAME_RATE, fps, 1));
         COM_CHECK(MFSetAttributeRatio(mediaTypeOut, MF_MT_PIXEL_ASPECT_RATIO, 1, 1));
         return mediaTypeOut;
-    }
-
-    static void COM_CHECK (HRESULT hr) {
-        if (FAILED(hr)) {
-            _com_error err(hr);
-#ifdef _UNICODE
-            const wchar_t * msg = err.ErrorMessage(); // weak ptr.
-            throw std::runtime_error(ToAscii(msg));
-#else
-            const char * msg = err.ErrorMessage(); // weak ptr.
-            throw std::runtime_error(msg);
-#endif
-        }
     }
 
     const uint64_t           m_frame_duration = 0; // frame duration in 100-nanosecond units

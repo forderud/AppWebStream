@@ -11,6 +11,7 @@
     <ClInclude Include="OutputStream.hpp" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="MP4Utils.hpp" />
+    <ClInclude Include="ComUtil.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="WebStream.html" />

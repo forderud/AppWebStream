@@ -5,7 +5,7 @@
 #include <mfidl.h>
 #include <mferror.h>
 #include <mfreadwrite.h>
-#include "ComUtil.hpp"
+#include "../AppWebStream/ComUtil.hpp"
 
 #pragma comment(lib, "Mfplat.lib")
 #pragma comment(lib, "Mfreadwrite.lib")
