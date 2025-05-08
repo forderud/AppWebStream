@@ -130,15 +130,17 @@ void ProcessFrames(IMFSourceReader& reader) {
     bool quit = false;
     while (!quit) {
         DWORD streamIdx = 0, flags = 0;
-        LONGLONG timeStamp = 0;
+        LONGLONG timeStamp = 0; // in 100-nanosecond units
         IMFSamplePtr frame;
         hr = reader.ReadSample(
             (DWORD)MF_SOURCE_READER_ANY_STREAM, /*flags*/0, &streamIdx, &flags, &timeStamp, &frame);
         if (FAILED(hr))
             break;
 
+        wprintf(L"Stream idx: %u\n", streamIdx);
+
         // TODO: Convert to timeStamp to wall-time by adding the MPEG4 CreationTime attribute
-        wprintf(L"Stream %d frame time (%I64d)\n", streamIdx, timeStamp);
+        wprintf(L"Frame time: %f ms\n", timeStamp*0.1f/1000); // convert to milliseconds
         if (flags & MF_SOURCE_READERF_ENDOFSTREAM) {
             wprintf(L"\tEnd of stream\n");
             quit = true;
