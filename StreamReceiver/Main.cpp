@@ -56,6 +56,7 @@ int main(int argc, char* argv[]) {
         COM_CHECK(MFCreateAttributes(&attribs, 0));
         COM_CHECK(attribs->SetUINT32(MF_LOW_LATENCY, TRUE)); // low latency mode
         COM_CHECK(attribs->SetUINT32(MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS, TRUE)); // GPU accelerated
+        COM_CHECK(attribs->SetUINT32(MF_SOURCE_READER_ENABLE_VIDEO_PROCESSING, TRUE)); // enable YUV to RGB-32 conversion
     }
 
     IMFSourceReaderPtr reader;
