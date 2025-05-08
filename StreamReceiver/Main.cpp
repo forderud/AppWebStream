@@ -16,7 +16,7 @@ _COM_SMARTPTR_TYPEDEF(IMFAttributes, __uuidof(IMFAttributes));
 _COM_SMARTPTR_TYPEDEF(IMFSourceReader, __uuidof(IMFSourceReader));
 _COM_SMARTPTR_TYPEDEF(IMFMediaType, __uuidof(IMFMediaType));
 
-
+EXTERN_GUID(WMMEDIATYPE_Video, 0x73646976, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71); // from https://learn.microsoft.com/en-us/windows/win32/wmformat/media-type-identifiers
 
 HRESULT EnumerateTypesForStream(IMFSourceReader* pReader, DWORD dwStreamIndex) {
     HRESULT hr = S_OK;
@@ -35,10 +35,15 @@ HRESULT EnumerateTypesForStream(IMFSourceReader* pReader, DWORD dwStreamIndex) {
             printf("Stream detected...\n");
             GUID guid{};
             COM_CHECK(type->GetMajorType(&guid));
-            wchar_t guid_str[39] = {};
-            int ok = StringFromGUID2(guid, guid_str, (int)std::size(guid_str));
-            assert(ok);
-            wprintf(L"* MajorType: %s\n", guid_str);
+            if (guid == WMMEDIATYPE_Video) {
+                printf("* MajorType: WMMEDIATYPE_Video\n");
+            } else {
+                wchar_t guid_str[39] = {};
+                int ok = StringFromGUID2(guid, guid_str, (int)std::size(guid_str));
+                assert(ok);
+                wprintf(L"* MajorType: %s\n", guid_str);
+            }
+
             wprintf(L"\n");
         }
 
