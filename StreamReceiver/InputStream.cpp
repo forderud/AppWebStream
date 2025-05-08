@@ -2,6 +2,7 @@
 #include <stdexcept>
 #include <comdef.h> // for _com_error
 #include <Mfapi.h>
+#include <ws2tcpip.h>
 #include "InputStream.hpp"
 
 #pragma comment (lib, "Ws2_32.lib")
@@ -11,13 +12,32 @@ InputStream::InputStream() {
 }
 
 InputStream::~InputStream() {
+    WSACleanup();
 }
 
-void InputStream::Initialize(char* hostnamePort) {
+HRESULT InputStream::Initialize(char* hostname, char* port) {
     WSADATA wsaData = {};
     int res = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (res)
         throw std::runtime_error("WSAStartup failure");
+
+    ADDRINFOA hints{};
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_protocol = IPPROTO_TCP;
+
+    // Resolve the server address and port
+    ADDRINFOA* result = nullptr;
+    res = getaddrinfo(hostname, port, &hints, &result);
+    if (res != 0) {
+        printf("getaddrinfo failed: %d\n", res);
+        WSACleanup();
+        return E_FAIL;;
+    }
+
+    freeaddrinfo(result);
+
+    return S_OK;
 }
 
 
