@@ -5,7 +5,7 @@ This repo contains a _reference implementation_ that demonstrates how MPEG4 tran
 
 Intended usage:
 * Lightweight environment for experimenting with video encoding settings.
-* Starting point for developing a production-quality implementation.
+* Starting point for developing product implementations.
 * Independent implementation for compatibility testing.
 
 
