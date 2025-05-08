@@ -132,7 +132,8 @@ void ProcessFrames(IMFSourceReader* pReader) {
         if (FAILED(hr))
             break;
 
-        wprintf(L"Stream %d (%I64d)\n", streamIdx, timeStamp);
+        // TODO: Convert to timeStamp to wall-time by adding the MPEG4 CreationTime attribute
+        wprintf(L"Stream %d frame time (%I64d)\n", streamIdx, timeStamp);
         if (flags & MF_SOURCE_READERF_ENDOFSTREAM) {
             wprintf(L"\tEnd of stream\n");
             quit = true;
@@ -156,6 +157,10 @@ void ProcessFrames(IMFSourceReader* pReader) {
             if (FAILED(hr))
                 break;
         }
+
+        // TODO:
+        // * Print frame resolution
+        // * Figure out how to extract per-frame DPI
 
         if (frame)
             ++frameCount;
@@ -198,9 +203,4 @@ int main(int argc, char* argv[]) {
     ConfigureDecoder(reader, streamIdx);
 
     ProcessFrames(reader);
-
-    // TODO:
-    // * Process frames as they arrive.
-    // * Print frmae metadata to console (time-stamp, DPI, resolution etc.)
-    // DOC: https://learn.microsoft.com/en-us/windows/win32/medfound/processing-media-data-with-the-source-reader
 }
