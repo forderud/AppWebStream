@@ -1,7 +1,10 @@
 #define WIN32_LEAN_AND_MEAN
+#include <stdexcept>
 #include <comdef.h> // for _com_error
 #include <Mfapi.h>
 #include "InputStream.hpp"
+
+#pragma comment (lib, "Ws2_32.lib")
 
 
 InputStream::InputStream() {
@@ -9,6 +12,14 @@ InputStream::InputStream() {
 
 InputStream::~InputStream() {
 }
+
+void InputStream::Initialize(char* hostnamePort) {
+    WSADATA wsaData = {};
+    int res = WSAStartup(MAKEWORD(2, 2), &wsaData);
+    if (res)
+        throw std::runtime_error("WSAStartup failure");
+}
+
 
 HRESULT InputStream::GetCapabilities(/*out*/DWORD *capabilities) {
     *capabilities = MFBYTESTREAM_IS_READABLE | MFBYTESTREAM_IS_REMOTE;

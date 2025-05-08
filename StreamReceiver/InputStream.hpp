@@ -13,6 +13,8 @@ public:
     InputStream();
     /*NOT virtual*/ ~InputStream();
 
+    void Initialize(char* hostNamePort);
+
     HRESULT GetCapabilities(/*out*/DWORD *capabilities) override;
 
     HRESULT GetLength(/*out*/QWORD* length) override;
