@@ -10,7 +10,7 @@ Intended usage:
 
 
 ### Testing possibilities
-The `AppWebStream` and `StreamReceiver` projects in this repo can be used together with web browsers and VLC to test both other apps ability to _transmit_ and _receive_ streamed MPEG4 videos:  
+The `AppWebStream` and `StreamReceiver` projects in this repo can be used together with web browsers and VLC to test other apps ability to both _transmit_ and _receive_ streamed MPEG4 videos:  
 ![interop](interop.svg)
 
 ### Getting started
