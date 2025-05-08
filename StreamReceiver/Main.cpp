@@ -40,19 +40,21 @@ _COM_SMARTPTR_TYPEDEF(IMFSourceReader, __uuidof(IMFSourceReader));
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
-        printf("Usage: StreamReceiver.exe <host>:<port> (e.g. StreamReceiver.exe localhost:8080)\n");
+        printf("Usage: StreamReceiver.exe URL (e.g. StreamReceiver.exe http://localhost:8080/movie.mp4)\n");
         return -1;
     }
 
-    char* host_port = argv[1];
-
     COM_CHECK(MFStartup(MF_VERSION));
 
-    _bstr_t url = L"http://";
-    url += host_port;
+    _bstr_t url = argv[1];
 
     // TODO: Connect to MPEG4 H.264 stream
     IMFAttributesPtr attribs = nullptr;
     IMFSourceReaderPtr reader;
+    // TODO: Replace with MFCreateSourceReaderFromByteStream for explicit socket handling to allow parsing of the underlying bitstream
     COM_CHECK(MFCreateSourceReaderFromURL(url, attribs, &reader));
+
+    // TODO:
+    // * Process frames as they arrive.
+    // * Print frmae metadata to console (time-stamp, resolution etc.)
 }
