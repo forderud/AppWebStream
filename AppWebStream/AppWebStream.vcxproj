@@ -12,8 +12,6 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{797A10DE-1E3F-442F-8706-78A7CE6BEC09}</ProjectGuid>
-    <Keyword>Win32Proj</Keyword>
-    <RootNamespace>AppWebStream</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
