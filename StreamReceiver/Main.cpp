@@ -49,7 +49,7 @@ int main(int argc, char* argv[]) {
     _bstr_t url = argv[1];
 
     // TODO: Connect to MPEG4 H.264 stream
-    IMFAttributesPtr attribs = nullptr;
+    IMFAttributesPtr attribs;
     IMFSourceReaderPtr reader;
     // TODO: Replace with MFCreateSourceReaderFromByteStream for explicit socket handling to allow parsing of the underlying bitstream
     COM_CHECK(MFCreateSourceReaderFromURL(url, attribs, &reader));
