@@ -42,4 +42,5 @@ int main(int argc, char* argv[]) {
     // TODO:
     // * Process frames as they arrive.
     // * Print frmae metadata to console (time-stamp, resolution etc.)
+    // DOC: https://learn.microsoft.com/en-us/windows/win32/medfound/processing-media-data-with-the-source-reader
 }
