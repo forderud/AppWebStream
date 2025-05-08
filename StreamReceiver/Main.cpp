@@ -127,6 +127,8 @@ void ProcessFrames(IMFSourceReader& reader) {
     HRESULT hr = S_OK;
     unsigned int frameCount = 0;
 
+    //TODO: retrieve MPEG4 CreationTime or ModificationTime parameter and log it to console (check if MF_PD_LAST_MODIFIED_TIME)
+
     bool quit = false;
     while (!quit) {
         DWORD streamIdx = 0, flags = 0;
@@ -139,8 +141,8 @@ void ProcessFrames(IMFSourceReader& reader) {
 
         wprintf(L"Stream idx: %u\n", streamIdx);
 
-        // TODO: Convert to timeStamp to wall-time by adding the MPEG4 CreationTime attribute
         wprintf(L"Frame time: %f ms\n", timeStamp*0.1f/1000); // convert to milliseconds
+
         if (flags & MF_SOURCE_READERF_ENDOFSTREAM) {
             wprintf(L"\tEnd of stream\n");
             quit = true;
