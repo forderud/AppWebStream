@@ -120,22 +120,15 @@ HRESULT ConfigureDecoder(IMFSourceReader* pReader, DWORD dwStreamIndex) {
 
 void ProcessFrames(IMFSourceReader* pReader) {
     HRESULT hr = S_OK;
-    IMFSamplePtr pSample;
-    unsigned int cSamples = 0;
+    unsigned int frameCount = 0;
 
     bool quit = false;
     while (!quit) {
         DWORD streamIdx = 0, flags = 0;
         LONGLONG timeStamp = 0;
-
+        IMFSamplePtr frame;
         hr = pReader->ReadSample(
-            (DWORD)MF_SOURCE_READER_ANY_STREAM,    // Stream index.
-            0,                              // Flags.
-            &streamIdx,                   // Receives the actual stream index. 
-            &flags,                         // Receives status flags.
-            &timeStamp,                   // Receives the time stamp.
-            &pSample                        // Receives the sample or NULL.
-        );
+            (DWORD)MF_SOURCE_READER_ANY_STREAM, /*flags*/0, &streamIdx, &flags, &timeStamp, &frame);
         if (FAILED(hr))
             break;
 
@@ -164,14 +157,14 @@ void ProcessFrames(IMFSourceReader* pReader) {
                 break;
         }
 
-        if (pSample)
-            ++cSamples;
+        if (frame)
+            ++frameCount;
     }
 
     if (FAILED(hr)) {
         wprintf(L"ProcessSamples FAILED, hr = 0x%x\n", hr);
     } else {
-        wprintf(L"Processed %u samples\n", cSamples);
+        wprintf(L"Processed %u frames\n", frameCount);
     }
 }
 
