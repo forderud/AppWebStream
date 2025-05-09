@@ -22,8 +22,9 @@ HRESULT InputStream2::Initialize(std::string url) {
 }
 
 // IStream interface
-HRESULT InputStream2::Seek(LARGE_INTEGER /*dlibMove*/, DWORD /*dwOrigin*/, /*out*/ULARGE_INTEGER* /*plibNewPosition*/) {
-    return E_NOTIMPL;
+HRESULT InputStream2::Seek(LARGE_INTEGER dlibMove, DWORD dwOrigin, /*out*/ULARGE_INTEGER* /*plibNewPosition*/) {
+    assert(dwOrigin == STREAM_SEEK_SET); // can also be STREAM_SEEK_CUR or STREAM_SEEK_END
+    return S_OK;
 }
 
 HRESULT InputStream2::SetSize(ULARGE_INTEGER /*libNewSize*/) {
@@ -50,8 +51,11 @@ HRESULT InputStream2::UnlockRegion(ULARGE_INTEGER /*libOffset*/, ULARGE_INTEGER 
     return E_NOTIMPL;
 }
 
-HRESULT InputStream2::Stat(/*out*/STATSTG* /**statstg*/, DWORD /*grfStatFlag*/) {
-    return E_NOTIMPL;
+HRESULT InputStream2::Stat(/*out*/STATSTG* statstg, DWORD grfStatFlag) {
+    assert((grfStatFlag == STATFLAG_DEFAULT) || (grfStatFlag == STATFLAG_NONAME));
+    statstg->type = STGTY_STREAM;
+    statstg->clsid = CLSID_NULL;
+    return S_OK;
 }
 
 HRESULT InputStream2::Clone(/*out*/IStream** /*ppstm*/) {
