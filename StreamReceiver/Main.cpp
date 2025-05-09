@@ -219,14 +219,17 @@ int main(int argc, char* argv[]) {
     // Needed to access CreationTime & DPI parameters that doesn't seem to be exposed through the MediaFoundation API.
     // TODO: Probably need to register a byte-stream handler (doc https://learn.microsoft.com/en-us/windows/win32/api/mfreadwrite/nf-mfreadwrite-mfcreatesourcereaderfrombytestream)
 #if 1
-    IMFSourceResolverPtr resolver;
-    COM_CHECK(MFCreateSourceResolver(&resolver));
+    IMFByteStreamPtr byteStream;
+    {
+        IMFSourceResolverPtr resolver;
+        COM_CHECK(MFCreateSourceResolver(&resolver));
 
-    DWORD createObjFlags = MF_RESOLUTION_READ | MF_RESOLUTION_BYTESTREAM | MF_RESOLUTION_CONTENT_DOES_NOT_HAVE_TO_MATCH_EXTENSION_OR_MIME_TYPE;
-    MF_OBJECT_TYPE objectType = MF_OBJECT_INVALID;
-    IUnknownPtr source;
-    COM_CHECK(resolver->CreateObjectFromURL(_bstr_t(url), createObjFlags, nullptr, &objectType, &source));
-    IMFByteStreamPtr byteStream = source;
+        DWORD createObjFlags = MF_RESOLUTION_READ | MF_RESOLUTION_BYTESTREAM | MF_RESOLUTION_CONTENT_DOES_NOT_HAVE_TO_MATCH_EXTENSION_OR_MIME_TYPE;
+        MF_OBJECT_TYPE objectType = MF_OBJECT_INVALID;
+        IUnknownPtr source;
+        COM_CHECK(resolver->CreateObjectFromURL(_bstr_t(url), createObjFlags, nullptr, &objectType, &source));
+        byteStream = source;
+    }
     COM_CHECK(MFCreateSourceReaderFromByteStream(byteStream, attribs, &reader));
 #elif 0
     auto stream = CreateLocalInstance<InputStream2>();
