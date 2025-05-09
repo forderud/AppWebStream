@@ -223,6 +223,12 @@ int main(int argc, char* argv[]) {
 
     IMFByteStreamPtr byteStream;
     COM_CHECK(MFCreateMFByteStreamOnStream(stream, &byteStream));
+    {
+        IMFAttributesPtr streamAttr;
+        streamAttr = byteStream;
+        _bstr_t contentType = "video/mp4";
+        COM_CHECK(streamAttr->SetString(MF_BYTESTREAM_CONTENT_TYPE, contentType));
+    }
 
     COM_CHECK(MFCreateSourceReaderFromByteStream(byteStream, attribs, &reader));
 #else
