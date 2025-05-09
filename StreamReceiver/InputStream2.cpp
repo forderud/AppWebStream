@@ -66,8 +66,10 @@ HRESULT InputStream2::Clone(/*out*/IStream** /*ppstm*/) {
 }
 
 // ISequentialStream  interface
-HRESULT InputStream2::Read(/*out*/void* /*pv*/, ULONG /*cb*/, /*our*/ULONG* /*pcbRead*/) {
-    return E_NOTIMPL;
+HRESULT InputStream2::Read(/*out*/void* pv, ULONG cb, /*our*/ULONG* pcbRead) {
+    uint32_t res = m_socket->Read((BYTE*)pv, cb);
+    *pcbRead = res;
+    return S_OK;
 }
 
 HRESULT InputStream2::Write(/*in*/const void* /*pv*/, ULONG /*cb*/, /*out*/ULONG* /*pcbWritten*/) {

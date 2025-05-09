@@ -54,9 +54,6 @@ HRESULT InputStream::IsEndOfStream(/*out*/BOOL* /*endOfStream*/) {
 HRESULT InputStream::Read(/*out*/BYTE* pb, /*in*/ULONG cb, /*out*/ULONG* bRead) {
     // socket read
     uint32_t res = m_socket->Read(pb, cb);
-    if (res == SOCKET_ERROR)
-        return E_FAIL;
-
     *bRead = res; // bytes read
     return S_OK;
 }
