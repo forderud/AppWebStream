@@ -30,13 +30,23 @@ HRESULT InputStream::Initialize(char* servername, char* port) {
 
         // resolve server address & port
         res = getaddrinfo(servername, port, &hints, &result);
-        if (res != 0) {
-            printf("getaddrinfo failed: %d\n", res);
-            return E_FAIL;;
-        }
+        if (res != 0)
+            throw std::runtime_error("getaddrinfo failed.");
     }
 
+    m_sock = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+    if (m_sock == INVALID_SOCKET) {
+        freeaddrinfo(result);
+        throw std::runtime_error("socket failure");
+    }
+
+    res = connect(m_sock, result->ai_addr, (int)result->ai_addrlen);
     freeaddrinfo(result);
+    if (res == SOCKET_ERROR) {
+        closesocket(m_sock);
+        m_sock = INVALID_SOCKET;
+        throw std::runtime_error("connect failure");
+    }
 
     return S_OK;
 }

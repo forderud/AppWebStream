@@ -50,4 +50,5 @@ public:
     END_COM_MAP()
 
 private:
+    SOCKET m_sock = INVALID_SOCKET;
 };
