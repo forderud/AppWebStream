@@ -1,9 +1,12 @@
 #pragma once
+#include <memory>
 #include <atlbase.h>
 #include <atlcom.h>
 #include <MFidl.h>
 #include <Mfreadwrite.h>
 
+
+class ClientSocket; // forward decl
 
 class ATL_NO_VTABLE InputStream2 :
     public CComObjectRootEx<CComMultiThreadModel>,
@@ -12,6 +15,8 @@ class ATL_NO_VTABLE InputStream2 :
 public:
     InputStream2();
     /*NOT virtual*/ ~InputStream2();
+
+    HRESULT Initialize(std::string url);
 
     // IStream interface
     HRESULT Seek(LARGE_INTEGER dlibMove, DWORD dwOrigin, /*out*/ULARGE_INTEGER* plibNewPosition) override;
@@ -43,4 +48,5 @@ public:
     END_COM_MAP()
 
 private:
+    std::unique_ptr<ClientSocket> m_socket;
 };

@@ -2,13 +2,23 @@
 #include <stdexcept>
 #include <comdef.h> // for _com_error
 #include "InputStream2.hpp"
-
+#include "ClientSocket.hpp"
 
 
 InputStream2::InputStream2() {
 }
 
 InputStream2::~InputStream2() {
+}
+
+HRESULT InputStream2::Initialize(std::string url) {
+    auto [servername, port, resource] = ParseURL(url);
+    m_socket = std::make_unique<ClientSocket>(servername.c_str(), port.c_str());
+
+    // request HTTP video
+    m_socket->WriteHttpGet(resource);
+
+    return S_OK;
 }
 
 // IStream interface
