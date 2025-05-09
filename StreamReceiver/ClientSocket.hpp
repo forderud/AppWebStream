@@ -91,7 +91,9 @@ public:
         // read HTTP response header
         std::string response;
         response.resize(139); // TODO: Get rid of hardcoded HTTP response header size
-        uint32_t bytes = Read((BYTE*)response.data(), (ULONG)response.size());
+        Read((BYTE*)response.data(), (ULONG)response.size());
+
+        m_cur_pos = 0; // reset stream pointer to zero
     }
 
     uint64_t CurPos() const {
