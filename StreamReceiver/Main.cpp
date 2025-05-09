@@ -226,3 +226,10 @@ int main(int argc, char* argv[]) {
 
     ProcessFrames(reader);
 }
+
+
+class StreamReceiverModule : public ATL::CAtlExeModuleT<StreamReceiverModule> {
+public:
+};
+
+StreamReceiverModule _AtlModule;
