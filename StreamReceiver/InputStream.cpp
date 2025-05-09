@@ -1,5 +1,6 @@
 #define WIN32_LEAN_AND_MEAN
 #include <stdexcept>
+#include <tuple>
 #include <comdef.h> // for _com_error
 #include <Mfapi.h>
 #include <ws2tcpip.h>
@@ -7,6 +8,16 @@
 
 #pragma comment (lib, "Ws2_32.lib")
 
+static std::tuple<std::string, std::string, std::string> ParseURL(std::string url) {
+    size_t idx1 = url.find("://");
+    size_t idx2 = url.find(":", idx1 + 3);
+    size_t idx3 = url.find("/", idx2 + 1);
+
+    std::string servername = url.substr(idx1 + 3, idx2 - idx1 - 3);
+    std::string port = url.substr(idx2 + 1, idx3 - idx2 - 1);
+    std::string resource = url.substr(idx3);
+    return std::tie(servername, port, resource);
+}
 
 InputStream::InputStream() {
 }
@@ -21,18 +32,7 @@ InputStream::~InputStream() {
 }
 
 HRESULT InputStream::Initialize(std::string url) {
-    std::string servername;
-    std::string port;
-    std::string resource;
-    {
-        // parse URL
-        size_t idx1 = url.find("://");
-        size_t idx2 = url.find(":", idx1+3);
-        size_t idx3 = url.find("/", idx2 + 1);
-        servername = url.substr(idx1 + 3, idx2 - idx1 - 3);
-        port = url.substr(idx2 + 1, idx3 - idx2 - 1);
-        resource = url.substr(idx3);
-    }
+    auto [servername, port, resource] = ParseURL(url);
 
     WSAData wsaData = {};
     int res = WSAStartup(MAKEWORD(2, 2), &wsaData);
