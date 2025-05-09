@@ -6,6 +6,9 @@
 #include <mferror.h>
 #include <mfreadwrite.h>
 #include "../AppWebStream/ComUtil.hpp"
+#include "InputStream.hpp"
+
+//#define USE_EXPLICIT_SOCKET
 
 #pragma comment(lib, "Mfplat.lib")
 #pragma comment(lib, "Mfreadwrite.lib")
@@ -195,7 +198,7 @@ int main(int argc, char* argv[]) {
 
     COM_CHECK(MFStartup(MF_VERSION));
 
-    _bstr_t url = argv[1];
+    const char* url = argv[1];
 
     // connect to the MPEG4 H.264 stream
     IMFAttributesPtr attribs;
@@ -208,8 +211,15 @@ int main(int argc, char* argv[]) {
     }
 
     IMFSourceReaderPtr reader;
-    // If needed, replace with MFCreateSourceReaderFromByteStream or MFCreateSourceReaderFromMediaSource for explicit socket handling to allow parsing of the underlying bitstream
-    COM_CHECK(MFCreateSourceReaderFromURL(url, attribs, &reader));
+#ifdef USE_EXPLICIT_SOCKET
+    // Create explicit socket to allow parsing of the underlying MPEG4 bitstream.
+    // Needed to access CreationTime & DPI parameters that doesn't seem to be exposed through the MediaFoundation API.
+    auto stream = CreateLocalInstance<InputStream>();
+    COM_CHECK(stream->Initialize(url));
+    COM_CHECK(MFCreateSourceReaderFromByteStream(stream, attribs, &reader));
+#else
+    COM_CHECK(MFCreateSourceReaderFromURL(_bstr_t(url), attribs, &reader));
+#endif
 
     DWORD streamIdx = GetFirstVideoStream(reader);
     ConfigureDecoder(reader, streamIdx);
