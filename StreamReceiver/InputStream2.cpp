@@ -60,14 +60,15 @@ HRESULT InputStream2::UnlockRegion(ULARGE_INTEGER /*libOffset*/, ULARGE_INTEGER 
 }
 
 HRESULT InputStream2::Stat(/*out*/STATSTG* statstg, DWORD grfStatFlag) {
+#if 0
     const wchar_t name[] = L"StreamReceiver buffer";
     auto* nameBuffer = (wchar_t*)CoTaskMemAlloc(sizeof(name));
     memcpy(nameBuffer, name, sizeof(name));
-
+#endif
     assert((grfStatFlag == STATFLAG_DEFAULT) || (grfStatFlag == STATFLAG_NONAME));
-    statstg->pwcsName = nameBuffer; // transfer ownership
+    statstg->pwcsName = NULL; // nameBuffer; // transfer ownership
     statstg->type = STGTY_STREAM;
-    statstg->cbSize;
+    statstg->cbSize; // m_cur_pos;
     statstg->mtime;
     statstg->ctime;
     statstg->atime;
