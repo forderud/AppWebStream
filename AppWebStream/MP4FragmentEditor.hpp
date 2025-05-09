@@ -97,8 +97,13 @@ private:
             uint32_t mvhd_len = GetAtomSize(ptr);
             ptr += HEADER_SIZE; // skip size & type
 
-            uint8_t version = 0;
-            std::tie(version, ptr) = ParseVersionCreateModifyTime(ptr, m_startTime);
+            auto version = DeSerialize<uint8_t>(ptr);
+            ptr += 1;
+
+            //uint32_t flags = DeSerialize<uint24_t>(ptr);
+            ptr += sizeof(uint24_t);
+
+            ptr = UpdateCreateModifyTime(ptr, version, m_startTime);
 
             // read timescale (number of time units per second)
             m_timeScale = DeSerialize<uint32_t>(ptr); // 1000*fps
@@ -148,8 +153,13 @@ private:
 
                 char* tkhd_ptr = ptr + HEADER_SIZE;
 
-                uint8_t version = 0;
-                std::tie(version, tkhd_ptr) = ParseVersionCreateModifyTime(tkhd_ptr, m_startTime);
+                auto version = DeSerialize<uint8_t>(tkhd_ptr);
+                tkhd_ptr += 1;
+
+                //uint32_t flags = DeSerialize<uint24_t>(tkhd_ptr);
+                tkhd_ptr += sizeof(uint24_t);
+
+                tkhd_ptr = UpdateCreateModifyTime(tkhd_ptr, version, m_startTime);
 
                 ptr += tkhd_len;
             }
@@ -166,8 +176,13 @@ private:
                 uint32_t mdhd_len = GetAtomSize(ptr);
                 char* mdhd_ptr = ptr + HEADER_SIZE;
 
-                uint8_t version = 0;
-                std::tie(version, mdhd_ptr) = ParseVersionCreateModifyTime(mdhd_ptr, m_startTime);
+                auto version = DeSerialize<uint8_t>(mdhd_ptr);
+                mdhd_ptr += 1;
+
+                //uint32_t flags = DeSerialize<uint24_t>(mdhd_ptr);
+                mdhd_ptr += sizeof(uint24_t);
+
+                mdhd_ptr = UpdateCreateModifyTime(mdhd_ptr, version, m_startTime);
 
                 ptr += mdhd_len;
             }
@@ -508,13 +523,7 @@ private:
         }
     }
 
-    static std::tuple<uint8_t, char*> ParseVersionCreateModifyTime(char* ptr, uint64_t newTime) {
-        auto version = DeSerialize<uint8_t>(ptr);
-        ptr += 1;
-
-        //uint32_t flags = DeSerialize<uint24_t>(ptr);
-        ptr += sizeof(uint24_t);
-
+    static char* UpdateCreateModifyTime(char* ptr, uint8_t version, uint64_t newTime) {
         // seconds since Fri Jan 1 00:00:00 1904
         uint64_t creationTime = 0;
         uint64_t modificationTime = 0;
@@ -536,8 +545,7 @@ private:
             ptr += 4;
         }
 
-        // return preexisting creation & modification times
-        return std::tie(version, ptr);
+        return ptr;
     }
 
 private:
