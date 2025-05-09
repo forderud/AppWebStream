@@ -6,8 +6,7 @@
 #include <mferror.h>
 #include <mfreadwrite.h>
 #include "../AppWebStream/ComUtil.hpp"
-#include "InputStream.hpp"
-#include "InputStream2.hpp"
+#include "StreamWrapper.hpp"
 
 #define USE_EXPLICIT_SOCKET
 
@@ -228,7 +227,11 @@ int main(int argc, char* argv[]) {
         MF_OBJECT_TYPE objectType = MF_OBJECT_INVALID;
         IUnknownPtr source;
         COM_CHECK(resolver->CreateObjectFromURL(_bstr_t(url), createObjFlags, nullptr, &objectType, &source));
-        byteStream = source;
+        IMFByteStreamPtr innerStream = source;
+
+        auto tmp = CreateLocalInstance<StreamWrapper>();
+        tmp->Initialize(innerStream);
+        COM_CHECK(tmp.QueryInterface(&byteStream));
     }
     COM_CHECK(MFCreateSourceReaderFromByteStream(byteStream, attribs, &reader));
 #elif 0

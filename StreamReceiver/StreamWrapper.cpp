@@ -50,7 +50,9 @@ HRESULT StreamWrapper::BeginRead(/*out*/BYTE* pb, /*in*/ULONG cb, /*in*/IMFAsync
 }
 
 HRESULT StreamWrapper::EndRead(/*in*/IMFAsyncResult* result, /*out*/ULONG* cbRead) {
-    return m_obj->EndRead(result, cbRead);
+    HRESULT hr = m_obj->EndRead(result, cbRead);
+    // TODO: Inspect bitstream
+    return hr;
 }
 
 HRESULT StreamWrapper::Write(/*in*/const BYTE* pb, /*in*/ULONG cb, /*out*/ULONG* cbWritten) {
