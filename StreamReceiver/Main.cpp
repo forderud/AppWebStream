@@ -215,8 +215,10 @@ int main(int argc, char* argv[]) {
     // Create explicit socket to allow parsing of the underlying MPEG4 bitstream.
     // Needed to access CreationTime & DPI parameters that doesn't seem to be exposed through the MediaFoundation API.
     // TODO: Probably need to register a byte-stream handler (doc https://learn.microsoft.com/en-us/windows/win32/api/mfreadwrite/nf-mfreadwrite-mfcreatesourcereaderfrombytestream)
+    // TODO: Convert to IStream and combine with MFCreateMFByteStreamOnStream
     auto stream = CreateLocalInstance<InputStream>();
     COM_CHECK(stream->Initialize(url));
+
     COM_CHECK(MFCreateSourceReaderFromByteStream(stream, attribs, &reader));
 #else
     COM_CHECK(MFCreateSourceReaderFromURL(_bstr_t(url), attribs, &reader));
