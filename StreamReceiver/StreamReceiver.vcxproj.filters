@@ -8,5 +8,6 @@
   <ItemGroup>
     <ClInclude Include="InputStream.hpp" />
     <ClInclude Include="InputStream2.hpp" />
+    <ClInclude Include="ClientSocket.hpp" />
   </ItemGroup>
 </Project>
