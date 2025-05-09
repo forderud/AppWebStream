@@ -1,9 +1,12 @@
 #pragma once
+#include <memory>
 #include <atlbase.h>
 #include <atlcom.h>
 #include <MFidl.h>
 #include <Mfreadwrite.h>
 
+
+class ClientSocket; // forward decl
 
 class ATL_NO_VTABLE InputStream :
     public CComObjectRootEx<CComMultiThreadModel>,
@@ -50,6 +53,5 @@ public:
     END_COM_MAP()
 
 private:
-    uint64_t m_cur_pos = 0;
-    SOCKET   m_sock = INVALID_SOCKET;
+    std::unique_ptr<ClientSocket> m_socket;
 };
