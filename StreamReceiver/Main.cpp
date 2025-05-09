@@ -8,8 +8,6 @@
 #include "../AppWebStream/ComUtil.hpp"
 #include "StreamWrapper.hpp"
 
-#define USE_EXPLICIT_SOCKET
-
 #pragma comment(lib, "Mfplat.lib")
 #pragma comment(lib, "Mfreadwrite.lib")
 #pragma comment(lib, "mfuuid.lib")
@@ -213,11 +211,9 @@ int main(int argc, char* argv[]) {
     }
 
     IMFSourceReaderPtr reader;
-#ifdef USE_EXPLICIT_SOCKET
-    // Create explicit socket to allow parsing of the underlying MPEG4 bitstream.
-    // Needed to access CreationTime & DPI parameters that doesn't seem to be exposed through the MediaFoundation API.
-    // TODO: Probably need to register a byte-stream handler (doc https://learn.microsoft.com/en-us/windows/win32/api/mfreadwrite/nf-mfreadwrite-mfcreatesourcereaderfrombytestream)
 #if 1
+    // Create intermediate IMFByteStream object allow parsing of the underlying MPEG4 bitstream.
+    // Needed to access CreationTime & DPI parameters that doesn't seem to be exposed through the MediaFoundation API.
     IMFByteStreamPtr byteStream;
     {
         IMFSourceResolverPtr resolver;
@@ -234,26 +230,6 @@ int main(int argc, char* argv[]) {
         COM_CHECK(tmp.QueryInterface(&byteStream));
     }
     COM_CHECK(MFCreateSourceReaderFromByteStream(byteStream, attribs, &reader));
-#elif 0
-    auto stream = CreateLocalInstance<InputStream2>();
-    COM_CHECK(stream->Initialize(url));
-
-    IMFByteStreamPtr byteStream;
-    COM_CHECK(MFCreateMFByteStreamOnStream(stream, &byteStream));
-    {
-        IMFAttributesPtr streamAttr;
-        streamAttr = byteStream;
-        _bstr_t contentType = "video/mp4";
-        COM_CHECK(streamAttr->SetString(MF_BYTESTREAM_CONTENT_TYPE, contentType));
-    }
-
-    COM_CHECK(MFCreateSourceReaderFromByteStream(byteStream, attribs, &reader));
-#else
-    auto stream = CreateLocalInstance<InputStream>();
-    COM_CHECK(stream->Initialize(url));
-
-    COM_CHECK(MFCreateSourceReaderFromByteStream(stream, attribs, &reader));
-#endif
 #else
     COM_CHECK(MFCreateSourceReaderFromURL(_bstr_t(url), attribs, &reader));
 #endif

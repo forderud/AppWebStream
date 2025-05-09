@@ -2,14 +2,9 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="InputStream.cpp" />
-    <ClCompile Include="InputStream2.cpp" />
     <ClCompile Include="StreamWrapper.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="InputStream.hpp" />
-    <ClInclude Include="InputStream2.hpp" />
-    <ClInclude Include="ClientSocket.hpp" />
     <ClInclude Include="StreamWrapper.hpp" />
   </ItemGroup>
 </Project>
