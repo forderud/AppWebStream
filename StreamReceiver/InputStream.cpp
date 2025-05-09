@@ -57,7 +57,7 @@ HRESULT InputStream::Read(/*out*/BYTE* pb, /*in*/ULONG cb, /*out*/ULONG* bRead) 
     if (res == SOCKET_ERROR)
         return E_FAIL;
 
-    *bRead = res;
+    *bRead = res; // bytes read
     return S_OK;
 }
 

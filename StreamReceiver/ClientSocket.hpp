@@ -68,7 +68,7 @@ public:
             throw std::runtime_error("recv failure");
 
         m_cur_pos += res;
-        return res;  // bytes read
+        return res; // bytes read
 
     }
 
