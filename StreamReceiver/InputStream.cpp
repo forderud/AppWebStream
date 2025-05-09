@@ -22,7 +22,7 @@ HRESULT InputStream::Initialize(char* hostname, char* port) {
         throw std::runtime_error("WSAStartup failure");
 
     addrinfo hints{};
-    hints.ai_family = AF_INET;
+    hints.ai_family = AF_UNSPEC; // allow both IPv4 & IPv6
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_protocol = IPPROTO_TCP;
 
