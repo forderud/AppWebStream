@@ -18,7 +18,7 @@ static std::tuple<std::string, std::string, std::string> ParseURL(std::string ur
 
 class ClientSocket {
 public:
-    ClientSocket(const char* servername, const char* port) {
+    ClientSocket(const char* servername, const char* port) : m_servername(servername) {
         WSAData wsaData = {};
         int res = WSAStartup(MAKEWORD(2, 2), &wsaData);
         if (res)
@@ -79,11 +79,22 @@ public:
         return res;
     }
 
+    void WriteHttpGet(std::string resource) {
+        // request HTTP video
+        std::string request = "GET " + resource + " HTTP/1.1\r\n";
+        request += "Host: " + m_servername + "\r\n";
+        request += "User-Agent: StreamReceiver\r\n";
+        request += "Accept: */*\r\n";
+        request += "\r\n";
+        Write(request);
+    }
+
     uint64_t CurPos() const {
         return m_cur_pos;
     }
 
 private:
-    uint64_t m_cur_pos = 0;
-    SOCKET   m_sock = INVALID_SOCKET;
+    std::string m_servername;
+    uint64_t    m_cur_pos = 0;
+    SOCKET      m_sock = INVALID_SOCKET;
 };

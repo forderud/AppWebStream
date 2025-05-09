@@ -15,16 +15,10 @@ InputStream::~InputStream() {
 
 HRESULT InputStream::Initialize(std::string url) {
     auto [servername, port, resource] = ParseURL(url);
-
     m_socket = std::make_unique<ClientSocket>(servername.c_str(), port.c_str());
 
     // request HTTP video
-    std::string request = "GET " + resource + " HTTP/1.1\r\n";
-    request += "Host: " + servername + "\r\n";
-    request += "User-Agent: StreamReceiver\r\n";
-    request += "Accept: */*\r\n";
-    request += "\r\n";
-    m_socket->Write(request);
+    m_socket->WriteHttpGet(resource);
 
     return S_OK;
 }
