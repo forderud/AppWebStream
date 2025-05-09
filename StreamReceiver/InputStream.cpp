@@ -12,6 +12,11 @@ InputStream::InputStream() {
 }
 
 InputStream::~InputStream() {
+    if (m_sock != INVALID_SOCKET) {
+        closesocket(m_sock);
+        m_sock = INVALID_SOCKET;
+    }
+
     WSACleanup();
 }
 
