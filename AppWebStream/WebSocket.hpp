@@ -163,16 +163,19 @@ public:
         if (res)
             throw std::runtime_error("WSAStartup failure");
 
-        addrinfo hints{};
-        hints.ai_family = AF_UNSPEC; // allow both IPv4 & IPv6
-        hints.ai_socktype = SOCK_STREAM;
-        hints.ai_protocol = IPPROTO_TCP;
-        hints.ai_flags = AI_PASSIVE;
+        addrinfo* result = nullptr;
+        {
+            addrinfo hints{};
+            hints.ai_family = AF_UNSPEC; // allow both IPv4 & IPv6
+            hints.ai_socktype = SOCK_STREAM;
+            hints.ai_protocol = IPPROTO_TCP;
+            hints.ai_flags = AI_PASSIVE;
 
-        addrinfo *result = nullptr;
-        res = getaddrinfo(NULL, port_str, &hints, &result);
-        if (res)
-            throw std::runtime_error("getaddrinfo failure");
+            // resolve port
+            res = getaddrinfo(NULL, port_str, &hints, &result);
+            if (res)
+                throw std::runtime_error("getaddrinfo failure");
+        }
 
         m_sock = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
         if (m_sock == INVALID_SOCKET)

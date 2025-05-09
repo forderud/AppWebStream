@@ -15,23 +15,25 @@ InputStream::~InputStream() {
     WSACleanup();
 }
 
-HRESULT InputStream::Initialize(char* hostname, char* port) {
+HRESULT InputStream::Initialize(char* servername, char* port) {
     WSAData wsaData = {};
     int res = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (res)
         throw std::runtime_error("WSAStartup failure");
 
-    addrinfo hints{};
-    hints.ai_family = AF_UNSPEC; // allow both IPv4 & IPv6
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_protocol = IPPROTO_TCP;
-
-    // Resolve the server address and port
     addrinfo* result = nullptr;
-    res = getaddrinfo(hostname, port, &hints, &result);
-    if (res != 0) {
-        printf("getaddrinfo failed: %d\n", res);
-        return E_FAIL;;
+    {
+        addrinfo hints{};
+        hints.ai_family = AF_UNSPEC; // allow both IPv4 & IPv6
+        hints.ai_socktype = SOCK_STREAM;
+        hints.ai_protocol = IPPROTO_TCP;
+
+        // resolve server address & port
+        res = getaddrinfo(servername, port, &hints, &result);
+        if (res != 0) {
+            printf("getaddrinfo failed: %d\n", res);
+            return E_FAIL;;
+        }
     }
 
     freeaddrinfo(result);

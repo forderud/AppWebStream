@@ -13,7 +13,7 @@ public:
     InputStream();
     /*NOT virtual*/ ~InputStream();
 
-    HRESULT Initialize(char* hostName, char* port);
+    HRESULT Initialize(char* servername, char* port);
 
     HRESULT GetCapabilities(/*out*/DWORD *capabilities) override;
 
