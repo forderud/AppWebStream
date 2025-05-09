@@ -75,11 +75,13 @@
     <ClCompile Include="InputStream.cpp" />
     <ClCompile Include="InputStream2.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="StreamWrapper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ClientSocket.hpp" />
     <ClInclude Include="InputStream.hpp" />
     <ClInclude Include="InputStream2.hpp" />
+    <ClInclude Include="StreamWrapper.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
