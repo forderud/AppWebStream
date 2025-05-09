@@ -9,7 +9,7 @@
 #include "InputStream.hpp"
 #include "InputStream2.hpp"
 
-//#define USE_EXPLICIT_SOCKET
+#define USE_EXPLICIT_SOCKET
 
 #pragma comment(lib, "Mfplat.lib")
 #pragma comment(lib, "Mfreadwrite.lib")
@@ -21,6 +21,7 @@ _COM_SMARTPTR_TYPEDEF(IMFSourceReader, __uuidof(IMFSourceReader));
 _COM_SMARTPTR_TYPEDEF(IMFMediaType, __uuidof(IMFMediaType));
 _COM_SMARTPTR_TYPEDEF(IMFSample, __uuidof(IMFSample));
 _COM_SMARTPTR_TYPEDEF(IMFByteStream, __uuidof(IMFByteStream));
+_COM_SMARTPTR_TYPEDEF(IMFSourceResolver, __uuidof(IMFSourceResolver));
 
 
 EXTERN_GUID(WMMEDIATYPE_Video, 0x73646976, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71); // from https://learn.microsoft.com/en-us/windows/win32/wmformat/media-type-identifiers
@@ -218,6 +219,16 @@ int main(int argc, char* argv[]) {
     // Needed to access CreationTime & DPI parameters that doesn't seem to be exposed through the MediaFoundation API.
     // TODO: Probably need to register a byte-stream handler (doc https://learn.microsoft.com/en-us/windows/win32/api/mfreadwrite/nf-mfreadwrite-mfcreatesourcereaderfrombytestream)
 #if 1
+    IMFSourceResolverPtr resolver;
+    COM_CHECK(MFCreateSourceResolver(&resolver));
+
+    DWORD createObjFlags = MF_RESOLUTION_READ | MF_RESOLUTION_BYTESTREAM | MF_RESOLUTION_CONTENT_DOES_NOT_HAVE_TO_MATCH_EXTENSION_OR_MIME_TYPE;
+    MF_OBJECT_TYPE objectType = MF_OBJECT_INVALID;
+    IUnknownPtr source;
+    COM_CHECK(resolver->CreateObjectFromURL(_bstr_t(url), createObjFlags, nullptr, &objectType, &source));
+    IMFByteStreamPtr byteStream = source;
+    COM_CHECK(MFCreateSourceReaderFromByteStream(byteStream, attribs, &reader));
+#elif 0
     auto stream = CreateLocalInstance<InputStream2>();
     COM_CHECK(stream->Initialize(url));
 
