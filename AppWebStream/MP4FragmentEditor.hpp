@@ -525,27 +525,42 @@ private:
 
     static char* UpdateCreateModifyTime(char* ptr, uint8_t version, uint64_t newTime) {
         // seconds since Fri Jan 1 00:00:00 1904
-        uint64_t creationTime = 0;
-        uint64_t modificationTime = 0;
         if (version == 1) {
-            creationTime = DeSerialize<uint64_t>(ptr);
             Serialize<uint64_t>(ptr, newTime);
             ptr += 8;
 
-            modificationTime = DeSerialize<uint64_t>(ptr);
             Serialize<uint64_t>(ptr, newTime);
             ptr += 8;
         } else {
-            creationTime = DeSerialize<uint32_t>(ptr);
             Serialize<uint32_t>(ptr, (uint32_t)newTime);
             ptr += 4;
 
-            modificationTime = DeSerialize<uint32_t>(ptr);
             Serialize<uint32_t>(ptr, (uint32_t)newTime);
             ptr += 4;
         }
 
         return ptr;
+    }
+
+    static std::tuple<uint64_t, uint64_t, char*> ParseCreateModifyTime(char* ptr, uint8_t version) {
+        // seconds since Fri Jan 1 00:00:00 1904
+        uint64_t creationTime = 0;
+        uint64_t modificationTime = 0;
+        if (version == 1) {
+            creationTime = DeSerialize<uint64_t>(ptr);
+            ptr += 8;
+
+            modificationTime = DeSerialize<uint64_t>(ptr);
+            ptr += 8;
+        } else {
+            creationTime = DeSerialize<uint32_t>(ptr);
+            ptr += 4;
+
+            modificationTime = DeSerialize<uint32_t>(ptr);
+            ptr += 4;
+        }
+
+        return std::tie(creationTime, modificationTime, ptr);
     }
 
 private:
