@@ -46,12 +46,13 @@ HRESULT StreamWrapper::Read(/*out*/BYTE* pb, /*in*/ULONG cb, /*out*/ULONG* bRead
 }
 
 HRESULT StreamWrapper::BeginRead(/*out*/BYTE* pb, /*in*/ULONG cb, /*in*/IMFAsyncCallback* callback, /*in*/IUnknown* unkState) {
+    m_read_buf = pb;
     return m_obj->BeginRead(pb, cb, callback, unkState);
 }
 
 HRESULT StreamWrapper::EndRead(/*in*/IMFAsyncResult* result, /*out*/ULONG* cbRead) {
     HRESULT hr = m_obj->EndRead(result, cbRead);
-    // TODO: Inspect bitstream
+    // TODO: Inspect m_read_buf bitstream
     return hr;
 }
 

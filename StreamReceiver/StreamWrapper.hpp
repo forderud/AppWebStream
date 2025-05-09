@@ -53,5 +53,6 @@ public:
     END_COM_MAP()
 
 private:
+    BYTE*            m_read_buf = nullptr; // set by BeginRead
     IMFByteStreamPtr m_obj;
 };
