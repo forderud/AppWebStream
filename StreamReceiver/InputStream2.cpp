@@ -22,8 +22,11 @@ HRESULT InputStream2::Initialize(std::string url) {
 }
 
 // IStream interface
-HRESULT InputStream2::Seek(LARGE_INTEGER dlibMove, DWORD dwOrigin, /*out*/ULARGE_INTEGER* /*plibNewPosition*/) {
+HRESULT InputStream2::Seek(LARGE_INTEGER dlibMove, DWORD dwOrigin, /*out*/ULARGE_INTEGER* plibNewPosition) {
+    assert(dlibMove.QuadPart == 0);
     assert(dwOrigin == STREAM_SEEK_SET); // can also be STREAM_SEEK_CUR or STREAM_SEEK_END
+    if (plibNewPosition)
+        plibNewPosition->QuadPart = m_socket->CurPos();
     return S_OK;
 }
 
