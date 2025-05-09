@@ -81,7 +81,7 @@ HRESULT InputStream::Initialize(std::string url) {
 
 
 HRESULT InputStream::GetCapabilities(/*out*/DWORD *capabilities) {
-    *capabilities = MFBYTESTREAM_IS_READABLE | MFBYTESTREAM_IS_REMOTE;
+    *capabilities = MFBYTESTREAM_IS_READABLE | MFBYTESTREAM_IS_REMOTE | MFBYTESTREAM_IS_PARTIALLY_DOWNLOADED;
     return S_OK;
 }
 
