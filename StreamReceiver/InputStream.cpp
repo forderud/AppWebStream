@@ -66,6 +66,12 @@ HRESULT InputStream::Initialize(std::string url) {
         throw std::runtime_error("connect failure");
     }
 
+    std::string request = "GET " + resource + " HTTP/1.1\n";
+    request += "\n";
+    res = send(m_sock, request.data(), static_cast<int>(request.size()), 0);
+    if (res == SOCKET_ERROR)
+        return E_FAIL;
+
     return S_OK;
 }
 
