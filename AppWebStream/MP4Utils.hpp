@@ -170,3 +170,32 @@ inline uint64_t CurrentTime1904() {
     return mpeg4Time;
 #endif
 }
+
+
+/** Mofified version of "memmove" that clears the abandoned bytes, as well as intermediate data.
+WARNING: Only use for contiguous/overlapping moves, or else it will clear more than excpected. */
+static void MemMove(char* dest, const char* source, size_t num) {
+    // move memory block
+    memmove(dest, source, num);
+
+    // clear abandoned byte range
+    if (dest > source)
+        memset(const_cast<char*>(source)/*dst*/, 0/*val*/, dest - source/*size*/);
+    else
+        memset(dest + num/*dst*/, 0/*val*/, source - dest/*size*/);
+}
+
+/** Get MPEG4 atom type (4 chars). */
+static char* GetAtomType(const char* atom_ptr) {
+    return (char*)atom_ptr + 4;
+}
+
+/** Check if an MPEG4 atom is of a given type. */
+static bool IsAtomType(const char* atom_ptr, const char type[4]) {
+    return memcmp(GetAtomType(atom_ptr), type, 4) == 0; // atom type is stored at offset 4-7
+}
+
+/** Get the size of an MPEG4 atom. */
+static uint32_t GetAtomSize(const char* atom_ptr) {
+    return DeSerialize<uint32_t>(atom_ptr);
+}
