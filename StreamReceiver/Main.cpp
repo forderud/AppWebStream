@@ -20,6 +20,7 @@ _COM_SMARTPTR_TYPEDEF(IMFAttributes, __uuidof(IMFAttributes));
 _COM_SMARTPTR_TYPEDEF(IMFSourceReader, __uuidof(IMFSourceReader));
 _COM_SMARTPTR_TYPEDEF(IMFMediaType, __uuidof(IMFMediaType));
 _COM_SMARTPTR_TYPEDEF(IMFSample, __uuidof(IMFSample));
+_COM_SMARTPTR_TYPEDEF(IMFByteStream, __uuidof(IMFByteStream));
 
 
 EXTERN_GUID(WMMEDIATYPE_Video, 0x73646976, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71); // from https://learn.microsoft.com/en-us/windows/win32/wmformat/media-type-identifiers

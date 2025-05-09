@@ -68,7 +68,7 @@ HRESULT InputStream2::Clone(/*out*/IStream** /*ppstm*/) {
 // ISequentialStream  interface
 HRESULT InputStream2::Read(/*out*/void* pv, ULONG cb, /*our*/ULONG* pcbRead) {
     uint32_t res = m_socket->Read((BYTE*)pv, cb);
-    *pcbRead = res;
+    *pcbRead = res; // bytes read
     return S_OK;
 }
 
