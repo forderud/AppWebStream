@@ -82,8 +82,14 @@ HRESULT InputStream::IsEndOfStream(/*out*/BOOL* /*endOfStream*/) {
     return E_NOTIMPL;
 }
 
-HRESULT InputStream::Read(/*out*/BYTE* /*pb*/, /*in*/ULONG /*cb*/, /*out*/ULONG* /*bRead*/) {
-    return E_NOTIMPL;
+HRESULT InputStream::Read(/*out*/BYTE* pb, /*in*/ULONG cb, /*out*/ULONG* bRead) {
+    // socket read
+    int res = recv(m_sock, (char*)pb, cb, 0);
+    if (res == SOCKET_ERROR)
+        return E_FAIL;
+
+    *bRead = res; // bytes read
+    return S_OK;
 }
 
 HRESULT InputStream::BeginRead(/*out*/BYTE* /*pb*/, /*in*/ULONG /*cb*/, /*in*/IMFAsyncCallback* /*callback*/, /*in*/IUnknown* /*unkState*/) {
