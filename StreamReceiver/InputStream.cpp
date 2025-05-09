@@ -85,8 +85,9 @@ HRESULT InputStream::GetCapabilities(/*out*/DWORD *capabilities) {
     return S_OK;
 }
 
-HRESULT InputStream::GetLength(/*out*/QWORD* /*length*/) {
-    return E_NOTIMPL;
+HRESULT InputStream::GetLength(/*out*/QWORD* length) {
+    *length = (QWORD)(-1); // unknown
+    return S_OK;
 }
 
 HRESULT InputStream::SetLength(/*in*/QWORD /*length*/) {
