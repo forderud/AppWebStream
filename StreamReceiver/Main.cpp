@@ -7,6 +7,7 @@
 #include <mfreadwrite.h>
 #include "../AppWebStream/ComUtil.hpp"
 #include "InputStream.hpp"
+#include "InputStream2.hpp"
 
 //#define USE_EXPLICIT_SOCKET
 
