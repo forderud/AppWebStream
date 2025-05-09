@@ -3,8 +3,10 @@
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="InputStream.cpp" />
+    <ClCompile Include="InputStream2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InputStream.hpp" />
+    <ClInclude Include="InputStream2.hpp" />
   </ItemGroup>
 </Project>

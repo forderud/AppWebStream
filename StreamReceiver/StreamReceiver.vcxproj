@@ -71,10 +71,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="InputStream.cpp" />
+    <ClCompile Include="InputStream2.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InputStream.hpp" />
+    <ClInclude Include="InputStream2.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

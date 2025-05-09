@@ -1,0 +1,58 @@
+#define WIN32_LEAN_AND_MEAN
+#include <stdexcept>
+#include <comdef.h> // for _com_error
+#include "InputStream2.hpp"
+
+
+
+InputStream2::InputStream2() {
+}
+
+InputStream2::~InputStream2() {
+}
+
+// IStream interface
+HRESULT InputStream2::Seek(LARGE_INTEGER /*dlibMove*/, DWORD /*dwOrigin*/, /*out*/ULARGE_INTEGER* /*plibNewPosition*/) {
+    return E_NOTIMPL;
+}
+
+HRESULT InputStream2::SetSize(ULARGE_INTEGER /*libNewSize*/) {
+    return E_NOTIMPL;
+}
+
+HRESULT InputStream2::CopyTo(/*in*/IStream* /*pstm*/, ULARGE_INTEGER /*cb*/, /*out*/ULARGE_INTEGER* /*pcbRead*/, /*out*/ULARGE_INTEGER* /*pcbWritten*/) {
+    return E_NOTIMPL;
+}
+
+HRESULT InputStream2::Commit(DWORD /*grfCommitFlags*/) {
+    return E_NOTIMPL;
+}
+
+HRESULT InputStream2::Revert() {
+    return E_NOTIMPL;
+}
+
+HRESULT InputStream2::LockRegion(ULARGE_INTEGER /*libOffset*/, ULARGE_INTEGER /*cb*/, DWORD /*dwLockType*/) {
+    return E_NOTIMPL;
+}
+
+HRESULT InputStream2::UnlockRegion(ULARGE_INTEGER /*libOffset*/, ULARGE_INTEGER /*cb*/, DWORD /*dwLockType*/) {
+    return E_NOTIMPL;
+}
+
+HRESULT InputStream2::Stat(/*out*/STATSTG* /**statstg*/, DWORD /*grfStatFlag*/) {
+    return E_NOTIMPL;
+}
+
+HRESULT InputStream2::Clone(/*out*/IStream** /*ppstm*/) {
+    return E_NOTIMPL;
+}
+
+// ISequentialStream  interface
+HRESULT InputStream2::Read(/*out*/void* /*pv*/, ULONG /*cb*/, /*our*/ULONG* /*pcbRead*/) {
+    return E_NOTIMPL;
+}
+
+HRESULT InputStream2::Write(/*in*/const void* /*pv*/, ULONG /*cb*/, /*out*/ULONG* /*pcbWritten*/) {
+    return E_NOTIMPL;
+}
