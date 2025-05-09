@@ -87,6 +87,7 @@ HRESULT InputStream2::Read(/*out*/void* pv, ULONG cb, /*our*/ULONG* pcbRead) {
     uint32_t res = m_socket->Read((BYTE*)pv, cb);
     *pcbRead = res; // bytes read
 
+    m_cur_pos = m_socket->CurPos();
     printf("Read %u bytes.\n", res);
     return S_OK;
 }
