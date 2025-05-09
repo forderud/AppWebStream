@@ -66,8 +66,12 @@ HRESULT InputStream::Initialize(std::string url) {
         throw std::runtime_error("connect failure");
     }
 
-    std::string request = "GET " + resource + " HTTP/1.1\n";
-    request += "\n";
+    // request HTTP video
+    std::string request = "GET " + resource + " HTTP/1.1\r\n";
+    request += "Host: " + servername + "\r\n";
+    request += "User-Agent: StreamReceiver\r\n";
+    request += "Accept: */*\r\n";
+    request += "\r\n";
     res = send(m_sock, request.data(), static_cast<int>(request.size()), 0);
     if (res == SOCKET_ERROR)
         return E_FAIL;
