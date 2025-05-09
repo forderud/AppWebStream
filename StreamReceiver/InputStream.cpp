@@ -93,8 +93,9 @@ HRESULT InputStream::SetLength(/*in*/QWORD /*length*/) {
     return E_NOTIMPL;
 }
 
-HRESULT InputStream::GetCurrentPosition(/*out*/QWORD* /*position*/) {
-    return E_NOTIMPL;
+HRESULT InputStream::GetCurrentPosition(/*out*/QWORD* position) {
+    *position = m_cur_pos;
+    return S_OK;
 }
 
 HRESULT InputStream::SetCurrentPosition(/*in*/QWORD /*position*/) {
@@ -111,6 +112,7 @@ HRESULT InputStream::Read(/*out*/BYTE* pb, /*in*/ULONG cb, /*out*/ULONG* bRead) 
     if (res == SOCKET_ERROR)
         return E_FAIL;
 
+    m_cur_pos += res;
     *bRead = res; // bytes read
     return S_OK;
 }

@@ -50,5 +50,6 @@ public:
     END_COM_MAP()
 
 private:
-    SOCKET m_sock = INVALID_SOCKET;
+    uint64_t m_cur_pos = 0;
+    SOCKET   m_sock = INVALID_SOCKET;
 };

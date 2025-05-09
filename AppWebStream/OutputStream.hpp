@@ -74,6 +74,6 @@ private:
 
     std::unique_ptr<ByteWriter> m_writer;
 
-    unsigned __int64      m_cur_pos = 0;
+    uint64_t                           m_cur_pos = 0;
     std::unique_ptr<MP4FragmentEditor> m_stream_editor;
 };
