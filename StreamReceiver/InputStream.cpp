@@ -20,7 +20,20 @@ InputStream::~InputStream() {
     WSACleanup();
 }
 
-HRESULT InputStream::Initialize(char* servername, char* port) {
+HRESULT InputStream::Initialize(std::string url) {
+    std::string servername;
+    std::string port;
+    std::string resource;
+    {
+        // parse URL
+        size_t idx1 = url.find("://");
+        size_t idx2 = url.find(":", idx1+3);
+        size_t idx3 = url.find("/", idx2 + 1);
+        servername = url.substr(idx1 + 3, idx2 - idx1 - 3);
+        port = url.substr(idx2 + 1, idx3 - idx2 - 1);
+        resource = url.substr(idx3);
+    }
+
     WSAData wsaData = {};
     int res = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (res)
@@ -34,7 +47,7 @@ HRESULT InputStream::Initialize(char* servername, char* port) {
         hints.ai_protocol = IPPROTO_TCP;
 
         // resolve server address & port
-        res = getaddrinfo(servername, port, &hints, &result);
+        res = getaddrinfo(servername.c_str(), port.c_str(), &hints, &result);
         if (res != 0)
             throw std::runtime_error("getaddrinfo failed.");
     }

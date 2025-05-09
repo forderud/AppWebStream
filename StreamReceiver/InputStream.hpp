@@ -13,7 +13,7 @@ public:
     InputStream();
     /*NOT virtual*/ ~InputStream();
 
-    HRESULT Initialize(char* servername, char* port);
+    HRESULT Initialize(std::string url);
 
     HRESULT GetCapabilities(/*out*/DWORD *capabilities) override;
 
