@@ -158,12 +158,12 @@ public:
     ServerSock() {
     }
     ServerSock(const char * port_str) {
-        WSADATA wsaData = {};
+        WSAData wsaData = {};
         int res = WSAStartup(MAKEWORD(2, 2), &wsaData);
         if (res)
             throw std::runtime_error("WSAStartup failure");
 
-        addrinfo hints = {};
+        addrinfo hints{};
         hints.ai_family = AF_INET;
         hints.ai_socktype = SOCK_STREAM;
         hints.ai_protocol = IPPROTO_TCP;

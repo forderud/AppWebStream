@@ -16,22 +16,21 @@ InputStream::~InputStream() {
 }
 
 HRESULT InputStream::Initialize(char* hostname, char* port) {
-    WSADATA wsaData = {};
+    WSAData wsaData = {};
     int res = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (res)
         throw std::runtime_error("WSAStartup failure");
 
-    ADDRINFOA hints{};
-    hints.ai_family = AF_UNSPEC;
+    addrinfo hints{};
+    hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_protocol = IPPROTO_TCP;
 
     // Resolve the server address and port
-    ADDRINFOA* result = nullptr;
+    addrinfo* result = nullptr;
     res = getaddrinfo(hostname, port, &hints, &result);
     if (res != 0) {
         printf("getaddrinfo failed: %d\n", res);
-        WSACleanup();
         return E_FAIL;;
     }
 
