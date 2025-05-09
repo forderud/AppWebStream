@@ -87,6 +87,11 @@ public:
         request += "Accept: */*\r\n";
         request += "\r\n";
         Write(request);
+
+        // read HTTP response header
+        std::string response;
+        response.resize(139); // TODO: Get rid of hardcoded HTTP response header size
+        uint32_t bytes = Read((BYTE*)response.data(), (ULONG)response.size());
     }
 
     uint64_t CurPos() const {
