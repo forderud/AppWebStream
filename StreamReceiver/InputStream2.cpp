@@ -23,10 +23,15 @@ HRESULT InputStream2::Initialize(std::string url) {
 
 // IStream interface
 HRESULT InputStream2::Seek(LARGE_INTEGER dlibMove, DWORD dwOrigin, /*out*/ULARGE_INTEGER* plibNewPosition) {
-    assert(dlibMove.QuadPart == 0);
-    assert(dwOrigin == STREAM_SEEK_SET); // can also be STREAM_SEEK_CUR or STREAM_SEEK_END
+    if (dwOrigin == STREAM_SEEK_SET)
+        m_cur_pos = dlibMove.QuadPart;
+    else if (dwOrigin == STREAM_SEEK_CUR)
+        m_cur_pos += dlibMove.QuadPart;
+    assert(dwOrigin != STREAM_SEEK_END);
+
+    // TODO: Figure out how to combine with m_socket->CurPos()
     if (plibNewPosition)
-        plibNewPosition->QuadPart = m_socket->CurPos();
+        plibNewPosition->QuadPart = m_cur_pos;
     return S_OK;
 }
 
@@ -69,6 +74,8 @@ HRESULT InputStream2::Clone(/*out*/IStream** /*ppstm*/) {
 HRESULT InputStream2::Read(/*out*/void* pv, ULONG cb, /*our*/ULONG* pcbRead) {
     uint32_t res = m_socket->Read((BYTE*)pv, cb);
     *pcbRead = res; // bytes read
+
+    printf("Read %u bytes.\n", res);
     return S_OK;
 }
 

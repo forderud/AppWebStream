@@ -48,5 +48,6 @@ public:
     END_COM_MAP()
 
 private:
+    uint64_t                      m_cur_pos = 0;
     std::unique_ptr<ClientSocket> m_socket;
 };
