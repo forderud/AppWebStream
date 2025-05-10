@@ -124,7 +124,7 @@ OutputStream::~OutputStream() {
 
 
 void OutputStream::Initialize(double dpi, uint64_t startTime1904) {
-    m_stream_editor = std::make_unique<MP4FragmentEditor>(dpi, startTime1904);
+    m_stream_editor = std::make_unique<MP4StreamEditor>(dpi, startTime1904);
 }
 
 

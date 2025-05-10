@@ -84,7 +84,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ComUtil.hpp" />
-    <ClInclude Include="MP4FragmentEditor.hpp" />
+    <ClInclude Include="MP4StreamEditor.hpp" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="MP4Utils.hpp" />
     <ClInclude Include="VideoEncoder.hpp" />

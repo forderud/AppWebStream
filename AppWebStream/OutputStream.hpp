@@ -8,7 +8,7 @@
 #include <MFidl.h>
 #include <Mfreadwrite.h>
 #include "Resource.h"
-#include "MP4FragmentEditor.hpp"
+#include "MP4StreamEditor.hpp"
 
 
 class ByteWriter {
@@ -74,6 +74,6 @@ private:
 
     std::unique_ptr<ByteWriter> m_writer;
 
-    uint64_t                           m_cur_pos = 0;
-    std::unique_ptr<MP4FragmentEditor> m_stream_editor;
+    uint64_t                         m_cur_pos = 0;
+    std::unique_ptr<MP4StreamEditor> m_stream_editor;
 };

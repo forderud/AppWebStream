@@ -5,7 +5,7 @@
     <ClCompile Include="OutputStream.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MP4FragmentEditor.hpp" />
+    <ClInclude Include="MP4StreamEditor.hpp" />
     <ClInclude Include="VideoEncoder.hpp" />
     <ClInclude Include="WebSocket.hpp" />
     <ClInclude Include="OutputStream.hpp" />

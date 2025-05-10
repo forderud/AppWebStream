@@ -32,7 +32,7 @@ Expected atom hiearchy:
   - [trun] track run (will be modified)
 [mdat] fragment with H.264 video data
 */
-class MP4FragmentEditor {
+class MP4StreamEditor {
     static constexpr uint32_t HEADER_SIZE = 8; // atom header size (4bytes size + 4byte name)
     static constexpr uint32_t VERSION_FLAGS_SIZE = 4;  // version & flags size (1byte version + 3bytes flags)
 
@@ -40,9 +40,9 @@ class MP4FragmentEditor {
     static constexpr uint32_t TFDT_SIZE = 20;    // size of new tfdt atom that is added
 
 public:
-    MP4FragmentEditor() = default;
+    MP4StreamEditor() = default;
 
-    MP4FragmentEditor(double dpi, uint64_t startTime1904) {
+    MP4StreamEditor(double dpi, uint64_t startTime1904) {
         m_dpi = dpi;
         m_startTime = startTime1904;
     }
