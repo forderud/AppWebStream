@@ -222,7 +222,7 @@ static char* UpdateCreateModifyTime(char* ptr, uint8_t version, uint64_t newTime
     return ptr;
 }
 
-static std::tuple<uint64_t, uint64_t, char*> ParseCreateModifyTime(char* ptr, uint8_t version) {
+static std::tuple<uint64_t, uint64_t, const char*> ParseCreateModifyTime(const char* ptr, uint8_t version) {
     // seconds since Fri Jan 1 00:00:00 1904
     uint64_t creationTime = 0;
     uint64_t modificationTime = 0;
