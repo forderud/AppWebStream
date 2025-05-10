@@ -98,10 +98,9 @@ public:
 
         if (IsAtomType(buffer.data(), "moov")) {
             uint32_t atom_size = GetAtomSize(buffer.data());
-            assert(atom_size <= buffer.size());
+            assert(atom_size == buffer.size());
 
             // Movie box (moov)
-            assert(atom_size == buffer.size());
             ModifyMoov(buffer);
             return buffer;
         } else if (IsAtomType(buffer.data(), "moof")) {
