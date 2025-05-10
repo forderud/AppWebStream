@@ -146,6 +146,8 @@ private:
         assert(GetAtomSize(ptr) <= buffer.size());
         ptr += HEADER_SIZE; // skip size & type
 
+        // NOTE: Optional "prfl" atom here
+
         {
             // entering "mvhd" atom
             // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/MovieHeaderBox.java
@@ -196,6 +198,10 @@ private:
             // end of "mvhd" atom
             assert(ptr == buffer.data() + HEADER_SIZE + mvhd_len);
         }
+
+        // NOTE: Optional "clip" atom here
+
+        //NOTE: It might be more than one "track" atom here
         {
             // entering "trak" atom
             assert(IsAtomType(ptr, "trak"));
@@ -307,6 +313,8 @@ private:
             }
         }
 
+        //NOTE: Ignore remaining "udta", "ctab", ,"cmov", "rmra" child atoms
+
         return true;
     }
 
@@ -316,6 +324,8 @@ private:
         assert(IsAtomType(ptr, "moov"));
         assert(GetAtomSize(ptr) == buffer.size());
         ptr += HEADER_SIZE; // skip size & type
+
+        // NOTE: Optional "prfl" atom here
 
         {
             // entering "mvhd" atom
@@ -366,6 +376,10 @@ private:
             // end of "mvhd" atom
             assert(ptr == buffer.data() + HEADER_SIZE + mvhd_len);
         }
+
+        // NOTE: Optional "clip" atom here
+
+        //NOTE: It might be more than one "track" atom here
         {
             // entering "trak" atom
             assert(IsAtomType(ptr, "trak"));
@@ -505,6 +519,8 @@ private:
                 // ignore the remaining parameters
             }
         }
+
+        //NOTE: Ignore remaining "udta", "ctab", ,"cmov", "rmra" child atoms
     }
 
     /** REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/MovieFragmentBox.java */
