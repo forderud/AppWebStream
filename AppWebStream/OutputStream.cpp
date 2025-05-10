@@ -130,7 +130,7 @@ void OutputStream::Initialize(double dpi, uint64_t startTime1904) {
 
 void OutputStream::SetPortOrFilename(const char * port_or_filename) {
     if (atoi(port_or_filename)) {
-        printf("Please connect with a web browser on port %s to receive the stream\n", port_or_filename);
+        printf("Please open http://localhost:%s/ in a web browser or directly open the MPEG4 stream on http://localhost:%s/movie.mp4\n", port_or_filename, port_or_filename);
         printf("\n");
         m_writer = std::make_unique<WebStream>(port_or_filename);
     } else {
