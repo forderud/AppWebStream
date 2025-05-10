@@ -32,6 +32,8 @@ public:
 
     void SetPortOrFilename(const char * port_or_filename);
 
+    void SetNextFrameTime(uint64_t timeStamp);
+
     HRESULT GetCapabilities(/*out*/DWORD *capabilities) override;
 
     HRESULT GetLength(/*out*/QWORD* length) override;

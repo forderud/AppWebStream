@@ -127,6 +127,10 @@ public:
         }
     }
 
+    void SetNextFrameTime(uint64_t nextTime) {
+        m_cur_time = nextTime;
+    }
+
     double GetDPI() const {
         return m_dpi;
     }

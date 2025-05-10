@@ -140,6 +140,10 @@ void OutputStream::SetPortOrFilename(const char * port_or_filename) {
     }
 }
 
+void OutputStream::SetNextFrameTime(uint64_t timeStamp) {
+    m_stream_editor->SetNextFrameTime(timeStamp);
+}
+
 HRESULT OutputStream::GetCapabilities(/*out*/DWORD *capabilities) {
     *capabilities = MFBYTESTREAM_IS_WRITABLE | MFBYTESTREAM_IS_REMOTE;
     return S_OK;
