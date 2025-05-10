@@ -139,9 +139,8 @@ public:
 
 private:
     bool ParseMoov(const std::string_view buffer) {
-        // TODO: extract DPI from "avc1" atom
-
         const char* ptr = (char*)buffer.data();
+
         assert(IsAtomType(ptr, "moov"));
         assert(GetAtomSize(ptr) <= buffer.size());
         ptr += HEADER_SIZE; // skip size & type
