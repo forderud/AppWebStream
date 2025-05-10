@@ -173,6 +173,19 @@ inline uint64_t CurrentTime1904() {
 #endif
 }
 
+inline std::string TimeString1904(uint64_t mpeg4Time) {
+    time_t unixTime = mpeg4Time - (66 * 365 + 17) * (24 * 60 * 60);
+
+    tm timeStruct{};
+    errno_t res = gmtime_s(&timeStruct, &unixTime);
+    assert(!res);
+
+    char buffer[128]{};
+    res = asctime_s(buffer, &timeStruct); // UTC time
+    assert(!res);
+    return buffer;
+}
+
 
 /** Mofified version of "memmove" that clears the abandoned bytes, as well as intermediate data.
 WARNING: Only use for contiguous/overlapping moves, or else it will clear more than excpected. */
