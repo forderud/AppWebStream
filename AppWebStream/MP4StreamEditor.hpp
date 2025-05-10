@@ -96,6 +96,7 @@ public:
         if (buffer.size() < HEADER_SIZE)
             return buffer; // buffer too small for MPEG atom header parsing
 
+        // REF: https://developer.apple.com/documentation/quicktime-file-format/movie_atom
         if (IsAtomType(buffer.data(), "moov")) {
             uint32_t atom_size = GetAtomSize(buffer.data());
             assert(atom_size == buffer.size());
@@ -311,6 +312,7 @@ private:
 
     void ModifyMoov (std::string_view buffer) {
         char* ptr = (char*)buffer.data();
+        // REF: https://developer.apple.com/documentation/quicktime-file-format/movie_atom
         assert(IsAtomType(ptr, "moov"));
         assert(GetAtomSize(ptr) == buffer.size());
         ptr += HEADER_SIZE; // skip size & type
