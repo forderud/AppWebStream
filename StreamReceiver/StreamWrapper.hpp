@@ -4,6 +4,7 @@
 #include <atlcom.h>
 #include <MFidl.h>
 #include <Mfreadwrite.h>
+#include "../AppWebStream/MP4FragmentEditor.hpp"
 
 _COM_SMARTPTR_TYPEDEF(IMFByteStream, __uuidof(IMFByteStream));
 
@@ -53,6 +54,7 @@ public:
     END_COM_MAP()
 
 private:
-    BYTE*            m_read_buf = nullptr; // set by BeginRead
-    IMFByteStreamPtr m_obj;
+    char*             m_read_buf = nullptr; // set by BeginRead
+    IMFByteStreamPtr  m_obj;
+    MP4FragmentEditor m_stream_editor;
 };

@@ -46,13 +46,18 @@ HRESULT StreamWrapper::Read(/*out*/BYTE* pb, /*in*/ULONG cb, /*out*/ULONG* bRead
 }
 
 HRESULT StreamWrapper::BeginRead(/*out*/BYTE* pb, /*in*/ULONG cb, /*in*/IMFAsyncCallback* callback, /*in*/IUnknown* unkState) {
-    m_read_buf = pb;
+    m_read_buf = (char*)pb;
     return m_obj->BeginRead(pb, cb, callback, unkState);
 }
 
 HRESULT StreamWrapper::EndRead(/*in*/IMFAsyncResult* result, /*out*/ULONG* cbRead) {
     HRESULT hr = m_obj->EndRead(result, cbRead);
-    // TODO: Inspect m_read_buf bitstream
+    // Inspect m_read_buf bitstream
+    bool updated = m_stream_editor.ParseStream(std::string_view(m_read_buf, *cbRead));
+    if (updated) {
+        printf("Frame DPI: %f\n", m_stream_editor.GetDPI());
+        printf("Start time: %Iu\n", m_stream_editor.GetStartTime());
+    }
     return hr;
 }
 
