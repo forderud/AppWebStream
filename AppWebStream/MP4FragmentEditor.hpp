@@ -83,8 +83,10 @@ public:
             return false;
         {
             // Movie box (moov)
-            uint32_t atom_size = GetAtomSize(ptr);
-            return ParseMoov(buffer);
+            uint32_t moov_size = GetAtomSize(ptr);
+            std::string_view moov_buf = buffer.substr(ptr - buffer.data());
+            assert(moov_size <= moov_buf.size());
+            return ParseMoov(moov_buf);
         }
     }
 
