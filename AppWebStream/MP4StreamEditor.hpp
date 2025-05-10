@@ -208,6 +208,8 @@ private:
             //uint32_t trak_len = GetAtomSize(ptr);
             ptr += HEADER_SIZE; // skip size & type
 
+            // NOTE: Optional "prfl" atom here
+
             {
                 // skip over "tkhd" atom
                 // REF: https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/mov.c#L5478
@@ -215,6 +217,8 @@ private:
                 uint32_t tkhd_len = GetAtomSize(ptr);
                 ptr += tkhd_len;
             }
+
+            // NOTE: Optional "tapt", "clip", "matt", "edts", "tref", "txas", "load", "imap" atoms here
 
             {
                 // entring "mdia" atom
@@ -388,6 +392,8 @@ private:
             //uint32_t trak_len = GetAtomSize(ptr);
             ptr += HEADER_SIZE; // skip size & type
 
+            // NOTE: Optional "prfl" atom here
+
             {
                 // partially parse "tkhd" atom
                 // REF: https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/mov.c#L5478
@@ -406,6 +412,8 @@ private:
 
                 ptr += tkhd_len;
             }
+
+            // NOTE: Optional "tapt", "clip", "matt", "edts", "tref", "txas", "load", "imap" atoms here
 
             {
                 // entring "mdia" atom
