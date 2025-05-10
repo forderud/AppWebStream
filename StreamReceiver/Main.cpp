@@ -142,7 +142,6 @@ void ProcessFrames(IMFSourceReader& reader) {
 
         wprintf(L"Stream idx: %u\n", streamIdx);
 
-        //TODO: retrieve MPEG4 CreationTime or ModificationTime parameter and log it to console
 #if 0
         PROPVARIANT val{};
         PropVariantClear(&val);
@@ -174,9 +173,6 @@ void ProcessFrames(IMFSourceReader& reader) {
             if (FAILED(hr))
                 break;
         }
-
-        // TODO:
-        // * Figure out how to extract per-frame DPI
 
         if (frame)
             ++frameCount;
