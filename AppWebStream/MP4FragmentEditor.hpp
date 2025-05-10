@@ -243,6 +243,65 @@ private:
                 uint32_t dinf_len = GetAtomSize(ptr);
                 ptr += dinf_len;
             }
+
+            // entering "stbl" atmom
+            assert(IsAtomType(ptr, "stbl"));
+            //uint32_t stbl_len = GetAtomSize(ptr);
+            ptr += HEADER_SIZE; // skip size & type
+
+            // entering "stsd" atom (see https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/movenc.c)
+            // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/SampleDescriptionBox.java
+            assert(IsAtomType(ptr, "stsd"));
+            //uint32_t stsd_len = GetAtomSize(ptr);
+            ptr += HEADER_SIZE; // skip size & type
+
+            auto version = DeSerialize<uint8_t>(ptr);
+            assert(version == 0);
+            ptr += sizeof(uint8_t);
+
+            uint32_t flags = DeSerialize<uint24_t>(ptr);
+            assert(flags == 0);
+            ptr += sizeof(uint24_t);
+
+            uint32_t entryCount = DeSerialize<uint32_t>(ptr);
+            assert(entryCount == 1);
+            ptr += sizeof(uint32_t);
+
+            {
+                // entering "avc1" atom
+                // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/sampleentry/VisualSampleEntry.java
+                assert(IsAtomType(ptr, "avc1"));
+                //uint32_t avc1_len = GetAtomSize(ptr);
+                ptr += HEADER_SIZE; // skip size & type
+
+                ptr += 6; // skip first 6 bytes
+
+                //auto dataReferenceIdx = DeSerialize<uint16_t>(ptr);
+                ptr += sizeof(uint16_t);
+
+                auto reserved = DeSerialize<uint16_t>(ptr);
+                assert(reserved == 0);
+                ptr += sizeof(uint16_t);
+
+                reserved = DeSerialize<uint16_t>(ptr);
+                assert(reserved == 0);
+                ptr += sizeof(uint16_t);
+
+                ptr += 3 * sizeof(uint32_t); // skip 3 "predefined" values that should all be zero
+
+                auto width = DeSerialize<uint16_t>(ptr);
+                ptr += 2;
+                auto height = DeSerialize<uint16_t>(ptr);
+                ptr += 2;
+                printf("avc1 atom resolution: (%u, %u)\n", width, height);
+
+                // read horizontal and vertical video DPI in fixed-point 16+16 format
+                m_dpi = ReadFixed1616(ptr);
+                double vdpi = ReadFixed1616(ptr + 4);
+                assert(m_dpi == vdpi); // same horizontal and vertical DPI
+
+                // ignore the remaining parameters
+            }
         }
 
         return true;
