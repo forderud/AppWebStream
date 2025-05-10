@@ -136,7 +136,7 @@ struct matrix {
     }
 };
 
-/**  MP4 file uses time counting in SECONDS since midnight, Jan. 1, 1904. */
+/**  MPEG4 file uses time counting in SECONDS since midnight, Jan. 1, 1904. */
 inline uint64_t CurrentTime1904() {
 #if 0
     FILETIME curTime{};
