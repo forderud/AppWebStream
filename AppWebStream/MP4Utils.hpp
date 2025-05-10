@@ -1,5 +1,7 @@
 #pragma once
+#include <ctime>
 #include <Windows.h>
+
 
 struct uint24_t {
     uint8_t raw[3]{};
