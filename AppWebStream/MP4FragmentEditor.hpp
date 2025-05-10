@@ -45,9 +45,8 @@ public:
         m_startTime = startTime1904;
     }
 
-    /** Intended to be called from IMFByteStream::BeginWrite and IMFByteStream::Write before forwarding the data to a socket.
-        Will modify the "moof" atom if present.
-        returns a (ptr, size) tuple pointing to a potentially modified buffer. */
+    /** Edit MPEG4 bitstream to update parameters that are not directly accessible through the Media Foundation and/or FFMPEG APIs.
+        Returns a (ptr, size) tuple pointing to a potentially modified buffer. */
     std::string_view EditStream (std::string_view buffer) {
         if (buffer.size() < HEADER_SIZE)
             return buffer; // buffer too small for MPEG atom header parsing
