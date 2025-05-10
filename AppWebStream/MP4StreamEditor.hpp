@@ -255,6 +255,9 @@ private:
                         uint32_t vmhd_len = GetAtomSize(ptr);
                         ptr += vmhd_len;
                     }
+
+                    // NOTE: Optional "hdlr" atom here
+
                     {
                         // skip over "dinf" atom
                         assert(IsAtomType(ptr, "dinf"));
@@ -467,6 +470,9 @@ private:
                         uint32_t vmhd_len = GetAtomSize(ptr);
                         ptr += vmhd_len;
                     }
+
+                    // NOTE: Optional "hdlr" atom here
+
                     {
                         // skip over "dinf" atom
                         assert(IsAtomType(ptr, "dinf"));
