@@ -233,6 +233,9 @@ private:
                     uint32_t mdhd_len = GetAtomSize(ptr);
                     ptr += mdhd_len;
                 }
+
+                // NOTE: Optional "elng" atom here
+
                 {
                     // skip over "hdlr" atom
                     assert(IsAtomType(ptr, "hdlr"));
@@ -438,6 +441,9 @@ private:
 
                     ptr += mdhd_len;
                 }
+
+                // NOTE: Optional "elng" atom here
+
                 {
                     // skip over "hdlr" atom
                     assert(IsAtomType(ptr, "hdlr"));
