@@ -289,9 +289,9 @@ private:
 
                 ptr += 3 * sizeof(uint32_t); // skip 3 "predefined" values that should all be zero
 
-                auto width = DeSerialize<uint16_t>(ptr);
+                //auto width = DeSerialize<uint16_t>(ptr);
                 ptr += 2;
-                auto height = DeSerialize<uint16_t>(ptr);
+                //auto height = DeSerialize<uint16_t>(ptr);
                 ptr += 2;
                 //printf("avc1 atom resolution: (%u, %u)\n", width, height);
 
@@ -488,11 +488,12 @@ private:
                 // check existing video DPI in fixed-point 16+16 format
                 // Resolution hardcoded to 72dpi (0x00480000) in FFMPEG encoder (https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/movenc.c)
                 // It also appear to be hardocded in the MF encoder. I've at least not found a parameter for adjusting it.
+#if 0
                 double dpi = ReadFixed1616(ptr);
                 assert(dpi == 72); // 72.00 horizontal DPI
                 dpi = ReadFixed1616(ptr + 4);
                 assert(dpi == 72); // 72.00 vertical DPI
-
+#endif
                 // update video DPI in fixed-point 16+16 format
                 WriteFixed1616(ptr, m_dpi);    // horizontal DPI
                 WriteFixed1616(ptr + 4, m_dpi);// vertical DPI
