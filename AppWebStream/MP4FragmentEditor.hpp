@@ -40,9 +40,52 @@ class MP4FragmentEditor {
     static constexpr uint32_t TFDT_SIZE = 20;    // size of new tfdt atom that is added
 
 public:
+    MP4FragmentEditor() = default;
+
     MP4FragmentEditor(double dpi, uint64_t startTime1904) {
         m_dpi = dpi;
         m_startTime = startTime1904;
+    }
+
+    /** Parse MPEG4 bitstream to extract parameters that are not directly accessible through the Media Foundation and/or FFMPEG APIs.
+        Returns true if a new parameter have been extracted. */
+    bool ParseStream (std::string_view buffer) {
+        if (buffer.size() < HEADER_SIZE)
+            return false; // buffer too small for MPEG atom header parsing
+
+        const char* ptr = buffer.data();
+
+        if (!IsAtomType(ptr, "ftyp"))
+            return false;
+        {
+            // "ftyp" atom
+            uint32_t ftyp_size = GetAtomSize(ptr);
+            ptr += ftyp_size;
+        }
+
+        if (!IsAtomType(ptr, "uuid"))
+            return false;
+        {
+            // "uuid" atom
+            uint32_t uuid_size = GetAtomSize(ptr);
+            ptr += uuid_size;
+        }
+
+        if (!IsAtomType(ptr, "pdin"))
+            return false;
+        {
+            // "pdin" atom
+            uint32_t pdin_size = GetAtomSize(ptr);
+            ptr += pdin_size;
+        }
+
+        if (!IsAtomType(ptr, "moov"))
+            return false;
+        {
+            // Movie box (moov)
+            uint32_t atom_size = GetAtomSize(ptr);
+            return ParseMoov(buffer);
+        }
     }
 
     /** Edit MPEG4 bitstream to update parameters that are not directly accessible through the Media Foundation and/or FFMPEG APIs.
@@ -82,7 +125,20 @@ public:
         }
     }
 
+    double GetDPI() const {
+        return m_dpi;
+    }
+    uint64_t GetStartTime() const {
+        return m_startTime;
+    }
+
 private:
+    bool ParseMoov(std::string_view /*buffer*/) {
+        // TODO: Extract Create- & ModifyTime from "mvhd" atom
+        // TODO: extract DPI from "avc1" atom
+        return false;
+    }
+
     void ModifyMoov (std::string_view buffer) {
         char* ptr = (char*)buffer.data();
         assert(IsAtomType(ptr, "moov"));
