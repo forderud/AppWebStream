@@ -135,10 +135,66 @@ public:
     }
 
 private:
-    bool ParseMoov(std::string_view /*buffer*/) {
-        // TODO: Extract Create- & ModifyTime from "mvhd" atom
+    bool ParseMoov(const std::string_view buffer) {
         // TODO: extract DPI from "avc1" atom
-        return false;
+
+        const char* ptr = (char*)buffer.data();
+        assert(IsAtomType(ptr, "moov"));
+        assert(GetAtomSize(ptr) <= buffer.size());
+        ptr += HEADER_SIZE; // skip size & type
+
+        {
+            // entering "mvhd" atom
+            // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/MovieHeaderBox.java
+            assert(IsAtomType(ptr, "mvhd"));
+            uint32_t mvhd_len = GetAtomSize(ptr);
+            ptr += HEADER_SIZE; // skip size & type
+
+            auto version = DeSerialize<uint8_t>(ptr);
+            ptr += 1;
+
+            //uint32_t flags = DeSerialize<uint24_t>(ptr);
+            ptr += sizeof(uint24_t);
+
+            uint64_t modifyTime = 0;
+            std::tie(m_startTime, modifyTime, ptr) = ParseCreateModifyTime(ptr, version);
+
+            // read timescale (number of time units per second)
+            m_timeScale = DeSerialize<uint32_t>(ptr); // 1000*fps
+            ptr += 4;
+
+            uint64_t duration = 0;
+            if (version == 1) {
+                duration = DeSerialize<uint64_t>(ptr);
+                ptr += 8;
+            } else {
+                duration = DeSerialize<uint32_t>(ptr);
+                ptr += 4;
+            }
+
+            //double rate = ReadFixed1616(ptr); // preferred playback rate (16+16 fraction) (typ 1.0)
+            ptr += 4;
+
+            //double volume = ReadFixed88(ptr); // master volume of file (8+8 fraction) (typ 1.0)
+            ptr += 2;
+
+            ptr += sizeof(uint16_t); // reserved
+            ptr += sizeof(uint32_t) * 2; // reserved
+
+            // matrix to map points from one coordinate space into another
+            matrix mat(ptr);
+            ptr += matrix::SIZE;
+
+            ptr += sizeof(uint32_t) * 6; // reserved
+
+            //auto nextTrackId = DeSerialize<uint32_t>(ptr); // (typ 2)
+            ptr += 4;
+
+            // end of "mvhd" atom
+            assert(ptr == buffer.data() + HEADER_SIZE + mvhd_len);
+        }
+
+        return true;
     }
 
     void ModifyMoov (std::string_view buffer) {
