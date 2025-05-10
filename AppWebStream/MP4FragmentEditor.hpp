@@ -293,7 +293,7 @@ private:
                 ptr += 2;
                 auto height = DeSerialize<uint16_t>(ptr);
                 ptr += 2;
-                printf("avc1 atom resolution: (%u, %u)\n", width, height);
+                //printf("avc1 atom resolution: (%u, %u)\n", width, height);
 
                 // read horizontal and vertical video DPI in fixed-point 16+16 format
                 m_dpi = ReadFixed1616(ptr);
