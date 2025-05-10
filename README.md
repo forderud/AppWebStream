@@ -27,6 +27,7 @@ To build with FFMPG, you first need to download & unzip FFMPEG binaries to a fol
 #### Video metadata
 Metadata implementation status:
 * [x] Pixel spacing metadata
+* [x] All frames time-stamped with <0.1ms temporal accuracy against the MEPG 1904 epoch
 * [ ] Video "origin" metadata ([issue #23](../../issues/23))
 * [ ] Freeze & resume frame time-stamps ([issue #24](../../issues/24))
 
