@@ -58,7 +58,7 @@ public:
 
             // Movie box (moov)
             assert(atom_size == buffer.size());
-            ModifyMovieBox(buffer);
+            ModifyMoov(buffer);
             return buffer;
         } else if (IsAtomType(buffer.data(), "moof")) {
             uint32_t atom_size = GetAtomSize(buffer.data());
@@ -66,10 +66,10 @@ public:
 
             // Movie Fragment (moof)
 #ifdef ENABLE_FFMPEG
-            return ModifyMovieFragment(buffer.data(), (ULONG)buffer.size(), false);
+            return ModifyMoof(buffer.data(), (ULONG)buffer.size(), false);
 #else
             assert(atom_size == buffer.size());
-            return ModifyMovieFragment(buffer.data(), (ULONG)buffer.size(), true);
+            return ModifyMoof(buffer.data(), (ULONG)buffer.size(), true);
 #endif
         } else if (IsAtomType(buffer.data(), "mdat")) {
             //uint32_t atom_size = GetAtomSize(buffer.data());
@@ -84,7 +84,7 @@ public:
     }
 
 private:
-    void ModifyMovieBox(std::string_view buffer) {
+    void ModifyMoov (std::string_view buffer) {
         char* ptr = (char*)buffer.data();
         assert(IsAtomType(ptr, "moov"));
         assert(GetAtomSize(ptr) == buffer.size());
@@ -280,7 +280,7 @@ private:
     }
 
     /** REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/MovieFragmentBox.java */
-    std::string_view ModifyMovieFragment (const char* buf, const ULONG buf_size, bool add_tfdt) {
+    std::string_view ModifyMoof (const char* buf, const ULONG buf_size, bool add_tfdt) {
         assert(IsAtomType(buf, "moof"));
         assert(GetAtomSize(buf) <= buf_size);
 
