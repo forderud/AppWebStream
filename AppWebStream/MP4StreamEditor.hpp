@@ -287,10 +287,9 @@ private:
                             ptr += sizeof(uint24_t);
 
                             uint32_t entryCount = DeSerialize<uint32_t>(ptr);
-                            assert(entryCount == 1);
                             ptr += sizeof(uint32_t);
 
-                            {
+                            for (uint32_t entry = 0; entry < entryCount; entry++) {
                                 // entering "avc1" atom
                                 // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/sampleentry/VisualSampleEntry.java
                                 assert(IsAtomType(ptr, "avc1"));
@@ -508,10 +507,9 @@ private:
                             ptr += sizeof(uint24_t);
 
                             uint32_t entryCount = DeSerialize<uint32_t>(ptr);
-                            assert(entryCount == 1);
                             ptr += sizeof(uint32_t);
 
-                            {
+                            for (uint32_t entry = 0; entry < entryCount; entry++) {
                                 // entering "avc1" atom
                                 // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/sampleentry/VisualSampleEntry.java
                                 assert(IsAtomType(ptr, "avc1"));
