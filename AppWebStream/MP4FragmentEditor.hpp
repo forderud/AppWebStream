@@ -193,6 +193,57 @@ private:
             // end of "mvhd" atom
             assert(ptr == buffer.data() + HEADER_SIZE + mvhd_len);
         }
+        {
+            // entering "trak" atom
+            assert(IsAtomType(ptr, "trak"));
+            //uint32_t trak_len = GetAtomSize(ptr);
+            ptr += HEADER_SIZE; // skip size & type
+
+            {
+                // skip over "tkhd" atom
+                // REF: https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/mov.c#L5478
+                assert(IsAtomType(ptr, "tkhd"));
+                uint32_t tkhd_len = GetAtomSize(ptr);
+                ptr += tkhd_len;
+            }
+
+            // entring "mdia" atom
+            assert(IsAtomType(ptr, "mdia"));
+            //uint32_t mdia_len = GetAtomSize(ptr);
+            ptr += HEADER_SIZE; // skip size & type
+
+            {
+                // skip over "mdhd" atom
+                // REF: https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/mov.c#L1864
+                assert(IsAtomType(ptr, "mdhd"));
+                uint32_t mdhd_len = GetAtomSize(ptr);
+                ptr += mdhd_len;
+            }
+            {
+                // skip over "hdlr" atom
+                assert(IsAtomType(ptr, "hdlr"));
+                uint32_t hdlr_len = GetAtomSize(ptr);
+                ptr += hdlr_len;
+            }
+
+            // entering "minf" atom
+            assert(IsAtomType(ptr, "minf"));
+            //uint32_t minf_len = GetAtomSize(ptr);
+            ptr += HEADER_SIZE; // skip size & type
+
+            {
+                // skip over "vmhd" atom
+                assert(IsAtomType(ptr, "vmhd"));
+                uint32_t vmhd_len = GetAtomSize(ptr);
+                ptr += vmhd_len;
+            }
+            {
+                // skip over "dinf" atom
+                assert(IsAtomType(ptr, "dinf"));
+                uint32_t dinf_len = GetAtomSize(ptr);
+                ptr += dinf_len;
+            }
+        }
 
         return true;
     }
