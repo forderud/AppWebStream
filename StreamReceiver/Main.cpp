@@ -211,7 +211,7 @@ void ProcessFrames(IMFSourceReader& reader) {
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
-        printf("Usage: StreamReceiver.exe URL (e.g. StreamReceiver.exe http://localhost:8080/movie.mp4)\n");
+        wprintf(L"Usage: StreamReceiver.exe URL (e.g. StreamReceiver.exe http://localhost:8080/movie.mp4)\n");
         return -1;
     }
 
