@@ -28,10 +28,8 @@ HRESULT IsVideoStream(IMFSourceReader& reader, DWORD streamIdx) {
     for (DWORD mediaTypeIdx = 0;; mediaTypeIdx++) {
         IMFMediaTypePtr mediaType;
         HRESULT hr = reader.GetNativeMediaType(streamIdx, mediaTypeIdx, &mediaType);
-        if (hr == MF_E_NO_MORE_TYPES)
-            return E_FAIL;
         if (FAILED(hr))
-            return hr;
+            return hr; // MF_E_NO_MORE_TYPES of out of bounds
         
         // Examine the media type
         wprintf(L"Stream detected...\n");
@@ -47,8 +45,6 @@ HRESULT IsVideoStream(IMFSourceReader& reader, DWORD streamIdx) {
             assert(ok);
             wprintf(L"* MajorType: %s\n", guid_str);
         }
-
-        wprintf(L"\n");
     }
 }
 
