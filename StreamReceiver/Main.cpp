@@ -99,6 +99,14 @@ HRESULT ConfigureOutputType(IMFSourceReader& reader, DWORD dwStreamIndex) {
     return S_OK;
 }
 
+static unsigned int Align16(unsigned int size) {
+    if ((size % 16) == 0)
+        return size;
+    else
+        return size + 16 - (size % 16);
+}
+
+
 void ProcessFrames(IMFSourceReader& reader) {
     HRESULT hr = S_OK;
     unsigned int frameCount = 0;
@@ -175,7 +183,7 @@ void ProcessFrames(IMFSourceReader& reader) {
                 DWORD bufLen = 0;
                 COM_CHECK(buffer->GetCurrentLength(&bufLen));
                 wprintf(L"  Frame buffer #%u length: %u\n", idx, bufLen);
-                assert(bufLen >= 4 * width * height);
+                assert(bufLen == 4 * Align16(width) * Align16(height)); // buffer size is a multiple of MPEG4 16x16 macroblocks
 
                 // Call buffer->Lock()... Unlock() to access RGBA pixel data
             }
