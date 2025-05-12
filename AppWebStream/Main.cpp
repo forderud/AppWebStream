@@ -36,7 +36,8 @@ private:
 };
 
 
-struct offscreen_bmp {
+class offscreen_bmp {
+public:
     offscreen_bmp(HDC ref_dc, LONG width, LONG height) {
         dc = CreateCompatibleDC(ref_dc);
         if (!dc)
@@ -57,6 +58,7 @@ struct offscreen_bmp {
 
     HDC     dc   = nullptr;
     HBITMAP bmp  = nullptr;
+private:
     HGDIOBJ prev = nullptr;
 };
 
