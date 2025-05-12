@@ -78,13 +78,13 @@ DWORD GetFirstVideoStream (IMFSourceReader& reader) {
 
 
 HRESULT ConfigureDecoder(IMFSourceReader& reader, DWORD dwStreamIndex) {
-    // Find the native format of the stream.
-    IMFMediaTypePtr pNativeType;
-    COM_CHECK(reader.GetNativeMediaType(dwStreamIndex, 0, &pNativeType));
+    // get the native stream format
+    IMFMediaTypePtr nativeType;
+    COM_CHECK(reader.GetNativeMediaType(dwStreamIndex, 0, &nativeType));
 
     // Find the major type.
     GUID majorType{};
-    COM_CHECK(pNativeType->GetGUID(MF_MT_MAJOR_TYPE, &majorType));
+    COM_CHECK(nativeType->GetGUID(MF_MT_MAJOR_TYPE, &majorType));
 
     // Define the output type.
     IMFMediaTypePtr pType;
@@ -107,11 +107,6 @@ HRESULT ConfigureDecoder(IMFSourceReader& reader, DWORD dwStreamIndex) {
 
     // Set the uncompressed format.
     COM_CHECK(reader.SetCurrentMediaType(dwStreamIndex, NULL, pType));
-
-    uint32_t width = 0, height = 0;
-    COM_CHECK(MFGetAttributeSize(pNativeType, MF_MT_FRAME_SIZE, &width, &height));
-    wprintf(L"Frame resolution: %u x %u\n", width, height);
-
     return S_OK;
 }
 
@@ -131,6 +126,14 @@ void ProcessFrames(IMFSourceReader& reader) {
 
         wprintf(L"Stream event on idx: %u\n", streamIdx);
 
+        uint32_t width = 0, height = 0;
+        {
+            IMFMediaTypePtr nativeType;
+            COM_CHECK(reader.GetNativeMediaType(streamIdx, 0, &nativeType));
+
+            COM_CHECK(MFGetAttributeSize(nativeType, MF_MT_FRAME_SIZE, &width, &height));
+            wprintf(L"  Frame resolution: %u x %u\n", width, height);
+        }
 #if 0
         PROPVARIANT val{};
         PropVariantClear(&val);
@@ -183,6 +186,7 @@ void ProcessFrames(IMFSourceReader& reader) {
                 DWORD bufLen = 0;
                 COM_CHECK(buffer->GetCurrentLength(&bufLen));
                 wprintf(L"  Frame buffer #%u length: %u\n", idx, bufLen);
+                assert(bufLen >= 4 * width * height);
 
                 // Call buffer->Lock()... Unlock() to access RGBA pixel data
             }
