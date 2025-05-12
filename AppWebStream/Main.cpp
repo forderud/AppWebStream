@@ -5,7 +5,8 @@
 #include "OutputStream.hpp"
 
 
-struct window_dc {
+class window_dc {
+public:
     window_dc(HWND h) : wnd(h) {
         dc = GetDC(wnd);
         if (wnd) {
@@ -21,15 +22,16 @@ struct window_dc {
         ReleaseDC(wnd, dc);
     }
 
-    LONG width() {
+    LONG width() const {
         return rect.right - rect.left;
     }
-    LONG height() {
+    LONG height() const {
         return rect.bottom - rect.top;
     }
 
     HWND wnd  = nullptr;
     HDC  dc   = nullptr;
+private:
     RECT rect = {};
 };
 
