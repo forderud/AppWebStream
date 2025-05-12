@@ -12,8 +12,7 @@ static HRESULT EncodeFrame (VideoEncoder & encoder, window_dc & wnd_dc) {
     offscreen_bmp bmp(wnd_dc.dc, VideoEncoder::Align2(wnd_dc.width()), wnd_dc.height());
 
     // copy window content to bitmap
-    if (!BitBlt(/*dst*/bmp.dc, 0, 0, wnd_dc.width(), wnd_dc.height(),
-        /*src*/wnd_dc.dc, 0, 0, SRCCOPY))
+    if (!BitBlt(/*dst*/bmp.dc, 0, 0, wnd_dc.width(), wnd_dc.height(), /*src*/wnd_dc.dc, 0, 0, SRCCOPY))
         return E_FAIL;
 
     BITMAPINFO bmp_info = {};
