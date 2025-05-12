@@ -24,40 +24,34 @@ _COM_SMARTPTR_TYPEDEF(IMFMediaBuffer, __uuidof(IMFMediaBuffer));
 
 EXTERN_GUID(WMMEDIATYPE_Video, 0x73646976, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71); // from https://learn.microsoft.com/en-us/windows/win32/wmformat/media-type-identifiers
 
-HRESULT EnumerateTypesForStream(IMFSourceReader& reader, DWORD streamIdx) {
-    HRESULT hr = S_OK;
-    DWORD dwMediaTypeIndex = 0;
-
-    while (SUCCEEDED(hr)) {
+HRESULT IsVideoStream(IMFSourceReader& reader, DWORD streamIdx) {
+    for (DWORD dwMediaTypeIndex = 0;; dwMediaTypeIndex++) {
         IMFMediaTypePtr type;
-        hr = reader.GetNativeMediaType(streamIdx, dwMediaTypeIndex, &type);
-        if (hr == MF_E_NO_MORE_TYPES) {
-            hr = S_OK;
-            break;
-        }
+        HRESULT hr = reader.GetNativeMediaType(streamIdx, dwMediaTypeIndex, &type);
+        if (hr == MF_E_NO_MORE_TYPES)
+            return E_FAIL;
+        if (FAILED(hr))
+            return hr;
         
-        if (SUCCEEDED(hr)) {
-            // Examine the media type
-            wprintf(L"Stream detected...\n");
-            wprintf(L"* index: %u\n", streamIdx);
-            GUID guid{};
-            COM_CHECK(type->GetMajorType(&guid));
-            if (guid == WMMEDIATYPE_Video) {
-                wprintf(L"* MajorType: WMMEDIATYPE_Video\n");
-            } else {
-                wchar_t guid_str[39] = {};
-                int ok = StringFromGUID2(guid, guid_str, (int)std::size(guid_str));
-                assert(ok);
-                wprintf(L"* MajorType: %s\n", guid_str);
-            }
-
-            wprintf(L"\n");
+        // Examine the media type
+        wprintf(L"Stream detected...\n");
+        wprintf(L"* index: %u\n", streamIdx);
+        GUID guid{};
+        COM_CHECK(type->GetMajorType(&guid));
+        if (guid == WMMEDIATYPE_Video) {
+            wprintf(L"* MajorType: WMMEDIATYPE_Video\n");
             return S_OK;
+        } else {
+            wchar_t guid_str[39] = {};
+            int ok = StringFromGUID2(guid, guid_str, (int)std::size(guid_str));
+            assert(ok);
+            wprintf(L"* MajorType: %s\n", guid_str);
         }
 
-        ++dwMediaTypeIndex;
+        wprintf(L"\n");
     }
-    return hr;
+
+    return E_FAIL;
 }
 
 DWORD GetFirstVideoStream (IMFSourceReader& reader) {
@@ -65,7 +59,7 @@ DWORD GetFirstVideoStream (IMFSourceReader& reader) {
     DWORD streamIdx = 0;
 
     while (SUCCEEDED(hr)) {
-        hr = EnumerateTypesForStream(reader, streamIdx);
+        hr = IsVideoStream(reader, streamIdx);
         if (SUCCEEDED(hr))
             return streamIdx;
 
