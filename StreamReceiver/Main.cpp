@@ -87,10 +87,10 @@ HRESULT ConfigureDecoder(IMFSourceReader& reader, DWORD dwStreamIndex) {
     COM_CHECK(nativeType->GetGUID(MF_MT_MAJOR_TYPE, &majorType));
 
     // Define the output type.
-    IMFMediaTypePtr pType;
-    COM_CHECK(MFCreateMediaType(&pType));
+    IMFMediaTypePtr mediaType;
+    COM_CHECK(MFCreateMediaType(&mediaType));
 
-    COM_CHECK(pType->SetGUID(MF_MT_MAJOR_TYPE, majorType));
+    COM_CHECK(mediaType->SetGUID(MF_MT_MAJOR_TYPE, majorType));
 
     // Select a subtype.
     GUID subtype{};
@@ -103,10 +103,10 @@ HRESULT ConfigureDecoder(IMFSourceReader& reader, DWORD dwStreamIndex) {
         return E_FAIL;
     }
 
-    COM_CHECK(pType->SetGUID(MF_MT_SUBTYPE, subtype));
+    COM_CHECK(mediaType->SetGUID(MF_MT_SUBTYPE, subtype));
 
     // Set the uncompressed format.
-    COM_CHECK(reader.SetCurrentMediaType(dwStreamIndex, NULL, pType));
+    COM_CHECK(reader.SetCurrentMediaType(dwStreamIndex, NULL, mediaType));
     return S_OK;
 }
 
