@@ -57,8 +57,8 @@ extern "C" {
 
 class VideoEncoder {
 public:
-    /** Grow size to become a multiple of the MEPG macroblock size (typ. 8). */
-    static unsigned int Align (unsigned int size, unsigned int block_size = 8) {
+    /** Grow size to become a multiple of 2 (FFMPEG requirement). */
+    static unsigned int Align (unsigned int size, unsigned int block_size = 2) {
         if ((size % block_size) == 0)
             return size;
         else
