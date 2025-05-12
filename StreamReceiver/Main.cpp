@@ -195,6 +195,8 @@ void ProcessFrames(IMFSourceReader& reader) {
                 DWORD bufLen = 0;
                 COM_CHECK(buffer->GetCurrentLength(&bufLen));
                 printf("  Frame buffer #%u length: %u\n", idx, bufLen);
+
+                // Call buffer->Lock()... Unlock() to access RGBA pixel data
             }
         }
     }
