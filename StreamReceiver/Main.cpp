@@ -25,6 +25,7 @@ _COM_SMARTPTR_TYPEDEF(IMFMediaBuffer, __uuidof(IMFMediaBuffer));
 EXTERN_GUID(WMMEDIATYPE_Video, 0x73646976, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71); // video stream from https://learn.microsoft.com/en-us/windows/win32/wmformat/media-type-identifiers
 
 HRESULT IsVideoStream(IMFSourceReader& reader, DWORD streamIdx, /*out*/bool& isVideo) {
+    // iterate over all media types
     for (DWORD mediaTypeIdx = 0;; mediaTypeIdx++) {
         IMFMediaTypePtr mediaType;
         HRESULT hr = reader.GetNativeMediaType(streamIdx, mediaTypeIdx, &mediaType);
@@ -33,25 +34,26 @@ HRESULT IsVideoStream(IMFSourceReader& reader, DWORD streamIdx, /*out*/bool& isV
             return hr; // MF_E_NO_MORE_TYPES if out of bounds
         }
         
-        // Examine the media type
-        wprintf(L"Stream detected...\n");
-        wprintf(L"* index: %u\n", streamIdx);
+        // examine media type
         GUID guid{};
         COM_CHECK(mediaType->GetMajorType(&guid));
         if (guid == WMMEDIATYPE_Video) {
-            wprintf(L"* MajorType: WMMEDIATYPE_Video\n");
-            isVideo = true;
+            isVideo = true; // found video stream
             return S_OK;
-        } else {
-            wchar_t guid_str[39] = {};
-            int ok = StringFromGUID2(guid, guid_str, (int)std::size(guid_str));
-            assert(ok);
-            wprintf(L"* MajorType: %s\n", guid_str);
         }
+
+#if 0
+        // other major type
+        wchar_t guid_str[39] = {};
+        int ok = StringFromGUID2(guid, guid_str, (int)std::size(guid_str));
+        assert(ok);
+        wprintf(L"* MajorType: %s\n", guid_str);
+#endif
     }
 }
 
 DWORD GetFirstVideoStream (IMFSourceReader& reader) {
+    // iterate over all streams
     for (DWORD streamIdx = 0; ; streamIdx++) {
         bool isVideo = false;
         HRESULT hr = IsVideoStream(reader, streamIdx, isVideo);
@@ -87,14 +89,12 @@ HRESULT ConfigureOutputType(IMFSourceReader& reader, DWORD dwStreamIndex) {
             return E_FAIL; // unrecognized type
     }
 
-    // configure output type
+    // configure RGB32 output
     IMFMediaTypePtr mediaType;
     COM_CHECK(MFCreateMediaType(&mediaType));
-
     COM_CHECK(mediaType->SetGUID(MF_MT_MAJOR_TYPE, majorType));
     COM_CHECK(mediaType->SetGUID(MF_MT_SUBTYPE, subType));
 
-    // Set the uncompressed format.
     COM_CHECK(reader.SetCurrentMediaType(dwStreamIndex, NULL, mediaType));
     return S_OK;
 }
