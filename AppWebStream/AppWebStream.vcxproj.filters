@@ -12,6 +12,7 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="MP4Utils.hpp" />
     <ClInclude Include="ComUtil.hpp" />
+    <ClInclude Include="ScreenCapture.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="WebStream.html" />

@@ -87,6 +87,7 @@
     <ClInclude Include="MP4StreamEditor.hpp" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="MP4Utils.hpp" />
+    <ClInclude Include="ScreenCapture.hpp" />
     <ClInclude Include="VideoEncoder.hpp" />
     <ClInclude Include="WebSocket.hpp" />
     <ClInclude Include="OutputStream.hpp" />
