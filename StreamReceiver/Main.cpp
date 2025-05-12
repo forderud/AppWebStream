@@ -132,9 +132,10 @@ void ProcessFrames(IMFSourceReader& reader) {
 
     bool quit = false;
     while (!quit) {
-        DWORD streamIdx = 0, flags = 0;
+        DWORD streamIdx = 0;
+        DWORD flags = 0;        // MF_SOURCE_READER_FLAG bitmask
         LONGLONG timeStamp = 0; // in 100-nanosecond units
-        IMFSamplePtr frame;
+        IMFSamplePtr frame;     // NULL if (flags & MF_SOURCE_READERF_ENDOFSTREAM)
         hr = reader.ReadSample(
             (DWORD)MF_SOURCE_READER_ANY_STREAM, /*flags*/0, &streamIdx, &flags, &timeStamp, &frame);
         if (FAILED(hr))
