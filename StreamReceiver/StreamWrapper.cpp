@@ -56,7 +56,7 @@ HRESULT StreamWrapper::EndRead(/*in*/IMFAsyncResult* result, /*out*/ULONG* cbRea
     bool updated = m_stream_editor.ParseStream(std::string_view(m_read_buf, *cbRead));
     if (updated) {
         wprintf(L"Frame DPI: %f\n", m_stream_editor.GetDPI());
-        wprintf(L"Start time: %s\n", TimeString1904(m_stream_editor.GetStartTime()).c_str());
+        wprintf(L"Start time: %hs\n", TimeString1904(m_stream_editor.GetStartTime()).c_str());
     }
     return hr;
 }
