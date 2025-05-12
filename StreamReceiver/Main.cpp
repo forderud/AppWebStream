@@ -133,9 +133,9 @@ void ProcessFrames(IMFSourceReader& reader) {
     bool quit = false;
     while (!quit) {
         DWORD streamIdx = 0;
-        DWORD flags = 0;        // MF_SOURCE_READER_FLAG bitmask
-        LONGLONG timeStamp = 0; // in 100-nanosecond units
-        IMFSamplePtr frame;     // NULL if (flags & MF_SOURCE_READERF_ENDOFSTREAM)
+        DWORD flags = 0;       // MF_SOURCE_READER_FLAG bitmask
+        int64_t timeStamp = 0; // in 100-nanosecond units
+        IMFSamplePtr frame;    // NULL if (flags & MF_SOURCE_READERF_ENDOFSTREAM)
         hr = reader.ReadSample((DWORD)MF_SOURCE_READER_FIRST_VIDEO_STREAM, /*flags*/0, &streamIdx, &flags, &timeStamp, &frame);
         if (FAILED(hr))
             break;
@@ -174,8 +174,17 @@ void ProcessFrames(IMFSourceReader& reader) {
                 break;
         }
 
-        if (frame)
+        if (frame) {
             ++frameCount;
+
+            int64_t frameTime = 0; // in 100-nanosecond units
+            COM_CHECK(frame->GetSampleTime(&frameTime));
+            assert(frameTime == timeStamp);
+
+            int64_t frameDuration = 0; // in 100-nanosecond units
+            COM_CHECK(frame->GetSampleDuration(&frameDuration));
+            printf("Frame duration: %f ms\n", frameDuration*0.1f/1000); // convert to milliseconds
+        }
     }
 
     if (FAILED(hr)) {
