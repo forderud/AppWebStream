@@ -22,7 +22,7 @@ _COM_SMARTPTR_TYPEDEF(IMFSourceResolver, __uuidof(IMFSourceResolver));
 _COM_SMARTPTR_TYPEDEF(IMFMediaBuffer, __uuidof(IMFMediaBuffer));
 
 
-EXTERN_GUID(WMMEDIATYPE_Video, 0x73646976, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71); // from https://learn.microsoft.com/en-us/windows/win32/wmformat/media-type-identifiers
+EXTERN_GUID(WMMEDIATYPE_Video, 0x73646976, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71); // video stream from https://learn.microsoft.com/en-us/windows/win32/wmformat/media-type-identifiers
 
 HRESULT IsVideoStream(IMFSourceReader& reader, DWORD streamIdx) {
     for (DWORD mediaTypeIdx = 0;; mediaTypeIdx++) {
@@ -50,8 +50,6 @@ HRESULT IsVideoStream(IMFSourceReader& reader, DWORD streamIdx) {
 
         wprintf(L"\n");
     }
-
-    return E_FAIL;
 }
 
 DWORD GetFirstVideoStream (IMFSourceReader& reader) {
