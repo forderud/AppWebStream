@@ -57,13 +57,17 @@ extern "C" {
 
 class VideoEncoder {
 public:
-    /** Grow size to become a multiple of 2 (FFMPEG libx264 requirement). */
+    /** FFMPEG only: Grow size to become a multiple of 2 (libx264 requirement). */
     static unsigned int Align2 (unsigned int size) {
+#ifdef ENABLE_FFMPEG
         constexpr unsigned int block_size = 2;
         if ((size % block_size) == 0)
             return size;
         else
             return size + block_size - (size % block_size);
+#else
+        return size;
+#endif
     }
 
     VideoEncoder (unsigned short dimensions[2]) : m_width(dimensions[0]), m_height(dimensions[1]) {
