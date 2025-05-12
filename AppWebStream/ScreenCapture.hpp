@@ -53,6 +53,10 @@ public:
         DeleteDC(dc);
     }
 
+    bool CopyFromWindow(window_dc& src) {
+        return BitBlt(/*dst*/dc, 0, 0, src.width(), src.height(), /*src*/src.dc, 0, 0, SRCCOPY);
+    }
+
     HDC     dc = nullptr;
     HBITMAP bmp = nullptr;
 private:
