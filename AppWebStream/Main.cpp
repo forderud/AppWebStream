@@ -61,7 +61,7 @@ struct offscreen_bmp {
 static HRESULT EncodeFrame (VideoEncoder & encoder, window_dc & wnd_dc) {
     // create offscreen bitmap with device context
     // make bitmap width compatible with VideoEncoder, so that image buffer pointers can be shared
-    offscreen_bmp bmp(wnd_dc.dc, VideoEncoder::Align(wnd_dc.width()), wnd_dc.height());
+    offscreen_bmp bmp(wnd_dc.dc, VideoEncoder::Align2(wnd_dc.width()), wnd_dc.height());
 
     // copy window content to bitmap
     if (!BitBlt(/*dst*/bmp.dc, 0, 0, wnd_dc.width(), wnd_dc.height(),

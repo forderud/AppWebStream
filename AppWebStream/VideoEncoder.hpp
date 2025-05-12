@@ -58,7 +58,8 @@ extern "C" {
 class VideoEncoder {
 public:
     /** Grow size to become a multiple of 2 (FFMPEG requirement). */
-    static unsigned int Align (unsigned int size, unsigned int block_size = 2) {
+    static unsigned int Align2 (unsigned int size) {
+        constexpr unsigned int block_size = 2;
         if ((size % block_size) == 0)
             return size;
         else
@@ -82,7 +83,7 @@ public:
 #else
             const R8G8B8A8 * src_row = &src_data[(m_height-1-j)*m_width]; // flip upside down
 #endif
-            R8G8B8A8 * dst_row = &buffer_ptr[j*Align(m_width)];
+            R8G8B8A8 * dst_row = &buffer_ptr[j*Align2(m_width)];
 
             if (swap_rb) {
                 for (unsigned int i = 0; i < m_width; i++)
@@ -93,15 +94,15 @@ public:
             }
 
             // clear padding at end of scanline
-            size_t hor_padding = Align(m_width) - m_width;
+            size_t hor_padding = Align2(m_width) - m_width;
             if (hor_padding)
                 std::memset(&dst_row[m_width], 0, 4*hor_padding);
         }
 
         // clear padding after last scanline
-        size_t vert_padding = Align(m_height) - m_height;
+        size_t vert_padding = Align2(m_height) - m_height;
         if (vert_padding)
-            std::memset(&buffer_ptr[m_height*Align(m_width)], 0, 4*Align(m_width)*vert_padding);
+            std::memset(&buffer_ptr[m_height*Align2(m_width)], 0, 4*Align2(m_width)*vert_padding);
 
         return WriteFrameEnd();
     }
@@ -185,7 +186,7 @@ public:
     }
 
     R8G8B8A8* WriteFrameBegin () override {
-        const DWORD frame_size = 4*Align(m_width)*Align(m_height);
+        const DWORD frame_size = 4*Align2(m_width)*Align2(m_height);
 
         // Create a new memory buffer.
         if (!m_buffer)
@@ -198,7 +199,7 @@ public:
     }
 
     HRESULT WriteFrameEnd () override {
-        const DWORD frame_size = 4*Align(m_width)*Align(m_height);
+        const DWORD frame_size = 4*Align2(m_width)*Align2(m_height);
 
         COM_CHECK(m_buffer->Unlock());
 
@@ -237,7 +238,7 @@ private:
         COM_CHECK(mediaTypeIn->SetUINT32(MF_MT_INTERLACE_MODE, MFVideoInterlace_Progressive));
         //COM_CHECK(mediaTypeIn->SetUINT32(MF_MT_ALL_SAMPLES_INDEPENDENT, TRUE));
         // Frame size is aligned to avoid crash
-        COM_CHECK(MFSetAttributeSize(mediaTypeIn, MF_MT_FRAME_SIZE, Align(m_width), Align(m_height)));
+        COM_CHECK(MFSetAttributeSize(mediaTypeIn, MF_MT_FRAME_SIZE, Align2(m_width), Align2(m_height)));
         COM_CHECK(MFSetAttributeRatio(mediaTypeIn, MF_MT_FRAME_RATE, fps, 1));
         COM_CHECK(MFSetAttributeRatio(mediaTypeIn, MF_MT_PIXEL_ASPECT_RATIO, 1, 1));
         return mediaTypeIn;
@@ -251,7 +252,7 @@ private:
         COM_CHECK(mediaTypeOut->SetUINT32(MF_MT_AVG_BITRATE, bit_rate));
         COM_CHECK(mediaTypeOut->SetUINT32(MF_MT_INTERLACE_MODE, MFVideoInterlace_Progressive));
         // Frame size is aligned to avoid crash
-        COM_CHECK(MFSetAttributeSize(mediaTypeOut, MF_MT_FRAME_SIZE, Align(m_width), Align(m_height)));
+        COM_CHECK(MFSetAttributeSize(mediaTypeOut, MF_MT_FRAME_SIZE, Align2(m_width), Align2(m_height)));
         COM_CHECK(MFSetAttributeRatio(mediaTypeOut, MF_MT_FRAME_RATE, fps, 1));
         COM_CHECK(MFSetAttributeRatio(mediaTypeOut, MF_MT_PIXEL_ASPECT_RATIO, 1, 1));
         return mediaTypeOut;
@@ -289,7 +290,7 @@ public:
         if (!m_out_ctx)
             throw std::runtime_error("avformat_alloc_output_context2 failure");
 
-        m_rgb_buf.resize(Align(m_width)*Align(m_height));
+        m_rgb_buf.resize(Align2(m_width)* Align2(m_height));
 
         // Add the video streams using the default format codecs and initialize the codecs
         const AVCodec * video_codec = nullptr;
@@ -440,8 +441,8 @@ private:
             enc->codec_id = codec_id;
             enc->bit_rate = static_cast<unsigned int>(0.78f*m_fps*m_width*m_height); // yields 40Mb/s for 1920x1080@25fps
             // Resolution must be a multiple of two
-            enc->width    = Align(m_width);
-            enc->height   = Align(m_height);
+            enc->width    = Align2(m_width);
+            enc->height   = Align2(m_height);
             /* timebase: This is the fundamental unit of time (in seconds) in terms
             * of which frame timestamps are represented. For fixed-fps content,
             * timebase should be 1/framerate and timestamp increments should be
