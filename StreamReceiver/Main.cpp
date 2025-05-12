@@ -49,15 +49,10 @@ HRESULT IsVideoStream(IMFSourceReader& reader, DWORD streamIdx) {
 }
 
 DWORD GetFirstVideoStream (IMFSourceReader& reader) {
-    HRESULT hr = S_OK;
-    DWORD streamIdx = 0;
-
-    while (SUCCEEDED(hr)) {
-        hr = IsVideoStream(reader, streamIdx);
+    for (DWORD streamIdx = 0; ; streamIdx++) {
+        HRESULT hr = IsVideoStream(reader, streamIdx);
         if (SUCCEEDED(hr))
             return streamIdx;
-
-        ++streamIdx;
     }
 
     wprintf(L"ERROR: Unable to detect any video stream.\n");
