@@ -7,33 +7,12 @@
 
 
 static HRESULT EncodeFrame (VideoEncoder & encoder, window_dc & wnd_dc) {
-    // create offscreen bitmap with device context
-    // make bitmap width compatible with VideoEncoder, so that image buffer pointers can be shared
+    // create offscreen bitmap for screen capture (pad window size to be compatible with FFMPEG encoder)
     offscreen_bmp bmp(wnd_dc.dc, VideoEncoder::Align2(wnd_dc.width()), wnd_dc.height());
 
-    // copy window content to bitmap
-    if (!bmp.CopyFromWindow(wnd_dc))
-        return E_FAIL;
-
-    BITMAPINFO bmp_info = {};
-    bmp_info.bmiHeader.biSize = sizeof(bmp_info.bmiHeader);
-    {
-        // call GetDIBits to fill "bmp_info" struct 
-        int ok = GetDIBits(bmp.dc, bmp.bmp, 0, wnd_dc.height(), nullptr, &bmp_info, DIB_RGB_COLORS);
-        if (!ok)
-            return E_FAIL;
-        bmp_info.bmiHeader.biBitCount    = 32;     // request 32bit RGBA image 
-        bmp_info.bmiHeader.biCompression = BI_RGB; // disable compression
-#ifdef ENABLE_FFMPEG
-        bmp_info.bmiHeader.biHeight = -abs(bmp_info.bmiHeader.biHeight); // request bitmap with origin in top-left corner
-#else
-        bmp_info.bmiHeader.biHeight = abs(bmp_info.bmiHeader.biHeight); // request bottom-up bitmap, with origin in lower-left corner
-#endif
-    }
-
-    // call GetDIBits to get image data
+    // copy window content encoder buffer
     auto * img_ptr = encoder.WriteFrameBegin();
-    int scan_lines = GetDIBits(bmp.dc, bmp.bmp, 0, wnd_dc.height(), img_ptr, &bmp_info, DIB_RGB_COLORS);
+    int scan_lines = bmp.CopyToRGBABuffer(wnd_dc, (uint32_t*)img_ptr);
     if (scan_lines != wnd_dc.height()) {
         encoder.WriteFrameEnd(); // needed to unlock buffer
         return E_FAIL;
