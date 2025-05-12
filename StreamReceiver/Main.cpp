@@ -38,12 +38,12 @@ HRESULT EnumerateTypesForStream(IMFSourceReader& reader, DWORD streamIdx) {
         
         if (SUCCEEDED(hr)) {
             // Examine the media type
-            printf("Stream detected...\n");
-            printf("* index: %u\n", streamIdx);
+            wprintf(L"Stream detected...\n");
+            wprintf(L"* index: %u\n", streamIdx);
             GUID guid{};
             COM_CHECK(type->GetMajorType(&guid));
             if (guid == WMMEDIATYPE_Video) {
-                printf("* MajorType: WMMEDIATYPE_Video\n");
+                wprintf(L"* MajorType: WMMEDIATYPE_Video\n");
             } else {
                 wchar_t guid_str[39] = {};
                 int ok = StringFromGUID2(guid, guid_str, (int)std::size(guid_str));
@@ -72,7 +72,7 @@ DWORD GetFirstVideoStream (IMFSourceReader& reader) {
         ++streamIdx;
     }
 
-    printf("ERROR: Unable to detect any video stream.\n");
+    wprintf(L"ERROR: Unable to detect any video stream.\n");
     abort();
 }
 
@@ -122,7 +122,7 @@ HRESULT ConfigureDecoder(IMFSourceReader& reader, DWORD dwStreamIndex) {
 
     uint32_t width = 0, height = 0;
     COM_CHECK(MFGetAttributeSize(pNativeType, MF_MT_FRAME_SIZE, &width, &height));
-    printf("Frame resolution: %u x %u\n", width, height);
+    wprintf(L"Frame resolution: %u x %u\n", width, height);
 
     return hr;
 }
@@ -184,7 +184,7 @@ void ProcessFrames(IMFSourceReader& reader) {
 
             int64_t frameDuration = 0; // in 100-nanosecond units
             COM_CHECK(frame->GetSampleDuration(&frameDuration));
-            printf("  Frame duration: %f ms\n", frameDuration*0.1f/1000); // convert to milliseconds
+            wprintf(L"  Frame duration: %f ms\n", frameDuration*0.1f/1000); // convert to milliseconds
 
             DWORD bufferCount = 0;
             COM_CHECK(frame->GetBufferCount(&bufferCount));
@@ -194,7 +194,7 @@ void ProcessFrames(IMFSourceReader& reader) {
 
                 DWORD bufLen = 0;
                 COM_CHECK(buffer->GetCurrentLength(&bufLen));
-                printf("  Frame buffer #%u length: %u\n", idx, bufLen);
+                wprintf(L"  Frame buffer #%u length: %u\n", idx, bufLen);
 
                 // Call buffer->Lock()... Unlock() to access RGBA pixel data
             }
