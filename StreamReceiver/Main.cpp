@@ -163,31 +163,32 @@ void ProcessFrames(IMFSourceReader& reader) {
                 break;
         }
 
-        if (frame) {
-            ++frameCount;
+        if (!frame)
+            continue;
 
-            int64_t frameTime = 0; // in 100-nanosecond units
-            COM_CHECK(frame->GetSampleTime(&frameTime));
-            assert(frameTime == timeStamp);
+        int64_t frameTime = 0; // in 100-nanosecond units
+        COM_CHECK(frame->GetSampleTime(&frameTime));
+        assert(frameTime == timeStamp);
 
-            int64_t frameDuration = 0; // in 100-nanosecond units
-            COM_CHECK(frame->GetSampleDuration(&frameDuration));
-            wprintf(L"  Frame duration: %f ms\n", frameDuration*0.1f/1000); // convert to milliseconds
+        int64_t frameDuration = 0; // in 100-nanosecond units
+        COM_CHECK(frame->GetSampleDuration(&frameDuration));
+        wprintf(L"  Frame duration: %f ms\n", frameDuration*0.1f/1000); // convert to milliseconds
 
-            DWORD bufferCount = 0;
-            COM_CHECK(frame->GetBufferCount(&bufferCount));
-            for (DWORD idx = 0; idx < bufferCount; idx++) {
-                IMFMediaBufferPtr buffer;
-                COM_CHECK(frame->GetBufferByIndex(idx, &buffer));
+        DWORD bufferCount = 0;
+        COM_CHECK(frame->GetBufferCount(&bufferCount));
+        for (DWORD idx = 0; idx < bufferCount; idx++) {
+            IMFMediaBufferPtr buffer;
+            COM_CHECK(frame->GetBufferByIndex(idx, &buffer));
 
-                DWORD bufLen = 0;
-                COM_CHECK(buffer->GetCurrentLength(&bufLen));
-                wprintf(L"  Frame buffer #%u length: %u\n", idx, bufLen);
-                assert(bufLen == 4 * Align16(width) * Align16(height)); // buffer size is a multiple of MPEG4 16x16 macroblocks
+            DWORD bufLen = 0;
+            COM_CHECK(buffer->GetCurrentLength(&bufLen));
+            wprintf(L"  Frame buffer #%u length: %u\n", idx, bufLen);
+            assert(bufLen == 4 * Align16(width) * Align16(height)); // buffer size is a multiple of MPEG4 16x16 macroblocks
 
-                // Call buffer->Lock()... Unlock() to access RGBA pixel data
-            }
+            // Call buffer->Lock()... Unlock() to access RGBA pixel data
         }
+
+        ++frameCount;
     }
 
     if (FAILED(hr)) {
