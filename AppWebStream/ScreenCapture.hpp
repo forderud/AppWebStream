@@ -54,6 +54,7 @@ public:
     }
 
     int CopyToRGBABuffer(window_dc& src, /*out*/uint32_t* dst_ptr) {
+        // copy window content to bitmap
         if (!BitBlt(/*dst*/dc, 0, 0, src.width(), src.height(), /*src*/src.dc, 0, 0, SRCCOPY))
             return -1;
 
@@ -73,7 +74,7 @@ public:
 #endif
         }
 
-        // call GetDIBits to get image data
+        // copy bitmap content to destination buffer
         int scan_lines = GetDIBits(dc, bmp, 0, src.height(), dst_ptr, &bmp_info, DIB_RGB_COLORS);
         return scan_lines;
     }
