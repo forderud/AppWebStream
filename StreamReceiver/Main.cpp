@@ -80,25 +80,17 @@ DWORD GetFirstVideoStream (IMFSourceReader& reader) {
 HRESULT ConfigureDecoder(IMFSourceReader& reader, DWORD dwStreamIndex) {
     // Find the native format of the stream.
     IMFMediaTypePtr pNativeType;
-    HRESULT hr = reader.GetNativeMediaType(dwStreamIndex, 0, &pNativeType);
-    if (FAILED(hr))
-        return hr;
+    COM_CHECK(reader.GetNativeMediaType(dwStreamIndex, 0, &pNativeType));
 
     // Find the major type.
     GUID majorType{};
-    hr = pNativeType->GetGUID(MF_MT_MAJOR_TYPE, &majorType);
-    if (FAILED(hr))
-        return hr;
+    COM_CHECK(pNativeType->GetGUID(MF_MT_MAJOR_TYPE, &majorType));
 
     // Define the output type.
     IMFMediaTypePtr pType;
-    hr = MFCreateMediaType(&pType);
-    if (FAILED(hr))
-        return hr;
+    COM_CHECK(MFCreateMediaType(&pType));
 
-    hr = pType->SetGUID(MF_MT_MAJOR_TYPE, majorType);
-    if (FAILED(hr))
-        return hr;
+    COM_CHECK(pType->SetGUID(MF_MT_MAJOR_TYPE, majorType));
 
     // Select a subtype.
     GUID subtype{};
@@ -108,23 +100,19 @@ HRESULT ConfigureDecoder(IMFSourceReader& reader, DWORD dwStreamIndex) {
         subtype = MFAudioFormat_PCM;
     } else {
         // Unrecognized type. Skip.
-        return hr;
+        return E_FAIL;
     }
 
-    hr = pType->SetGUID(MF_MT_SUBTYPE, subtype);
-    if (FAILED(hr))
-        return hr;
+    COM_CHECK(pType->SetGUID(MF_MT_SUBTYPE, subtype));
 
     // Set the uncompressed format.
-    hr = reader.SetCurrentMediaType(dwStreamIndex, NULL, pType);
-    if (FAILED(hr))
-        return hr;
+    COM_CHECK(reader.SetCurrentMediaType(dwStreamIndex, NULL, pType));
 
     uint32_t width = 0, height = 0;
     COM_CHECK(MFGetAttributeSize(pNativeType, MF_MT_FRAME_SIZE, &width, &height));
     wprintf(L"Frame resolution: %u x %u\n", width, height);
 
-    return hr;
+    return S_OK;
 }
 
 void ProcessFrames(IMFSourceReader& reader) {
