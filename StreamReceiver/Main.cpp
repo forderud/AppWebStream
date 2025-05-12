@@ -77,7 +77,7 @@ DWORD GetFirstVideoStream (IMFSourceReader& reader) {
 }
 
 
-HRESULT ConfigureDecoder(IMFSourceReader& reader, DWORD dwStreamIndex) {
+HRESULT ConfigureOutputType(IMFSourceReader& reader, DWORD dwStreamIndex) {
     GUID majorType{};
     GUID subType{};
     {
@@ -160,7 +160,7 @@ void ProcessFrames(IMFSourceReader& reader) {
 
         if (flags & MF_SOURCE_READERF_NATIVEMEDIATYPECHANGED) {
             // The format changed. Reconfigure the decoder.
-            hr = ConfigureDecoder(reader, streamIdx);
+            hr = ConfigureOutputType(reader, streamIdx);
             if (FAILED(hr))
                 break;
         }
@@ -245,7 +245,7 @@ int main(int argc, char* argv[]) {
 #endif
 
     DWORD streamIdx = GetFirstVideoStream(reader);
-    ConfigureDecoder(reader, streamIdx);
+    ConfigureOutputType(reader, streamIdx);
 
     ProcessFrames(reader);
 }
