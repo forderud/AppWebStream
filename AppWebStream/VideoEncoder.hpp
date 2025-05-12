@@ -77,6 +77,7 @@ public:
 
     virtual R8G8B8A8* WriteFrameBegin () = 0;
     virtual HRESULT   WriteFrameEnd () = 0;
+    virtual void      AbortWrite() = 0;
 
     HRESULT WriteFrame (const R8G8B8A8* src_data, bool swap_rb) {
         R8G8B8A8 * buffer_ptr = WriteFrameBegin();
@@ -230,6 +231,10 @@ public:
         // increment time
         m_time_stamp += m_frame_duration;
         return S_OK;
+    }
+
+    void AbortWrite() override {
+        COM_CHECK(m_buffer->Unlock());
     }
 
 private:
@@ -417,6 +422,10 @@ public:
         }
 
         return S_OK;
+    }
+
+    void AbortWrite() override {
+        // do nothing
     }
 
 private:
