@@ -19,6 +19,7 @@ _COM_SMARTPTR_TYPEDEF(IMFMediaType, __uuidof(IMFMediaType));
 _COM_SMARTPTR_TYPEDEF(IMFSample, __uuidof(IMFSample));
 _COM_SMARTPTR_TYPEDEF(IMFByteStream, __uuidof(IMFByteStream));
 _COM_SMARTPTR_TYPEDEF(IMFSourceResolver, __uuidof(IMFSourceResolver));
+_COM_SMARTPTR_TYPEDEF(IMFMediaBuffer, __uuidof(IMFMediaBuffer));
 
 
 EXTERN_GUID(WMMEDIATYPE_Video, 0x73646976, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71); // from https://learn.microsoft.com/en-us/windows/win32/wmformat/media-type-identifiers
@@ -140,7 +141,7 @@ void ProcessFrames(IMFSourceReader& reader) {
         if (FAILED(hr))
             break;
 
-        wprintf(L"Stream idx: %u\n", streamIdx);
+        wprintf(L"Stream event on idx: %u\n", streamIdx);
 
 #if 0
         PROPVARIANT val{};
@@ -148,7 +149,7 @@ void ProcessFrames(IMFSourceReader& reader) {
         COM_CHECK(reader.GetPresentationAttribute(streamIdx, MF_PD_LAST_MODIFIED_TIME, &val)); // fails with "The requested attribute was not found."
 #endif
 
-        wprintf(L"Frame time: %f ms\n", timeStamp*0.1f/1000); // convert to milliseconds
+        wprintf(L"  Frame time: %f ms\n", timeStamp*0.1f/1000); // convert to milliseconds
 
         if (flags & MF_SOURCE_READERF_ENDOFSTREAM) {
             wprintf(L"\tEnd of stream\n");
@@ -183,7 +184,18 @@ void ProcessFrames(IMFSourceReader& reader) {
 
             int64_t frameDuration = 0; // in 100-nanosecond units
             COM_CHECK(frame->GetSampleDuration(&frameDuration));
-            printf("Frame duration: %f ms\n", frameDuration*0.1f/1000); // convert to milliseconds
+            printf("  Frame duration: %f ms\n", frameDuration*0.1f/1000); // convert to milliseconds
+
+            DWORD bufferCount = 0;
+            COM_CHECK(frame->GetBufferCount(&bufferCount));
+            for (DWORD idx = 0; idx < bufferCount; idx++) {
+                IMFMediaBufferPtr buffer;
+                COM_CHECK(frame->GetBufferByIndex(idx, &buffer));
+
+                DWORD bufLen = 0;
+                COM_CHECK(buffer->GetCurrentLength(&bufLen));
+                printf("  Frame buffer #%u length: %u\n", idx, bufLen);
+            }
         }
     }
 
