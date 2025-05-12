@@ -24,12 +24,14 @@ _COM_SMARTPTR_TYPEDEF(IMFMediaBuffer, __uuidof(IMFMediaBuffer));
 
 EXTERN_GUID(WMMEDIATYPE_Video, 0x73646976, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71); // video stream from https://learn.microsoft.com/en-us/windows/win32/wmformat/media-type-identifiers
 
-HRESULT IsVideoStream(IMFSourceReader& reader, DWORD streamIdx) {
+HRESULT IsVideoStream(IMFSourceReader& reader, DWORD streamIdx, /*out*/bool& isVideo) {
     for (DWORD mediaTypeIdx = 0;; mediaTypeIdx++) {
         IMFMediaTypePtr mediaType;
         HRESULT hr = reader.GetNativeMediaType(streamIdx, mediaTypeIdx, &mediaType);
-        if (FAILED(hr))
-            return hr; // MF_E_NO_MORE_TYPES of out of bounds
+        if (FAILED(hr)) {
+            isVideo = false;
+            return hr; // MF_E_NO_MORE_TYPES if out of bounds
+        }
         
         // Examine the media type
         wprintf(L"Stream detected...\n");
@@ -38,6 +40,7 @@ HRESULT IsVideoStream(IMFSourceReader& reader, DWORD streamIdx) {
         COM_CHECK(mediaType->GetMajorType(&guid));
         if (guid == WMMEDIATYPE_Video) {
             wprintf(L"* MajorType: WMMEDIATYPE_Video\n");
+            isVideo = true;
             return S_OK;
         } else {
             wchar_t guid_str[39] = {};
@@ -50,8 +53,12 @@ HRESULT IsVideoStream(IMFSourceReader& reader, DWORD streamIdx) {
 
 DWORD GetFirstVideoStream (IMFSourceReader& reader) {
     for (DWORD streamIdx = 0; ; streamIdx++) {
-        HRESULT hr = IsVideoStream(reader, streamIdx);
-        if (SUCCEEDED(hr))
+        bool isVideo = false;
+        HRESULT hr = IsVideoStream(reader, streamIdx, isVideo);
+        if (hr == MF_E_NO_MORE_TYPES) // out of bounds
+            break;
+
+        if (SUCCEEDED(hr) && isVideo)
             return streamIdx;
     }
 
