@@ -78,32 +78,31 @@ DWORD GetFirstVideoStream (IMFSourceReader& reader) {
 
 
 HRESULT ConfigureDecoder(IMFSourceReader& reader, DWORD dwStreamIndex) {
-    // get the native stream format
-    IMFMediaTypePtr nativeType;
-    COM_CHECK(reader.GetNativeMediaType(dwStreamIndex, 0, &nativeType));
-
-    // Find the major type.
     GUID majorType{};
-    COM_CHECK(nativeType->GetGUID(MF_MT_MAJOR_TYPE, &majorType));
+    GUID subType{};
+    {
+        // get the native stream format
+        IMFMediaTypePtr nativeType;
+        COM_CHECK(reader.GetNativeMediaType(dwStreamIndex, 0, &nativeType));
 
-    // Define the output type.
+        // get major type
+        COM_CHECK(nativeType->GetGUID(MF_MT_MAJOR_TYPE, &majorType));
+
+        // select matching subtype
+        if (majorType == MFMediaType_Video)
+            subType = MFVideoFormat_RGB32;
+        else if (majorType == MFMediaType_Audio)
+            subType = MFAudioFormat_PCM;
+        else
+            return E_FAIL; // unrecognized type
+    }
+
+    // configure output type
     IMFMediaTypePtr mediaType;
     COM_CHECK(MFCreateMediaType(&mediaType));
 
     COM_CHECK(mediaType->SetGUID(MF_MT_MAJOR_TYPE, majorType));
-
-    // Select a subtype.
-    GUID subtype{};
-    if (majorType == MFMediaType_Video) {
-        subtype = MFVideoFormat_RGB32;
-    } else if (majorType == MFMediaType_Audio) {
-        subtype = MFAudioFormat_PCM;
-    } else {
-        // Unrecognized type. Skip.
-        return E_FAIL;
-    }
-
-    COM_CHECK(mediaType->SetGUID(MF_MT_SUBTYPE, subtype));
+    COM_CHECK(mediaType->SetGUID(MF_MT_SUBTYPE, subType));
 
     // Set the uncompressed format.
     COM_CHECK(reader.SetCurrentMediaType(dwStreamIndex, NULL, mediaType));
