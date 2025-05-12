@@ -187,7 +187,7 @@ private:
             ptr += sizeof(uint32_t) * 2; // reserved
 
             // matrix to map points from one coordinate space into another
-            matrix mat(ptr);
+            //matrix mat(ptr);
             ptr += matrix::SIZE;
 
             ptr += sizeof(uint32_t) * 6; // reserved
@@ -386,7 +386,7 @@ private:
             ptr += sizeof(uint32_t) * 2; // reserved
 
             // matrix to map points from one coordinate space into another
-            matrix mat(ptr);
+            //matrix mat(ptr);
             ptr += matrix::SIZE;
 
             ptr += sizeof(uint32_t) * 6; // reserved
