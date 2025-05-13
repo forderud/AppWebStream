@@ -547,10 +547,9 @@ private:
                                 ptr += 2;
                                 printf("avc1 atom resolution: (%u, %u)\n", width, height);
 
-                                // check existing video DPI in fixed-point 16+16 format
-                                // Resolution hardcoded to 72dpi (0x00480000) in FFMPEG encoder (https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/movenc.c)
-                                // It also appear to be hardocded in the MF encoder. I've at least not found a parameter for adjusting it.
 #if 0
+                                // DPI hardcoded to 72dpi (0x00480000) in FFMPEG encoder (https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/movenc.c)
+                                // It also appear to be hardocded in the MF encoder. I've at least not found a parameter for adjusting it.
                                 double dpi = ReadFixed1616(ptr);
                                 assert(dpi == 72); // 72.00 horizontal DPI
                                 dpi = ReadFixed1616(ptr + 4);
