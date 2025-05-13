@@ -99,6 +99,11 @@ HRESULT ConfigureOutputType(IMFSourceReader& reader, DWORD dwStreamIndex) {
     return S_OK;
 }
 
+static void OnStartTimeDpiChanged(uint64_t startTime, double dpi) {
+    wprintf(L"Frame DPI:  %f\n", dpi);
+    wprintf(L"Start time: %hs (UTC)\n", TimeString1904(startTime).c_str());
+}
+
 static unsigned int Align16(unsigned int size) {
     if ((size % 16) == 0)
         return size;
@@ -239,7 +244,7 @@ int main(int argc, char* argv[]) {
         IMFByteStreamPtr innerStream = source;
 
         auto tmp = CreateLocalInstance<StreamWrapper>();
-        tmp->Initialize(innerStream);
+        tmp->Initialize(innerStream, OnStartTimeDpiChanged);
         COM_CHECK(tmp.QueryInterface(&byteStream));
     }
     COM_CHECK(MFCreateSourceReaderFromByteStream(byteStream, attribs, &reader));

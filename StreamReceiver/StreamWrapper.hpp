@@ -9,6 +9,8 @@
 _COM_SMARTPTR_TYPEDEF(IMFByteStream, __uuidof(IMFByteStream));
 
 
+typedef void (*StartTimeDpiChanged)(uint64_t startTime, double dpi);
+
 /** IMFByteStream wrapper to allow parsing of the underlying MPEG4 bitstream.
     Used to access CreationTime & DPI parameters that doesn't seem to be exposed through the MediaFoundation API. */
 class ATL_NO_VTABLE StreamWrapper :
@@ -19,7 +21,7 @@ public:
     StreamWrapper();
     /*NOT virtual*/ ~StreamWrapper();
 
-    void Initialize(IMFByteStream * obj);
+    void Initialize(IMFByteStream * obj, StartTimeDpiChanged notifier);
 
     HRESULT GetCapabilities(/*out*/DWORD *capabilities) override;
 
@@ -59,4 +61,5 @@ private:
     char*            m_read_buf = nullptr; // set by BeginRead
     IMFByteStreamPtr m_obj;
     MP4StreamEditor  m_stream_editor;
+    StartTimeDpiChanged m_notifier;
 };
