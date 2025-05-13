@@ -180,9 +180,13 @@ inline std::string TimeString1904(uint64_t mpeg4Time) {
     errno_t res = gmtime_s(&timeStruct, &unixTime);
     assert(!res);
 
-    char buffer[64]{};
+    char buffer[26]{}; // always same size
     res = asctime_s(buffer, &timeStruct);
     assert(!res);
+
+    // remove newline at end of string
+    buffer[24] = '\0';
+
     return buffer;
 }
 
