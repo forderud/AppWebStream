@@ -4,7 +4,7 @@
 #include "MP4Utils.hpp"
 
 
-/** Process atoms within a MPEG4 MovieFragment (moof) to make the stream comply with ISO base media file format (https://b.goeswhere.com/ISO_IEC_14496-12_2015.pdf).
+/** Process atoms within a MPEG4 MovieFragment (moof) to make the stream comply with ISO base media file format (https://b.goeswhere.com/ISO_IEC_14496-12_2015.pdf , https://github.com/MPEGGroup/isobmff).
     Work-around for shortcommings in the Media Foundation MPEG4 file sink (https://learn.microsoft.com/en-us/windows/win32/medfound/mpeg-4-file-sink).
     Please delete this class if a better alternative becomes available.
 Expected atom hiearchy:
