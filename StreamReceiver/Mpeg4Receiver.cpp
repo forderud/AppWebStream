@@ -225,6 +225,12 @@ HRESULT Mpeg4Receiver::ReceiveFrame() {
 }
 
 void Mpeg4Receiver::OnStartTimeDpiChanged(uint64_t startTime, double dpi) {
-    wprintf(L"Frame DPI:  %f\n", dpi);
-    wprintf(L"Start time: %hs (UTC)\n", TimeString1904(startTime).c_str());
+    if (startTime != m_startTime)
+        wprintf(L"Start time: %hs (UTC)\n", TimeString1904(startTime).c_str());
+
+    if (dpi != m_dpi)
+        wprintf(L"Frame DPI:  %f\n", dpi);
+
+    m_startTime = startTime;
+    m_dpi = dpi;
 }

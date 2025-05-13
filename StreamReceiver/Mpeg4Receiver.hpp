@@ -28,4 +28,6 @@ private:
     void OnStartTimeDpiChanged(uint64_t startTime, double dpi) override;
 
     IMFSourceReaderPtr m_reader;
+    uint64_t           m_startTime = 0; // SECONDS since midnight, Jan. 1, 1904
+    double             m_dpi = 0;       // pixel spacing
 };
