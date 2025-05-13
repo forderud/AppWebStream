@@ -40,7 +40,7 @@ Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, ProcessFrameCb frame_cb) : m_frame_cb(
     }
     COM_CHECK(MFCreateSourceReaderFromByteStream(byteStream, attribs, &m_reader));
 
-    ConfigureOutputType(m_reader, (DWORD)MF_SOURCE_READER_FIRST_VIDEO_STREAM);
+    COM_CHECK(ConfigureOutputType(m_reader, (DWORD)MF_SOURCE_READER_FIRST_VIDEO_STREAM));
 }
 
 Mpeg4Receiver::~Mpeg4Receiver() {
