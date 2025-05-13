@@ -1,4 +1,5 @@
 #pragma once
+#include <array>
 #include <comdef.h> // for __uuidof
 #include <mfapi.h>
 #include <mfidl.h>
@@ -38,6 +39,10 @@ public:
         return m_dpi;
     }
 
+    std::array<uint32_t, 2> GetResolution() const {
+        return m_resolution;
+    }
+
 private:
     void ParseFrame(IMFSample& frame);
 
@@ -46,6 +51,5 @@ private:
     IMFSourceReaderPtr m_reader;
     uint64_t           m_startTime = 0; // SECONDS since midnight, Jan. 1, 1904
     double             m_dpi = 0;       // pixel spacing
-    uint32_t           m_width = 0;
-    uint32_t           m_height = 0;
+    std::array<uint32_t, 2> m_resolution;  // horizontal & vertical pixel count
 };

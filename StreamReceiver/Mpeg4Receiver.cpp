@@ -93,6 +93,8 @@ static unsigned int Align16(unsigned int size) {
 
 
 Mpeg4Receiver::Mpeg4Receiver(_bstr_t url) {
+    m_resolution.fill(0); // clear array
+
     COM_CHECK(MFStartup(MF_VERSION));
 
     IMFAttributesPtr attribs;
@@ -181,9 +183,9 @@ HRESULT Mpeg4Receiver::ReceiveFrame() {
         IMFMediaTypePtr nativeType;
         COM_CHECK(m_reader->GetNativeMediaType(streamIdx, 0, &nativeType));
 
-        COM_CHECK(MFGetAttributeSize(nativeType, MF_MT_FRAME_SIZE, &m_width, &m_height));
+        COM_CHECK(MFGetAttributeSize(nativeType, MF_MT_FRAME_SIZE, &m_resolution[0], &m_resolution[1]));
         if (printAll)
-            wprintf(L"  Frame resolution: %u x %u\n", m_width, m_height);
+            wprintf(L"  Frame resolution: %u x %u\n", m_resolution[0], m_resolution[1]);
     }
 
     wprintf(L"  Frame time:     %f ms\n", timeStamp * 0.1f / 1000); // convert to milliseconds
@@ -213,7 +215,7 @@ void Mpeg4Receiver::ParseFrame(IMFSample& frame) {
         DWORD bufLen = 0;
         COM_CHECK(buffer->GetCurrentLength(&bufLen));
         //wprintf(L"  Frame buffer #%u length: %u\n", idx, bufLen);
-        assert(bufLen == 4 * Align16(m_width) * Align16(m_height)); // buffer size is a multiple of MPEG4 16x16 macroblocks
+        assert(bufLen == 4 * Align16(m_resolution[0]) * Align16(m_resolution[1])); // buffer size is a multiple of MPEG4 16x16 macroblocks
 
         // Call buffer->Lock()... Unlock() to access RGBA pixel data
     }
