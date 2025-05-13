@@ -128,19 +128,6 @@ HRESULT Mpeg4Receiver::ReceiveFrame() {
         wprintf(L"  Stream tick\n");
     }
 
-    {
-        IMFMediaTypePtr nativeType;
-        COM_CHECK(m_reader->GetNativeMediaType(streamIdx, 0, &nativeType));
-
-        uint32_t width = 0, height = 0;
-        COM_CHECK(MFGetAttributeSize(nativeType, MF_MT_FRAME_SIZE, &width, &height));
-        if ((width != m_resolution[0]) || (height != m_resolution[1]))
-            m_metadata_changed = true;
-
-        m_resolution[0] = width;
-        m_resolution[1] = height;
-    }
-
     if (!frame)
         return E_FAIL;
 
@@ -180,6 +167,15 @@ HRESULT Mpeg4Receiver::ConfigureOutputType(IMFSourceReader& reader, DWORD dwStre
             subType = MFAudioFormat_PCM;
         else
             return E_FAIL; // unrecognized type
+
+        // update frame resolution
+        uint32_t width = 0, height = 0;
+        COM_CHECK(MFGetAttributeSize(nativeType, MF_MT_FRAME_SIZE, &width, &height));
+        if ((width != m_resolution[0]) || (height != m_resolution[1]))
+            m_metadata_changed = true;
+
+        m_resolution[0] = width;
+        m_resolution[1] = height;
     }
 
     // configure RGB32 output
