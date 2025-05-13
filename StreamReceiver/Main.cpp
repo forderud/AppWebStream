@@ -123,42 +123,49 @@ void ProcessFrames(IMFSourceReader& reader) {
 
         wprintf(L"Stream event on idx: %u\n", streamIdx);
 
-        uint32_t width = 0, height = 0;
-        {
-            IMFMediaTypePtr nativeType;
-            COM_CHECK(reader.GetNativeMediaType(streamIdx, 0, &nativeType));
-
-            COM_CHECK(MFGetAttributeSize(nativeType, MF_MT_FRAME_SIZE, &width, &height));
-            wprintf(L"  Frame resolution: %u x %u\n", width, height);
-        }
 #if 0
         PROPVARIANT val{};
         PropVariantClear(&val);
         COM_CHECK(reader.GetPresentationAttribute(streamIdx, MF_PD_LAST_MODIFIED_TIME, &val)); // fails with "The requested attribute was not found."
 #endif
 
-        wprintf(L"  Frame time:     %f ms\n", timeStamp*0.1f/1000); // convert to milliseconds
-
+        bool printAll = false; // print all frame parameters
         if (flags & MF_SOURCE_READERF_ENDOFSTREAM) {
-            wprintf(L"\tEnd of stream\n");
+            wprintf(L"  End of stream\n");
             quit = true;
         }
         if (flags & MF_SOURCE_READERF_NEWSTREAM) {
-            wprintf(L"\tNew stream\n");
+            wprintf(L"  New stream\n");
+            printAll = true;
         }
         if (flags & MF_SOURCE_READERF_NATIVEMEDIATYPECHANGED) {
-            wprintf(L"\tNative type changed\n");
+            wprintf(L"  Native type changed\n");
+            printAll = true;
             // The format changed. Reconfigure the decoder.
             hr = ConfigureOutputType(reader, streamIdx);
             if (FAILED(hr))
                 break;
         }
         if (flags & MF_SOURCE_READERF_CURRENTMEDIATYPECHANGED) {
-            wprintf(L"\tCurrent type changed\n");
+            wprintf(L"  Current type changed\n");
+            printAll = true;
         }
         if (flags & MF_SOURCE_READERF_STREAMTICK) {
-            wprintf(L"\tStream tick\n");
+            wprintf(L"  Stream tick\n");
+            printAll = true;
         }
+
+        uint32_t width = 0, height = 0;
+        {
+            IMFMediaTypePtr nativeType;
+            COM_CHECK(reader.GetNativeMediaType(streamIdx, 0, &nativeType));
+
+            COM_CHECK(MFGetAttributeSize(nativeType, MF_MT_FRAME_SIZE, &width, &height));
+            if (printAll)
+                wprintf(L"  Frame resolution: %u x %u\n", width, height);
+        }
+
+        wprintf(L"  Frame time:     %f ms\n", timeStamp*0.1f/1000); // convert to milliseconds
 
         if (!frame)
             continue;
