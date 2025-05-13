@@ -99,11 +99,6 @@ HRESULT ConfigureOutputType(IMFSourceReader& reader, DWORD dwStreamIndex) {
     return S_OK;
 }
 
-static void OnStartTimeDpiChanged(uint64_t startTime, double dpi) {
-    wprintf(L"Frame DPI:  %f\n", dpi);
-    wprintf(L"Start time: %hs (UTC)\n", TimeString1904(startTime).c_str());
-}
-
 static unsigned int Align16(unsigned int size) {
     if ((size % 16) == 0)
         return size;
@@ -208,6 +203,18 @@ void ProcessFrames(IMFSourceReader& reader) {
 }
 
 
+class Mpeg4StreamReceiver : public IStartTimeDPIReceiver {
+public:
+    Mpeg4StreamReceiver() = default;
+    ~Mpeg4StreamReceiver() override = default;
+
+    void OnStartTimeDpiChanged(uint64_t startTime, double dpi) override {
+        wprintf(L"Frame DPI:  %f\n", dpi);
+        wprintf(L"Start time: %hs (UTC)\n", TimeString1904(startTime).c_str());
+    }
+};
+
+
 int main(int argc, char* argv[]) {
     if (argc < 2) {
         wprintf(L"Usage: StreamReceiver.exe URL (e.g. StreamReceiver.exe http://localhost:8080/movie.mp4)\n");
@@ -228,6 +235,7 @@ int main(int argc, char* argv[]) {
         COM_CHECK(attribs->SetUINT32(MF_SOURCE_READER_ENABLE_VIDEO_PROCESSING, TRUE)); // enable YUV to RGB-32 conversion
     }
 
+    Mpeg4StreamReceiver receiver;
     IMFSourceReaderPtr reader;
 #if 1
     // Create intermediate IMFByteStream object allow parsing of the underlying MPEG4 bitstream.
@@ -244,7 +252,7 @@ int main(int argc, char* argv[]) {
         IMFByteStreamPtr innerStream = source;
 
         auto tmp = CreateLocalInstance<StreamWrapper>();
-        tmp->Initialize(innerStream, OnStartTimeDpiChanged);
+        tmp->Initialize(innerStream, &receiver);
         COM_CHECK(tmp.QueryInterface(&byteStream));
     }
     COM_CHECK(MFCreateSourceReaderFromByteStream(byteStream, attribs, &reader));

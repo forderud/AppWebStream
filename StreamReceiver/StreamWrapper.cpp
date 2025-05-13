@@ -12,7 +12,7 @@ StreamWrapper::StreamWrapper() {
 StreamWrapper::~StreamWrapper() {
 }
 
-void StreamWrapper::Initialize(IMFByteStream* obj, StartTimeDpiChangedCb notifier) {
+void StreamWrapper::Initialize(IMFByteStream* obj, IStartTimeDPIReceiver* notifier) {
     m_obj = obj;
     m_notifier = notifier;
 }
@@ -56,7 +56,7 @@ HRESULT StreamWrapper::EndRead(/*in*/IMFAsyncResult* result, /*out*/ULONG* cbRea
     // Inspect m_read_buf bitstream
     bool updated = m_stream_editor.ParseStream(std::string_view(m_read_buf, *cbRead));
     if (m_notifier && updated)
-        m_notifier(m_stream_editor.GetStartTime(), m_stream_editor.GetDPI());
+        m_notifier->OnStartTimeDpiChanged(m_stream_editor.GetStartTime(), m_stream_editor.GetDPI());
 
     return hr;
 }
