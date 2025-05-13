@@ -22,10 +22,14 @@ public:
     virtual void OnStartTimeDpiChanged(uint64_t startTime, double dpi) = 0;
 };
 
+class Mpeg4Receiver; // forward decl.
+
+typedef void (*ProcessFrameCb)(Mpeg4Receiver& receiver, IMFSample& frame);
+
 
 class Mpeg4Receiver : public IStartTimeDPIReceiver {
 public:
-    Mpeg4Receiver(_bstr_t url);
+    Mpeg4Receiver(_bstr_t url, ProcessFrameCb frame_cb);
 
     ~Mpeg4Receiver() override;
 
@@ -44,12 +48,11 @@ public:
     }
 
 private:
-    void ParseFrame(IMFSample& frame);
-
     void OnStartTimeDpiChanged(uint64_t startTime, double dpi) override;
 
     IMFSourceReaderPtr m_reader;
     uint64_t           m_startTime = 0; // SECONDS since midnight, Jan. 1, 1904
     double             m_dpi = 0;       // pixel spacing
     std::array<uint32_t, 2> m_resolution;  // horizontal & vertical pixel count
+    ProcessFrameCb     m_frame_cb = nullptr;
 };

@@ -1,6 +1,34 @@
 #include <atlbase.h>
 #include <stdio.h>
 #include "Mpeg4Receiver.hpp"
+#include "../AppWebStream/ComUtil.hpp"
+
+static unsigned int Align16(unsigned int size) {
+    if ((size % 16) == 0)
+        return size;
+    else
+        return size + 16 - (size % 16);
+}
+
+
+static void OnProcessFrame(Mpeg4Receiver& receiver, IMFSample& frame) {
+    auto resolution = receiver.GetResolution();
+
+    DWORD bufferCount = 0;
+    COM_CHECK(frame.GetBufferCount(&bufferCount));
+    for (DWORD idx = 0; idx < bufferCount; idx++) {
+        IMFMediaBufferPtr buffer;
+        COM_CHECK(frame.GetBufferByIndex(idx, &buffer));
+
+        DWORD bufLen = 0;
+        COM_CHECK(buffer->GetCurrentLength(&bufLen));
+        //wprintf(L"  Frame buffer #%u length: %u\n", idx, bufLen);
+        assert(bufLen == 4 * Align16(resolution[0]) * Align16(resolution[1])); // buffer size is a multiple of MPEG4 16x16 macroblocks
+
+        // Call buffer->Lock()... Unlock() to access RGBA pixel data
+    }
+
+}
 
 
 int main(int argc, char* argv[]) {
@@ -11,7 +39,7 @@ int main(int argc, char* argv[]) {
 
     _bstr_t url = argv[1];
     // connect to MPEG4 H.264 stream
-    Mpeg4Receiver receiver(url);
+    Mpeg4Receiver receiver(url, OnProcessFrame);
 
     HRESULT hr = S_OK;
     while (SUCCEEDED(hr)) {

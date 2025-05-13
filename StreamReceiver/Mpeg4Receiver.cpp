@@ -84,15 +84,8 @@ HRESULT ConfigureOutputType(IMFSourceReader& reader, DWORD dwStreamIndex) {
     return S_OK;
 }
 
-static unsigned int Align16(unsigned int size) {
-    if ((size % 16) == 0)
-        return size;
-    else
-        return size + 16 - (size % 16);
-}
 
-
-Mpeg4Receiver::Mpeg4Receiver(_bstr_t url) {
+Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, ProcessFrameCb frame_cb) : m_frame_cb(frame_cb) {
     m_resolution.fill(0); // clear array
 
     COM_CHECK(MFStartup(MF_VERSION));
@@ -201,26 +194,11 @@ HRESULT Mpeg4Receiver::ReceiveFrame() {
     COM_CHECK(frame->GetSampleDuration(&frameDuration));
     wprintf(L"  Frame duration: %f ms\n", frameDuration * 0.1f / 1000); // convert to milliseconds
 
-    ParseFrame(*frame);
+    if (m_frame_cb)
+        m_frame_cb(*this, *frame);
+
     return S_OK;
 }
-
-void Mpeg4Receiver::ParseFrame(IMFSample& frame) {
-    DWORD bufferCount = 0;
-    COM_CHECK(frame.GetBufferCount(&bufferCount));
-    for (DWORD idx = 0; idx < bufferCount; idx++) {
-        IMFMediaBufferPtr buffer;
-        COM_CHECK(frame.GetBufferByIndex(idx, &buffer));
-
-        DWORD bufLen = 0;
-        COM_CHECK(buffer->GetCurrentLength(&bufLen));
-        //wprintf(L"  Frame buffer #%u length: %u\n", idx, bufLen);
-        assert(bufLen == 4 * Align16(m_resolution[0]) * Align16(m_resolution[1])); // buffer size is a multiple of MPEG4 16x16 macroblocks
-
-        // Call buffer->Lock()... Unlock() to access RGBA pixel data
-    }
-}
-
 
 void Mpeg4Receiver::OnStartTimeDpiChanged(uint64_t startTime, double dpi) {
     if (startTime != m_startTime)
