@@ -12,7 +12,7 @@ StreamWrapper::StreamWrapper() {
 StreamWrapper::~StreamWrapper() {
 }
 
-void StreamWrapper::Initialize(IMFByteStream* obj, StartTimeDpiChanged notifier) {
+void StreamWrapper::Initialize(IMFByteStream* obj, StartTimeDpiChangedCb notifier) {
     m_obj = obj;
     m_notifier = notifier;
 }
