@@ -688,7 +688,7 @@ private:
         if (add_tfdt) {
             ptr -= BASE_DATA_OFFSET_SIZE;
 
-            // move "trun" atom to make room for a new "tfhd"
+            // move TrackRunAtom ("trun") to make room for a new "tfhd"
             MemMove(ptr+TFDT_SIZE-BASE_DATA_OFFSET_SIZE/*dst*/, ptr/*src*/, buf_size-tfhd_size/*size*/);
         }
 
@@ -728,7 +728,7 @@ private:
         }
 
         {
-            // modify "trun" atom
+            // modify TrackRunAtom ("trun")
             // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/TrackRunBox.java
             char* trun_ptr = ptr;
             uint32_t trun_size = GetAtomSize(trun_ptr);
@@ -744,7 +744,7 @@ private:
             assert(version == 1);   // check version
 #endif
 
-            // "trun" atom flags (from https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/isom.h)
+            // TrackRunAtom ("trun") flags (from https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/isom.h)
             constexpr uint32_t MOV_TRUN_DATA_OFFSET = 0x01;
             constexpr uint32_t MOV_TRUN_FIRST_SAMPLE_FLAGS = 0x04;
             constexpr uint32_t MOV_TRUN_SAMPLE_DURATION = 0x100;
