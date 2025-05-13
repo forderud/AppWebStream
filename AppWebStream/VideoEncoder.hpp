@@ -520,7 +520,7 @@ private:
     }
 
     unsigned int         m_fps = 0;
-    int64_t         m_next_pts = 0; // pts of the next frame that will be generated
+    int64_t         m_next_pts = 0; // presentation timestamp (PTS) [time_base unit] for the next frame
     AVFormatContext *m_out_ctx = nullptr;
     AVStream         *m_stream = nullptr;
     AVCodecContext      *m_enc = nullptr;
