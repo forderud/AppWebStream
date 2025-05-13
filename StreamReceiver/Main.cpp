@@ -179,7 +179,7 @@ void ProcessFrames(IMFSourceReader& reader) {
 
             DWORD bufLen = 0;
             COM_CHECK(buffer->GetCurrentLength(&bufLen));
-            wprintf(L"  Frame buffer #%u length: %u\n", idx, bufLen);
+            //wprintf(L"  Frame buffer #%u length: %u\n", idx, bufLen);
             assert(bufLen == 4 * Align16(width) * Align16(height)); // buffer size is a multiple of MPEG4 16x16 macroblocks
 
             // Call buffer->Lock()... Unlock() to access RGBA pixel data
