@@ -175,14 +175,13 @@ HRESULT Mpeg4Receiver::ReceiveFrame() {
         printAll = true;
     }
 
-    uint32_t width = 0, height = 0;
     {
         IMFMediaTypePtr nativeType;
         COM_CHECK(m_reader->GetNativeMediaType(streamIdx, 0, &nativeType));
 
-        COM_CHECK(MFGetAttributeSize(nativeType, MF_MT_FRAME_SIZE, &width, &height));
+        COM_CHECK(MFGetAttributeSize(nativeType, MF_MT_FRAME_SIZE, &m_width, &m_height));
         if (printAll)
-            wprintf(L"  Frame resolution: %u x %u\n", width, height);
+            wprintf(L"  Frame resolution: %u x %u\n", m_width, m_height);
     }
 
     wprintf(L"  Frame time:     %f ms\n", timeStamp * 0.1f / 1000); // convert to milliseconds
@@ -207,7 +206,7 @@ HRESULT Mpeg4Receiver::ReceiveFrame() {
         DWORD bufLen = 0;
         COM_CHECK(buffer->GetCurrentLength(&bufLen));
         //wprintf(L"  Frame buffer #%u length: %u\n", idx, bufLen);
-        assert(bufLen == 4 * Align16(width) * Align16(height)); // buffer size is a multiple of MPEG4 16x16 macroblocks
+        assert(bufLen == 4 * Align16(m_width) * Align16(m_height)); // buffer size is a multiple of MPEG4 16x16 macroblocks
 
         // Call buffer->Lock()... Unlock() to access RGBA pixel data
     }

@@ -30,4 +30,6 @@ private:
     IMFSourceReaderPtr m_reader;
     uint64_t           m_startTime = 0; // SECONDS since midnight, Jan. 1, 1904
     double             m_dpi = 0;       // pixel spacing
+    uint32_t           m_width = 0;
+    uint32_t           m_height = 0;
 };
