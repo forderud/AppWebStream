@@ -49,6 +49,7 @@ public:
 
 private:
     void OnStartTimeDpiChanged(uint64_t startTime, double dpi) override;
+    HRESULT ConfigureOutputType(IMFSourceReader& reader, DWORD dwStreamIndex);
 
     IMFSourceReaderPtr m_reader;
     uint64_t           m_startTime = 0; // SECONDS since midnight, Jan. 1, 1904

@@ -46,37 +46,6 @@ DWORD GetFirstVideoStream(IMFSourceReader& reader) {
 }
 
 
-HRESULT ConfigureOutputType(IMFSourceReader& reader, DWORD dwStreamIndex) {
-    GUID majorType{};
-    GUID subType{};
-    {
-        // get the native stream format
-        IMFMediaTypePtr nativeType;
-        COM_CHECK(reader.GetNativeMediaType(dwStreamIndex, 0, &nativeType));
-
-        // get major type
-        COM_CHECK(nativeType->GetGUID(MF_MT_MAJOR_TYPE, &majorType));
-
-        // select matching subtype
-        if (majorType == MFMediaType_Video)
-            subType = MFVideoFormat_RGB32;
-        else if (majorType == MFMediaType_Audio)
-            subType = MFAudioFormat_PCM;
-        else
-            return E_FAIL; // unrecognized type
-    }
-
-    // configure RGB32 output
-    IMFMediaTypePtr mediaType;
-    COM_CHECK(MFCreateMediaType(&mediaType));
-    COM_CHECK(mediaType->SetGUID(MF_MT_MAJOR_TYPE, majorType));
-    COM_CHECK(mediaType->SetGUID(MF_MT_SUBTYPE, subType));
-
-    COM_CHECK(reader.SetCurrentMediaType(dwStreamIndex, NULL, mediaType));
-    return S_OK;
-}
-
-
 Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, ProcessFrameCb frame_cb) : m_frame_cb(frame_cb) {
     m_resolution.fill(0); // clear array
 
@@ -191,4 +160,34 @@ void Mpeg4Receiver::OnStartTimeDpiChanged(uint64_t startTime, double dpi) {
 
     m_startTime = startTime;
     m_dpi = dpi;
+}
+
+HRESULT Mpeg4Receiver::ConfigureOutputType(IMFSourceReader& reader, DWORD dwStreamIndex) {
+    GUID majorType{};
+    GUID subType{};
+    {
+        // get the native stream format
+        IMFMediaTypePtr nativeType;
+        COM_CHECK(reader.GetNativeMediaType(dwStreamIndex, 0, &nativeType));
+
+        // get major type
+        COM_CHECK(nativeType->GetGUID(MF_MT_MAJOR_TYPE, &majorType));
+
+        // select matching subtype
+        if (majorType == MFMediaType_Video)
+            subType = MFVideoFormat_RGB32;
+        else if (majorType == MFMediaType_Audio)
+            subType = MFAudioFormat_PCM;
+        else
+            return E_FAIL; // unrecognized type
+    }
+
+    // configure RGB32 output
+    IMFMediaTypePtr mediaType;
+    COM_CHECK(MFCreateMediaType(&mediaType));
+    COM_CHECK(mediaType->SetGUID(MF_MT_MAJOR_TYPE, majorType));
+    COM_CHECK(mediaType->SetGUID(MF_MT_SUBTYPE, subType));
+
+    COM_CHECK(reader.SetCurrentMediaType(dwStreamIndex, NULL, mediaType));
+    return S_OK;
 }
