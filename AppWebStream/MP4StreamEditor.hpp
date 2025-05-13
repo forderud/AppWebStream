@@ -4,6 +4,12 @@
 #include "MP4Utils.hpp"
 
 
+struct TimeHandler {
+    uint64_t startTime = 0; // creation- & modification time
+    uint64_t cur_time = 0;
+    uint32_t timeScale = 0; // time units per second: 1000*fps (50000 = 50fps) [unused]
+};
+
 /** Process atoms within a MPEG4 MovieFragment (moof) to make the stream comply with ISO base media file format (https://b.goeswhere.com/ISO_IEC_14496-12_2015.pdf , https://github.com/MPEGGroup/isobmff).
     Work-around for shortcommings in the Media Foundation MPEG4 file sink (https://learn.microsoft.com/en-us/windows/win32/medfound/mpeg-4-file-sink).
     Please delete this class if a better alternative becomes available.
@@ -44,7 +50,7 @@ public:
 
     MP4StreamEditor(double dpi, uint64_t startTime1904) {
         m_dpi = dpi;
-        m_startTime = startTime1904;
+        m_time.startTime = startTime1904;
     }
 
     /** Parse MPEG4 bitstream to extract parameters that are not directly accessible through the Media Foundation and/or FFMPEG APIs.
@@ -128,14 +134,14 @@ public:
     }
 
     void SetNextFrameTime(uint64_t nextTime) {
-        m_cur_time = nextTime;
+        m_time.cur_time = nextTime;
     }
 
     double GetDPI() const {
         return m_dpi;
     }
     uint64_t GetStartTime() const {
-        return m_startTime;
+        return m_time.startTime;
     }
 
 private:
@@ -162,10 +168,10 @@ private:
             ptr += sizeof(uint24_t);
 
             uint64_t modifyTime = 0;
-            std::tie(m_startTime, modifyTime, ptr) = ParseCreateModifyTime(ptr, version);
+            std::tie(m_time.startTime, modifyTime, ptr) = ParseCreateModifyTime(ptr, version);
 
             // read timescale (number of time units per second)
-            m_timeScale = DeSerialize<uint32_t>(ptr); // 1000*fps
+            m_time.timeScale = DeSerialize<uint32_t>(ptr); // 1000*fps
             ptr += 4;
 
             uint64_t duration = 0;
@@ -361,10 +367,10 @@ private:
             //uint32_t flags = DeSerialize<uint24_t>(ptr);
             ptr += sizeof(uint24_t);
 
-            ptr = UpdateCreateModifyTime(ptr, version, m_startTime);
+            ptr = UpdateCreateModifyTime(ptr, version, m_time.startTime);
 
             // read timescale (number of time units per second)
-            m_timeScale = DeSerialize<uint32_t>(ptr); // 1000*fps
+            m_time.timeScale = DeSerialize<uint32_t>(ptr); // 1000*fps
             ptr += 4;
 
             uint64_t duration = 0;
@@ -423,7 +429,7 @@ private:
                 //uint32_t flags = DeSerialize<uint24_t>(tkhd_ptr);
                 tkhd_ptr += sizeof(uint24_t);
 
-                tkhd_ptr = UpdateCreateModifyTime(tkhd_ptr, version, m_startTime);
+                tkhd_ptr = UpdateCreateModifyTime(tkhd_ptr, version, m_time.startTime);
 
                 ptr += tkhd_len;
             }
@@ -449,7 +455,7 @@ private:
                     //uint32_t flags = DeSerialize<uint24_t>(mdhd_ptr);
                     mdhd_ptr += sizeof(uint24_t);
 
-                    mdhd_ptr = UpdateCreateModifyTime(mdhd_ptr, version, m_startTime);
+                    mdhd_ptr = UpdateCreateModifyTime(mdhd_ptr, version, m_time.startTime);
 
                     ptr += mdhd_len;
                 }
@@ -704,7 +710,7 @@ private:
             *tfdt_ptr = 1; // version 1 (no other flags)
             tfdt_ptr += VERSION_FLAGS_SIZE; // skip flags
             // write tfdt/baseMediaDecodeTime
-            tfdt_ptr = Serialize<uint64_t>(tfdt_ptr, m_cur_time);
+            tfdt_ptr = Serialize<uint64_t>(tfdt_ptr, m_time.cur_time);
 
             assert(tfdt_ptr == ptr + TFDT_SIZE);
             ptr += TFDT_SIZE;
@@ -720,7 +726,7 @@ private:
 
             // check baseMediaDecodeTime
             auto baseMediaDecodeTime = DeSerialize<uint64_t>(tfdt_ptr);
-            assert(baseMediaDecodeTime == m_cur_time);
+            assert(baseMediaDecodeTime == m_time.cur_time);
             tfdt_ptr += sizeof(uint64_t);
 
             assert(tfdt_ptr == ptr + tfdt_size);
@@ -784,9 +790,9 @@ private:
                     payload += sizeof(uint32_t);
 
                     // update baseMediaDecodeTime for next fragment
-                    m_cur_time += sample_dur;
+                    m_time.cur_time += sample_dur;
                 } else {
-                    m_cur_time += 1024; // almost matches MediaFoundation
+                    m_time.cur_time += 1024; // almost matches MediaFoundation
                 }
 
                 if (flags & MOV_TRUN_SAMPLE_SIZE) {
@@ -811,8 +817,6 @@ private:
 
 private:
     double            m_dpi = 0;
-    uint64_t          m_startTime = 0; // creation- & modification time
-    uint32_t          m_timeScale = 0; // time units per second: 1000*fps (50000 = 50fps)
-    uint64_t          m_cur_time = 0;
+    TimeHandler       m_time;
     std::vector<char> m_moof_buf; ///< "moof" atom modification buffer
 };
