@@ -14,7 +14,7 @@ static unsigned int Align16(unsigned int size) {
 
 
 static void OnProcessFrame(Mpeg4Receiver& receiver, IMFSample& frame) {
-    uint64_t startTime = receiver.GetStartTime();
+    uint64_t startTime = receiver.GetStartTime(); // SECONDS since midnight, Jan. 1, 1904
     double dpi = receiver.GetDpi();
     auto resolution = receiver.GetResolution();
     if (receiver.HasMetadataChanged()) {
@@ -23,7 +23,7 @@ static void OnProcessFrame(Mpeg4Receiver& receiver, IMFSample& frame) {
         wprintf(L"Frame resolution: %u x %u\n", resolution[0], resolution[1]);
     }
 
-    int64_t frameTime = 0; // in 100-nanosecond units
+    int64_t frameTime = 0; // in 100-nanosecond units since startTime
     COM_CHECK(frame.GetSampleTime(&frameTime));
     wprintf(L"  Frame time:     %f ms\n", frameTime * 0.1f / 1000); // convert to milliseconds
 
