@@ -7,45 +7,6 @@
 #pragma comment(lib, "mfuuid.lib")
 
 
-EXTERN_GUID(WMMEDIATYPE_Video, 0x73646976, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71); // video stream from https://learn.microsoft.com/en-us/windows/win32/wmformat/media-type-identifiers
-
-HRESULT IsVideoStream(IMFSourceReader& reader, DWORD streamIdx, /*out*/bool& isVideo) {
-    // iterate over all media types
-    for (DWORD mediaTypeIdx = 0;; mediaTypeIdx++) {
-        IMFMediaTypePtr mediaType;
-        HRESULT hr = reader.GetNativeMediaType(streamIdx, mediaTypeIdx, &mediaType);
-        if (FAILED(hr)) {
-            isVideo = false;
-            return hr; // MF_E_NO_MORE_TYPES if out of bounds
-        }
-
-        // examine media type
-        GUID guid{};
-        COM_CHECK(mediaType->GetMajorType(&guid));
-        if (guid == WMMEDIATYPE_Video) {
-            isVideo = true; // found video stream
-            return S_OK;
-        }
-    }
-}
-
-DWORD GetFirstVideoStream(IMFSourceReader& reader) {
-    // iterate over all streams
-    for (DWORD streamIdx = 0; ; streamIdx++) {
-        bool isVideo = false;
-        HRESULT hr = IsVideoStream(reader, streamIdx, isVideo);
-        if (hr == MF_E_NO_MORE_TYPES) // out of bounds
-            break;
-
-        if (SUCCEEDED(hr) && isVideo)
-            return streamIdx;
-    }
-
-    wprintf(L"ERROR: Unable to detect any video stream.\n");
-    abort();
-}
-
-
 Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, ProcessFrameCb frame_cb) : m_frame_cb(frame_cb) {
     m_resolution.fill(0); // clear array
 
@@ -79,8 +40,7 @@ Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, ProcessFrameCb frame_cb) : m_frame_cb(
     }
     COM_CHECK(MFCreateSourceReaderFromByteStream(byteStream, attribs, &m_reader));
 
-    DWORD streamIdx = GetFirstVideoStream(m_reader);
-    ConfigureOutputType(m_reader, streamIdx);
+    ConfigureOutputType(m_reader, (DWORD)MF_SOURCE_READER_FIRST_VIDEO_STREAM);
 }
 
 Mpeg4Receiver::~Mpeg4Receiver() {
