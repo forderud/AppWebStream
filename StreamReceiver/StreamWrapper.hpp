@@ -57,8 +57,8 @@ public:
     END_COM_MAP()
 
 private:
-    std::string_view m_read_buf; // set by BeginRead
-    IMFByteStreamPtr m_socket;   // network socket stream to intercept
-    MP4StreamEditor  m_stream_editor;
+    IMFByteStreamPtr       m_socket;   // network socket stream to intercept
+    MP4StreamEditor        m_stream_editor;
+    std::string_view       m_read_buf; // set by BeginRead
     IStartTimeDPIReceiver* m_notifier = nullptr;
 };
