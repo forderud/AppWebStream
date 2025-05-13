@@ -1,4 +1,5 @@
 #include <cassert>
+#include <stdexcept>
 #include <tuple>
 #include <vector>
 #include "MP4Utils.hpp"

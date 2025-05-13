@@ -1,5 +1,6 @@
 #pragma once
 #include <ctime>
+#include <string>
 #include <Windows.h>
 
 
