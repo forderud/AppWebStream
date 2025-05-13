@@ -25,6 +25,8 @@ public:
     HRESULT ReceiveFrame();
 
 private:
+    void ParseFrame(IMFSample& frame);
+
     void OnStartTimeDpiChanged(uint64_t startTime, double dpi) override;
 
     IMFSourceReaderPtr m_reader;

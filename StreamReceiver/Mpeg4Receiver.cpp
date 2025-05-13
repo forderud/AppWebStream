@@ -197,11 +197,16 @@ HRESULT Mpeg4Receiver::ReceiveFrame() {
     COM_CHECK(frame->GetSampleDuration(&frameDuration));
     wprintf(L"  Frame duration: %f ms\n", frameDuration * 0.1f / 1000); // convert to milliseconds
 
+    ParseFrame(*frame);
+    return S_OK;
+}
+
+void Mpeg4Receiver::ParseFrame(IMFSample& frame) {
     DWORD bufferCount = 0;
-    COM_CHECK(frame->GetBufferCount(&bufferCount));
+    COM_CHECK(frame.GetBufferCount(&bufferCount));
     for (DWORD idx = 0; idx < bufferCount; idx++) {
         IMFMediaBufferPtr buffer;
-        COM_CHECK(frame->GetBufferByIndex(idx, &buffer));
+        COM_CHECK(frame.GetBufferByIndex(idx, &buffer));
 
         DWORD bufLen = 0;
         COM_CHECK(buffer->GetCurrentLength(&bufLen));
@@ -210,13 +215,8 @@ HRESULT Mpeg4Receiver::ReceiveFrame() {
 
         // Call buffer->Lock()... Unlock() to access RGBA pixel data
     }
-
-    if (FAILED(hr)) {
-        wprintf(L"ProcessSamples FAILED, hr = 0x%x\n", hr);
-    }
-
-    return SUCCEEDED(hr);
 }
+
 
 void Mpeg4Receiver::OnStartTimeDpiChanged(uint64_t startTime, double dpi) {
     if (startTime != m_startTime)
