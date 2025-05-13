@@ -40,12 +40,14 @@ static void OnProcessFrame(Mpeg4Receiver& receiver, IMFSample& frame, bool metad
         IMFMediaBufferPtr buffer;
         COM_CHECK(frame.GetBufferByIndex(idx, &buffer));
 
-        DWORD bufLen = 0;
-        COM_CHECK(buffer->GetCurrentLength(&bufLen));
-        //wprintf(L"  Frame buffer #%u length: %u\n", idx, bufLen);
-        assert(bufLen == 4 * Align16(resolution[0]) * Align16(resolution[1])); // buffer size is a multiple of MPEG4 16x16 macroblocks
+        BYTE* bufferPtr = nullptr;
+        DWORD bufferSize = 0;
+        COM_CHECK(buffer->Lock(&bufferPtr, nullptr, &bufferSize));
+        assert(bufferSize == 4 * Align16(resolution[0]) * Align16(resolution[1])); // buffer size is a multiple of MPEG4 16x16 macroblocks
 
-        // Call buffer->Lock()... Unlock() to access RGBA pixel data
+        // TODO: Access RGBA pixel data in bufferPtr
+
+        COM_CHECK(buffer->Unlock());
     }
 }
 
