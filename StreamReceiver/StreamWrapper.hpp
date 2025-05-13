@@ -8,12 +8,7 @@
 
 _COM_SMARTPTR_TYPEDEF(IMFByteStream, __uuidof(IMFByteStream));
 
-
-class IStartTimeDPIReceiver {
-public:
-    virtual ~IStartTimeDPIReceiver() = default;
-    virtual void OnStartTimeDpiChanged(uint64_t startTime, double dpi) = 0;
-};
+class IStartTimeDPIReceiver; // forward decl
 
 /** IMFByteStream wrapper to allow parsing of the underlying MPEG4 bitstream.
     Used to access CreationTime & DPI parameters that doesn't seem to be exposed through the MediaFoundation API. */

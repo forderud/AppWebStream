@@ -1,4 +1,5 @@
 #include "Mpeg4Receiver.hpp"
+#include "StreamWrapper.hpp"
 
 #pragma comment(lib, "Mfplat.lib")
 #pragma comment(lib, "Mfreadwrite.lib")
