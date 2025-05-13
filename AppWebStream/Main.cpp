@@ -17,6 +17,8 @@ static HRESULT EncodeFrame (VideoEncoder & encoder, window_dc & wnd_dc) {
         return E_FAIL;
     }
 
+    printf(".");
+
     // encode frame
     return encoder.WriteFrameEnd();
 }
