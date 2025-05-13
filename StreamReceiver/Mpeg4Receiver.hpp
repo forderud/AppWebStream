@@ -22,7 +22,7 @@ public:
 
     ~Mpeg4Receiver() override;
 
-    void ReceiveFrames();
+    HRESULT ReceiveFrame();
 
 private:
     void OnStartTimeDpiChanged(uint64_t startTime, double dpi) override;

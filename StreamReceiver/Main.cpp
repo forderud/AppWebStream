@@ -11,8 +11,11 @@ int main(int argc, char* argv[]) {
     _bstr_t url = argv[1];
     // connect to MPEG4 H.264 stream
     Mpeg4Receiver receiver(url);
-    // blocking call
-    receiver.ReceiveFrames();
+
+    HRESULT hr = S_OK;
+    while (SUCCEEDED(hr)) {
+        hr = receiver.ReceiveFrame();
+    }
 }
 
 

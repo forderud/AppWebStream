@@ -90,100 +90,91 @@ static unsigned int Align16(unsigned int size) {
 }
 
 
-void ProcessFrames(IMFSourceReader& reader) {
-    HRESULT hr = S_OK;
-    unsigned int frameCount = 0;
+HRESULT ProcessFrame(IMFSourceReader& reader) {
+    DWORD streamIdx = 0;
+    DWORD flags = 0;       // MF_SOURCE_READER_FLAG bitmask
+    int64_t timeStamp = 0; // in 100-nanosecond units
+    IMFSamplePtr frame;    // NULL if (flags & MF_SOURCE_READERF_ENDOFSTREAM)
+    HRESULT hr = reader.ReadSample((DWORD)MF_SOURCE_READER_FIRST_VIDEO_STREAM, /*flags*/0, &streamIdx, &flags, &timeStamp, &frame);
+    if (FAILED(hr))
+        return hr;
 
-    bool quit = false;
-    while (!quit) {
-        DWORD streamIdx = 0;
-        DWORD flags = 0;       // MF_SOURCE_READER_FLAG bitmask
-        int64_t timeStamp = 0; // in 100-nanosecond units
-        IMFSamplePtr frame;    // NULL if (flags & MF_SOURCE_READERF_ENDOFSTREAM)
-        hr = reader.ReadSample((DWORD)MF_SOURCE_READER_FIRST_VIDEO_STREAM, /*flags*/0, &streamIdx, &flags, &timeStamp, &frame);
-        if (FAILED(hr))
-            break;
-
-        wprintf(L"Stream event on idx: %u\n", streamIdx);
+    wprintf(L"Stream event on idx: %u\n", streamIdx);
 
 #if 0
-        PROPVARIANT val{};
-        PropVariantClear(&val);
-        COM_CHECK(reader.GetPresentationAttribute(streamIdx, MF_PD_LAST_MODIFIED_TIME, &val)); // fails with "The requested attribute was not found."
+    PROPVARIANT val{};
+    PropVariantClear(&val);
+    COM_CHECK(reader.GetPresentationAttribute(streamIdx, MF_PD_LAST_MODIFIED_TIME, &val)); // fails with "The requested attribute was not found."
 #endif
 
-        bool printAll = false; // print all frame parameters
-        if (flags & MF_SOURCE_READERF_ENDOFSTREAM) {
-            wprintf(L"  End of stream\n");
-            quit = true;
-        }
-        if (flags & MF_SOURCE_READERF_NEWSTREAM) {
-            wprintf(L"  New stream\n");
-            printAll = true;
-        }
-        if (flags & MF_SOURCE_READERF_NATIVEMEDIATYPECHANGED) {
-            wprintf(L"  Native type changed\n");
-            printAll = true;
-            // The format changed. Reconfigure the decoder.
-            hr = ConfigureOutputType(reader, streamIdx);
-            if (FAILED(hr))
-                break;
-        }
-        if (flags & MF_SOURCE_READERF_CURRENTMEDIATYPECHANGED) {
-            wprintf(L"  Current type changed\n");
-            printAll = true;
-        }
-        if (flags & MF_SOURCE_READERF_STREAMTICK) {
-            wprintf(L"  Stream tick\n");
-            printAll = true;
-        }
+    bool printAll = false; // print all frame parameters
+    if (flags & MF_SOURCE_READERF_ENDOFSTREAM) {
+        wprintf(L"  End of stream\n");
+        return E_FAIL;
+    }
+    if (flags & MF_SOURCE_READERF_NEWSTREAM) {
+        wprintf(L"  New stream\n");
+        printAll = true;
+    }
+    if (flags & MF_SOURCE_READERF_NATIVEMEDIATYPECHANGED) {
+        wprintf(L"  Native type changed\n");
+        printAll = true;
+        // The format changed. Reconfigure the decoder.
+        hr = ConfigureOutputType(reader, streamIdx);
+        if (FAILED(hr))
+            return E_FAIL;
+    }
+    if (flags & MF_SOURCE_READERF_CURRENTMEDIATYPECHANGED) {
+        wprintf(L"  Current type changed\n");
+        printAll = true;
+    }
+    if (flags & MF_SOURCE_READERF_STREAMTICK) {
+        wprintf(L"  Stream tick\n");
+        printAll = true;
+    }
 
-        uint32_t width = 0, height = 0;
-        {
-            IMFMediaTypePtr nativeType;
-            COM_CHECK(reader.GetNativeMediaType(streamIdx, 0, &nativeType));
+    uint32_t width = 0, height = 0;
+    {
+        IMFMediaTypePtr nativeType;
+        COM_CHECK(reader.GetNativeMediaType(streamIdx, 0, &nativeType));
 
-            COM_CHECK(MFGetAttributeSize(nativeType, MF_MT_FRAME_SIZE, &width, &height));
-            if (printAll)
-                wprintf(L"  Frame resolution: %u x %u\n", width, height);
-        }
+        COM_CHECK(MFGetAttributeSize(nativeType, MF_MT_FRAME_SIZE, &width, &height));
+        if (printAll)
+            wprintf(L"  Frame resolution: %u x %u\n", width, height);
+    }
 
-        wprintf(L"  Frame time:     %f ms\n", timeStamp * 0.1f / 1000); // convert to milliseconds
+    wprintf(L"  Frame time:     %f ms\n", timeStamp * 0.1f / 1000); // convert to milliseconds
 
-        if (!frame)
-            continue;
+    if (!frame)
+        return E_FAIL;
 
-        int64_t frameTime = 0; // in 100-nanosecond units
-        COM_CHECK(frame->GetSampleTime(&frameTime));
-        assert(frameTime == timeStamp);
+    int64_t frameTime = 0; // in 100-nanosecond units
+    COM_CHECK(frame->GetSampleTime(&frameTime));
+    assert(frameTime == timeStamp);
 
-        int64_t frameDuration = 0; // in 100-nanosecond units
-        COM_CHECK(frame->GetSampleDuration(&frameDuration));
-        wprintf(L"  Frame duration: %f ms\n", frameDuration * 0.1f / 1000); // convert to milliseconds
+    int64_t frameDuration = 0; // in 100-nanosecond units
+    COM_CHECK(frame->GetSampleDuration(&frameDuration));
+    wprintf(L"  Frame duration: %f ms\n", frameDuration * 0.1f / 1000); // convert to milliseconds
 
-        DWORD bufferCount = 0;
-        COM_CHECK(frame->GetBufferCount(&bufferCount));
-        for (DWORD idx = 0; idx < bufferCount; idx++) {
-            IMFMediaBufferPtr buffer;
-            COM_CHECK(frame->GetBufferByIndex(idx, &buffer));
+    DWORD bufferCount = 0;
+    COM_CHECK(frame->GetBufferCount(&bufferCount));
+    for (DWORD idx = 0; idx < bufferCount; idx++) {
+        IMFMediaBufferPtr buffer;
+        COM_CHECK(frame->GetBufferByIndex(idx, &buffer));
 
-            DWORD bufLen = 0;
-            COM_CHECK(buffer->GetCurrentLength(&bufLen));
-            //wprintf(L"  Frame buffer #%u length: %u\n", idx, bufLen);
-            assert(bufLen == 4 * Align16(width) * Align16(height)); // buffer size is a multiple of MPEG4 16x16 macroblocks
+        DWORD bufLen = 0;
+        COM_CHECK(buffer->GetCurrentLength(&bufLen));
+        //wprintf(L"  Frame buffer #%u length: %u\n", idx, bufLen);
+        assert(bufLen == 4 * Align16(width) * Align16(height)); // buffer size is a multiple of MPEG4 16x16 macroblocks
 
-            // Call buffer->Lock()... Unlock() to access RGBA pixel data
-        }
-
-        ++frameCount;
+        // Call buffer->Lock()... Unlock() to access RGBA pixel data
     }
 
     if (FAILED(hr)) {
         wprintf(L"ProcessSamples FAILED, hr = 0x%x\n", hr);
     }
-    else {
-        wprintf(L"Processed %u frames\n", frameCount);
-    }
+
+    return SUCCEEDED(hr);
 }
 
 
@@ -229,8 +220,8 @@ Mpeg4Receiver::Mpeg4Receiver(_bstr_t url) {
 Mpeg4Receiver::~Mpeg4Receiver() {
 }
 
-void Mpeg4Receiver::ReceiveFrames() {
-    ProcessFrames(m_reader);
+HRESULT Mpeg4Receiver::ReceiveFrame() {
+    return ProcessFrame(m_reader);
 }
 
 void Mpeg4Receiver::OnStartTimeDpiChanged(uint64_t startTime, double dpi) {
