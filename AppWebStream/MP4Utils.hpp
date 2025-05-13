@@ -176,12 +176,12 @@ inline uint64_t CurrentTime1904() {
 inline std::string TimeString1904(uint64_t mpeg4Time) {
     time_t unixTime = mpeg4Time - (66 * 365 + 17) * (24 * 60 * 60);
 
-    tm timeStruct{};
+    tm timeStruct{}; // in UTC time
     errno_t res = gmtime_s(&timeStruct, &unixTime);
     assert(!res);
 
-    char buffer[128]{};
-    res = asctime_s(buffer, &timeStruct); // UTC time
+    char buffer[64]{};
+    res = asctime_s(buffer, &timeStruct);
     assert(!res);
     return buffer;
 }
