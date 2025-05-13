@@ -108,24 +108,24 @@ HRESULT Mpeg4Receiver::ReceiveFrame() {
 #endif
 
     if (flags & MF_SOURCE_READERF_ENDOFSTREAM) {
-        wprintf(L"  End of stream\n");
+        wprintf(L"INFO: End of stream\n");
         return E_FAIL;
     }
     if (flags & MF_SOURCE_READERF_NEWSTREAM) {
-        wprintf(L"  New stream\n");
+        wprintf(L"INFO: New stream\n");
     }
     if (flags & MF_SOURCE_READERF_NATIVEMEDIATYPECHANGED) {
-        wprintf(L"  Native type changed\n");
+        wprintf(L"ERROR: Native media type changed\n");
         // The format changed. Reconfigure the decoder.
         hr = ConfigureOutputType(*m_reader, streamIdx);
         if (FAILED(hr))
             return E_FAIL;
     }
     if (flags & MF_SOURCE_READERF_CURRENTMEDIATYPECHANGED) {
-        wprintf(L"  Current type changed\n");
+        wprintf(L"ERROR: Current media type changed\n");
     }
     if (flags & MF_SOURCE_READERF_STREAMTICK) {
-        wprintf(L"  Stream tick\n");
+        wprintf(L"WARNING: Gap in stream\n");
     }
 
     if (!frame)
