@@ -3,6 +3,8 @@
 #include <comdef.h> // for _com_error
 #include <atlbase.h>
 #include <atlcom.h>
+#include <string>
+#include <stdexcept>
 
 
 /** Converts unicode string to ASCII */
