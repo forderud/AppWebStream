@@ -148,19 +148,16 @@ void ProcessFrames(IMFSourceReader& reader) {
         }
         if (flags & MF_SOURCE_READERF_NATIVEMEDIATYPECHANGED) {
             wprintf(L"\tNative type changed\n");
+            // The format changed. Reconfigure the decoder.
+            hr = ConfigureOutputType(reader, streamIdx);
+            if (FAILED(hr))
+                break;
         }
         if (flags & MF_SOURCE_READERF_CURRENTMEDIATYPECHANGED) {
             wprintf(L"\tCurrent type changed\n");
         }
         if (flags & MF_SOURCE_READERF_STREAMTICK) {
             wprintf(L"\tStream tick\n");
-        }
-
-        if (flags & MF_SOURCE_READERF_NATIVEMEDIATYPECHANGED) {
-            // The format changed. Reconfigure the decoder.
-            hr = ConfigureOutputType(reader, streamIdx);
-            if (FAILED(hr))
-                break;
         }
 
         if (!frame)
