@@ -24,7 +24,7 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      inkscape:zoom="1.0467522"
-     inkscape:cx="395.50908"
+     inkscape:cx="395.03141"
      inkscape:cy="408.88378"
      inkscape:window-width="1799"
      inkscape:window-height="1208"
@@ -67,13 +67,13 @@
        y="36.145535" />
     <text
        xml:space="preserve"
-       style="font-size:5.64444px;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#ffffff;stroke-width:0.264999;stroke-dasharray:none"
+       style="font-size:5.64444444px;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#ffffff;stroke-width:0.264999;stroke-dasharray:none;-inkscape-font-specification:'Arial, Normal';font-family:Arial;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
        x="10.110637"
        y="48.531067"
        id="text2"><tspan
          sodipodi:role="line"
          id="tspan2"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Arial;-inkscape-font-specification:Arial;stroke-width:0.265"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Arial;-inkscape-font-specification:'Arial, Normal';stroke-width:0.265;font-size:5.64444444px;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
          x="10.110637"
          y="48.531067">AppWebStream</tspan></text>
     <rect
@@ -85,15 +85,15 @@
        y="61.274994" />
     <text
        xml:space="preserve"
-       style="font-size:5.64444px;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#ffffff;stroke-width:0.264999;stroke-dasharray:none"
-       x="12.848395"
-       y="72.902222"
+       style="font-size:5.64444444px;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#ffffff;stroke-width:0.264999;stroke-dasharray:none;-inkscape-font-specification:'Arial, Normal';font-family:Arial;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+       x="14.364991"
+       y="73.660522"
        id="text2-8"><tspan
          sodipodi:role="line"
          id="tspan2-2"
-         style="stroke-width:0.265"
-         x="12.848395"
-         y="72.902222">&lt;other app&gt;</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Arial;-inkscape-font-specification:'Arial, Normal';stroke-width:0.265;font-size:5.64444444px;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+         x="14.364991"
+         y="73.660522">&lt;other app&gt;</tspan></text>
     <rect
        style="fill:#225500;stroke-width:0.264999;stroke-dasharray:none"
        id="rect2-1"
@@ -103,14 +103,14 @@
        y="39.359859" />
     <text
        xml:space="preserve"
-       style="font-size:5.64444px;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#ffffff;stroke-width:0.264999;stroke-dasharray:none"
-       x="108.43984"
+       style="font-size:5.64444444px;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#ffffff;stroke-width:0.264999;stroke-dasharray:none;-inkscape-font-specification:'Arial, Normal';font-family:Arial;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+       x="110.20921"
        y="51.492622"
        id="text2-7"><tspan
          sodipodi:role="line"
          id="tspan2-1"
-         style="stroke-width:0.265"
-         x="108.43984"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Arial;-inkscape-font-specification:'Arial, Normal';stroke-width:0.265;font-size:5.64444444px;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+         x="110.20921"
          y="51.492622">VLC</tspan></text>
     <rect
        style="fill:#225500;stroke-width:0.264999;stroke-dasharray:none"
@@ -121,14 +121,14 @@
        y="14.900016" />
     <text
        xml:space="preserve"
-       style="font-size:5.64444px;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#ffffff;stroke-width:0.264999;stroke-dasharray:none"
-       x="94.123383"
+       style="font-size:5.64444444px;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#ffffff;stroke-width:0.264999;stroke-dasharray:none;-inkscape-font-specification:'Arial, Normal';font-family:Arial;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+       x="98.420403"
        y="27.285547"
        id="text2-6"><tspan
          sodipodi:role="line"
          id="tspan2-14"
-         style="stroke-width:0.265"
-         x="94.123383"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Arial;-inkscape-font-specification:'Arial, Normal';stroke-width:0.265;font-size:5.64444444px;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+         x="98.420403"
          y="27.285547">Web browsers</tspan></text>
     <rect
        style="fill:#800000;stroke-width:0.264999;stroke-dasharray:none"
@@ -139,14 +139,14 @@
        y="63.444885" />
     <text
        xml:space="preserve"
-       style="font-size:5.64444px;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#ffffff;stroke-width:0.264999;stroke-dasharray:none"
-       x="94.03344"
+       style="font-size:5.64444444px;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#ffffff;stroke-width:0.264999;stroke-dasharray:none;-inkscape-font-specification:'Arial, Normal';font-family:Arial;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+       x="95.802803"
        y="75.830421"
        id="text2-1"><tspan
          sodipodi:role="line"
          id="tspan2-6"
-         style="stroke-width:0.265"
-         x="94.03344"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Arial;-inkscape-font-specification:'Arial, Normal';stroke-width:0.265;font-size:5.64444444px;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+         x="95.802803"
          y="75.830421">StreamReceiver</tspan></text>
     <rect
        style="fill:#333333;stroke-width:0.264999;stroke-dasharray:none"
@@ -157,14 +157,14 @@
        y="87.477936" />
     <text
        xml:space="preserve"
-       style="font-size:5.64444px;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#ffffff;stroke-width:0.264999;stroke-dasharray:none"
-       x="98.507721"
+       style="font-size:5.64444444px;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#ffffff;stroke-width:0.264999;stroke-dasharray:none;-inkscape-font-specification:'Arial, Normal';font-family:Arial;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+       x="100.27708"
        y="99.61071"
        id="text2-18"><tspan
          sodipodi:role="line"
          id="tspan2-9"
-         style="stroke-width:0.265"
-         x="98.507721"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Arial;-inkscape-font-specification:'Arial, Normal';stroke-width:0.265;font-size:5.64444444px;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+         x="100.27708"
          y="99.61071">&lt;other app&gt;</tspan></text>
     <path
        style="fill:#800000;fill-rule:evenodd;stroke:#550000;stroke-width:1.05833;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Triangle-9)"
