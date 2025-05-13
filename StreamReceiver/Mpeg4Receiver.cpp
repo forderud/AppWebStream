@@ -146,18 +146,15 @@ HRESULT Mpeg4Receiver::ReceiveFrame() {
     COM_CHECK(reader.GetPresentationAttribute(streamIdx, MF_PD_LAST_MODIFIED_TIME, &val)); // fails with "The requested attribute was not found."
 #endif
 
-    bool printAll = false; // print all frame parameters
     if (flags & MF_SOURCE_READERF_ENDOFSTREAM) {
         wprintf(L"  End of stream\n");
         return E_FAIL;
     }
     if (flags & MF_SOURCE_READERF_NEWSTREAM) {
         wprintf(L"  New stream\n");
-        printAll = true;
     }
     if (flags & MF_SOURCE_READERF_NATIVEMEDIATYPECHANGED) {
         wprintf(L"  Native type changed\n");
-        printAll = true;
         // The format changed. Reconfigure the decoder.
         hr = ConfigureOutputType(*m_reader, streamIdx);
         if (FAILED(hr))
@@ -165,11 +162,9 @@ HRESULT Mpeg4Receiver::ReceiveFrame() {
     }
     if (flags & MF_SOURCE_READERF_CURRENTMEDIATYPECHANGED) {
         wprintf(L"  Current type changed\n");
-        printAll = true;
     }
     if (flags & MF_SOURCE_READERF_STREAMTICK) {
         wprintf(L"  Stream tick\n");
-        printAll = true;
     }
 
     {
@@ -177,8 +172,6 @@ HRESULT Mpeg4Receiver::ReceiveFrame() {
         COM_CHECK(m_reader->GetNativeMediaType(streamIdx, 0, &nativeType));
 
         COM_CHECK(MFGetAttributeSize(nativeType, MF_MT_FRAME_SIZE, &m_resolution[0], &m_resolution[1]));
-        if (printAll)
-            wprintf(L"  Frame resolution: %u x %u\n", m_resolution[0], m_resolution[1]);
     }
 
     if (!frame)

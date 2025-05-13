@@ -13,6 +13,7 @@ static unsigned int Align16(unsigned int size) {
 
 static void OnProcessFrame(Mpeg4Receiver& receiver, IMFSample& frame) {
     auto resolution = receiver.GetResolution();
+    wprintf(L"  Frame resolution: %u x %u\n", resolution[0], resolution[1]);
 
     int64_t frameTime = 0; // in 100-nanosecond units
     COM_CHECK(frame.GetSampleTime(&frameTime));
