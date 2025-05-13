@@ -40,7 +40,6 @@ _COM_SMARTPTR_TYPEDEF(IMFMediaType,   __uuidof(IMFMediaType));
 #pragma comment(lib, "avutil.lib")
 
 #include <cassert>
-#include <stdexcept>
 #include <fstream>
 #include <tuple>
 #include <vector>

@@ -1,6 +1,5 @@
 #include <sstream>
 #include <iostream>
-#include <string>
 #include "VideoEncoder.hpp"
 #include "OutputStream.hpp"
 #include "ScreenCapture.hpp"
