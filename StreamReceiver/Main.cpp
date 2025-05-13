@@ -203,9 +203,9 @@ void ProcessFrames(IMFSourceReader& reader) {
 }
 
 
-class Mpeg4StreamReceiver : public IStartTimeDPIReceiver {
+class Mpeg4Receiver : public IStartTimeDPIReceiver {
 public:
-    Mpeg4StreamReceiver(_bstr_t url) {
+    Mpeg4Receiver(_bstr_t url) {
         COM_CHECK(MFStartup(MF_VERSION));
 
         IMFAttributesPtr attribs;
@@ -244,7 +244,7 @@ public:
         ConfigureOutputType(m_reader, streamIdx);
     }
 
-    ~Mpeg4StreamReceiver() override {
+    ~Mpeg4Receiver() override {
     }
 
     void ReceiveFrames() {
@@ -269,7 +269,7 @@ int main(int argc, char* argv[]) {
 
     _bstr_t url = argv[1];
     // connect to MPEG4 H.264 stream
-    Mpeg4StreamReceiver receiver(url);
+    Mpeg4Receiver receiver(url);
     // blocking call
     receiver.ReceiveFrames();
 }
