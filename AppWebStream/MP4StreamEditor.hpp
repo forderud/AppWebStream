@@ -178,12 +178,12 @@ private:
             m_time.timeScale = DeSerialize<uint32_t>(ptr); // 1000*fps
             ptr += 4;
 
-            uint64_t duration = 0;
+            uint64_t total_duration = 0; // [timescale unit]
             if (version == 1) {
-                duration = DeSerialize<uint64_t>(ptr);
+                total_duration = DeSerialize<uint64_t>(ptr);
                 ptr += 8;
             } else {
-                duration = DeSerialize<uint32_t>(ptr);
+                total_duration = DeSerialize<uint32_t>(ptr);
                 ptr += 4;
             }
 
