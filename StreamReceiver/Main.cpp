@@ -39,17 +39,19 @@ static void OnProcessFrame(Mpeg4Receiver& receiver, IMFSample& frame, bool metad
         assert(bufferCount == 1); // one buffer per frame for video
     }
 
-    IMFMediaBufferPtr buffer;
-    COM_CHECK(frame.GetBufferByIndex(0, &buffer)); // only one buffer per frame for video
+    {
+        IMFMediaBufferPtr buffer;
+        COM_CHECK(frame.GetBufferByIndex(0, &buffer)); // only one buffer per frame for video
 
-    BYTE* bufferPtr = nullptr;
-    DWORD bufferSize = 0;
-    COM_CHECK(buffer->Lock(&bufferPtr, nullptr, &bufferSize));
-    assert(bufferSize == 4 * Align16(resolution[0]) * Align16(resolution[1])); // buffer size is a multiple of MPEG4 16x16 macroblocks
+        BYTE* bufferPtr = nullptr;
+        DWORD bufferSize = 0;
+        COM_CHECK(buffer->Lock(&bufferPtr, nullptr, &bufferSize));
+        assert(bufferSize == 4 * Align16(resolution[0]) * Align16(resolution[1])); // buffer size is a multiple of MPEG4 16x16 macroblocks
 
-    // TODO: Access RGBA pixel data in bufferPtr
+        // TODO: Access RGBA pixel data in bufferPtr
 
-    COM_CHECK(buffer->Unlock());
+        COM_CHECK(buffer->Unlock());
+    }
 }
 
 
