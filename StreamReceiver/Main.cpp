@@ -13,11 +13,11 @@ static unsigned int Align16(unsigned int size) {
 }
 
 
-static void OnProcessFrame(Mpeg4Receiver& receiver, IMFSample& frame) {
+static void OnProcessFrame(Mpeg4Receiver& receiver, IMFSample& frame, bool metadataChanged) {
     uint64_t startTime = receiver.GetStartTime(); // SECONDS since midnight, Jan. 1, 1904
     double dpi = receiver.GetDpi();
     auto resolution = receiver.GetResolution();
-    if (receiver.HasMetadataChanged()) {
+    if (metadataChanged) {
         wprintf(L"Start time: %hs (UTC)\n", TimeString1904(startTime).c_str());
         wprintf(L"Frame DPI:  %f\n", dpi);
         wprintf(L"Frame resolution: %u x %u\n", resolution[0], resolution[1]);

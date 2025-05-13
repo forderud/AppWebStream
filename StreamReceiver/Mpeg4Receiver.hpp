@@ -24,7 +24,7 @@ public:
 
 class Mpeg4Receiver; // forward decl.
 
-typedef void (*ProcessFrameCb)(Mpeg4Receiver& receiver, IMFSample& frame);
+typedef void (*ProcessFrameCb)(Mpeg4Receiver& receiver, IMFSample& frame, bool metadataChanged);
 
 
 class Mpeg4Receiver : public IStartTimeDPIReceiver {
@@ -47,10 +47,6 @@ public:
         return m_resolution;
     }
 
-    bool HasMetadataChanged() const {
-        return m_metadata_changed;
-    }
-
 private:
     void OnStartTimeDpiChanged(uint64_t startTime, double dpi) override;
 
@@ -59,5 +55,5 @@ private:
     double             m_dpi = 0;       // pixel spacing
     std::array<uint32_t, 2> m_resolution;  // horizontal & vertical pixel count
     ProcessFrameCb     m_frame_cb = nullptr;
-    bool               m_metadata_changed = false; // 
+    bool               m_metadata_changed = false; // metadata changed since previous frame
 };

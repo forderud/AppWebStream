@@ -184,7 +184,7 @@ HRESULT Mpeg4Receiver::ReceiveFrame() {
         return E_FAIL;
 
     if (m_frame_cb)
-        m_frame_cb(*this, *frame);
+        m_frame_cb(*this, *frame, m_metadata_changed);
 
     m_metadata_changed = false; // clear flag after m_frame_cb have been called
 
