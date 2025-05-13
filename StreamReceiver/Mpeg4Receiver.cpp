@@ -99,8 +99,6 @@ HRESULT Mpeg4Receiver::ReceiveFrame() {
     if (FAILED(hr))
         return hr;
 
-    wprintf(L"Stream event on idx: %u\n", streamIdx);
-
 #if 0
     PROPVARIANT val{};
     PropVariantClear(&val);
