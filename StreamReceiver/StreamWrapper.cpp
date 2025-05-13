@@ -54,12 +54,12 @@ HRESULT StreamWrapper::BeginRead(/*out*/BYTE* pb, /*in*/ULONG cb, /*in*/IMFAsync
 
 HRESULT StreamWrapper::EndRead(/*in*/IMFAsyncResult* result, /*out*/ULONG* cbRead) {
     HRESULT hr = m_socket->EndRead(result, cbRead);
-
-    // inspect MPEG4 bitstream
-    bool updated = m_stream_editor.ParseStream(m_read_buf.substr(0, *cbRead));
-    if (m_notifier && updated)
-        m_notifier->OnStartTimeDpiChanged(m_stream_editor.GetStartTime(), m_stream_editor.GetDPI());
-
+    if (SUCCEEDED(hr)) {
+        // inspect MPEG4 bitstream
+        bool updated = m_stream_editor.ParseStream(m_read_buf.substr(0, *cbRead));
+        if (m_notifier && updated)
+            m_notifier->OnStartTimeDpiChanged(m_stream_editor.GetStartTime(), m_stream_editor.GetDPI());
+    }
     return hr;
 }
 
