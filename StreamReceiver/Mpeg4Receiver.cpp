@@ -84,6 +84,9 @@ Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, ProcessFrameCb frame_cb) : m_frame_cb(
 }
 
 Mpeg4Receiver::~Mpeg4Receiver() {
+    m_reader.Release();
+
+    COM_CHECK(MFShutdown());
 }
 
 HRESULT Mpeg4Receiver::ReceiveFrame() {
