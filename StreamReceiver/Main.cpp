@@ -205,13 +205,59 @@ void ProcessFrames(IMFSourceReader& reader) {
 
 class Mpeg4StreamReceiver : public IStartTimeDPIReceiver {
 public:
-    Mpeg4StreamReceiver() = default;
-    ~Mpeg4StreamReceiver() override = default;
+    Mpeg4StreamReceiver(_bstr_t url) {
+        COM_CHECK(MFStartup(MF_VERSION));
+
+        IMFAttributesPtr attribs;
+        {
+            // DOC: https://learn.microsoft.com/en-us/windows/win32/medfound/source-reader-attributes
+            COM_CHECK(MFCreateAttributes(&attribs, 0));
+            COM_CHECK(attribs->SetUINT32(MF_LOW_LATENCY, TRUE)); // low latency mode
+            COM_CHECK(attribs->SetUINT32(MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS, TRUE)); // GPU accelerated
+            COM_CHECK(attribs->SetUINT32(MF_SOURCE_READER_ENABLE_VIDEO_PROCESSING, TRUE)); // enable YUV to RGB-32 conversion
+        }
+
+#if 1
+        // Create intermediate IMFByteStream object allow parsing of the underlying MPEG4 bitstream.
+        // Needed to access CreationTime & DPI parameters that doesn't seem to be exposed through the MediaFoundation API.
+        IMFByteStreamPtr byteStream;
+        {
+            IMFSourceResolverPtr resolver;
+            COM_CHECK(MFCreateSourceResolver(&resolver));
+
+            DWORD createObjFlags = MF_RESOLUTION_READ | MF_RESOLUTION_BYTESTREAM | MF_RESOLUTION_CONTENT_DOES_NOT_HAVE_TO_MATCH_EXTENSION_OR_MIME_TYPE;
+            MF_OBJECT_TYPE objectType = MF_OBJECT_INVALID;
+            IUnknownPtr source;
+            COM_CHECK(resolver->CreateObjectFromURL(url, createObjFlags, nullptr, &objectType, &source));
+            IMFByteStreamPtr innerStream = source;
+
+            auto tmp = CreateLocalInstance<StreamWrapper>();
+            tmp->Initialize(innerStream, this);
+            COM_CHECK(tmp.QueryInterface(&byteStream));
+        }
+        COM_CHECK(MFCreateSourceReaderFromByteStream(byteStream, attribs, &m_reader));
+#else
+        COM_CHECK(MFCreateSourceReaderFromURL(url, attribs, &m_reader));
+#endif
+
+        DWORD streamIdx = GetFirstVideoStream(m_reader);
+        ConfigureOutputType(m_reader, streamIdx);
+    }
+
+    ~Mpeg4StreamReceiver() override {
+    }
+
+    void ReceiveFrames() {
+        ProcessFrames(m_reader);
+    }
 
     void OnStartTimeDpiChanged(uint64_t startTime, double dpi) override {
         wprintf(L"Frame DPI:  %f\n", dpi);
         wprintf(L"Start time: %hs (UTC)\n", TimeString1904(startTime).c_str());
     }
+
+private:
+    IMFSourceReaderPtr m_reader;
 };
 
 
@@ -221,49 +267,11 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    COM_CHECK(MFStartup(MF_VERSION));
-
     _bstr_t url = argv[1];
-
-    // connect to the MPEG4 H.264 stream
-    IMFAttributesPtr attribs;
-    {
-        // DOC: https://learn.microsoft.com/en-us/windows/win32/medfound/source-reader-attributes
-        COM_CHECK(MFCreateAttributes(&attribs, 0));
-        COM_CHECK(attribs->SetUINT32(MF_LOW_LATENCY, TRUE)); // low latency mode
-        COM_CHECK(attribs->SetUINT32(MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS, TRUE)); // GPU accelerated
-        COM_CHECK(attribs->SetUINT32(MF_SOURCE_READER_ENABLE_VIDEO_PROCESSING, TRUE)); // enable YUV to RGB-32 conversion
-    }
-
-    Mpeg4StreamReceiver receiver;
-    IMFSourceReaderPtr reader;
-#if 1
-    // Create intermediate IMFByteStream object allow parsing of the underlying MPEG4 bitstream.
-    // Needed to access CreationTime & DPI parameters that doesn't seem to be exposed through the MediaFoundation API.
-    IMFByteStreamPtr byteStream;
-    {
-        IMFSourceResolverPtr resolver;
-        COM_CHECK(MFCreateSourceResolver(&resolver));
-
-        DWORD createObjFlags = MF_RESOLUTION_READ | MF_RESOLUTION_BYTESTREAM | MF_RESOLUTION_CONTENT_DOES_NOT_HAVE_TO_MATCH_EXTENSION_OR_MIME_TYPE;
-        MF_OBJECT_TYPE objectType = MF_OBJECT_INVALID;
-        IUnknownPtr source;
-        COM_CHECK(resolver->CreateObjectFromURL(url, createObjFlags, nullptr, &objectType, &source));
-        IMFByteStreamPtr innerStream = source;
-
-        auto tmp = CreateLocalInstance<StreamWrapper>();
-        tmp->Initialize(innerStream, &receiver);
-        COM_CHECK(tmp.QueryInterface(&byteStream));
-    }
-    COM_CHECK(MFCreateSourceReaderFromByteStream(byteStream, attribs, &reader));
-#else
-    COM_CHECK(MFCreateSourceReaderFromURL(url, attribs, &reader));
-#endif
-
-    DWORD streamIdx = GetFirstVideoStream(reader);
-    ConfigureOutputType(reader, streamIdx);
-
-    ProcessFrames(reader);
+    // connect to MPEG4 H.264 stream
+    Mpeg4StreamReceiver receiver(url);
+    // blocking call
+    receiver.ReceiveFrames();
 }
 
 
