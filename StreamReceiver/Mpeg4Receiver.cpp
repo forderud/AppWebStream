@@ -181,18 +181,8 @@ HRESULT Mpeg4Receiver::ReceiveFrame() {
             wprintf(L"  Frame resolution: %u x %u\n", m_resolution[0], m_resolution[1]);
     }
 
-    wprintf(L"  Frame time:     %f ms\n", timeStamp * 0.1f / 1000); // convert to milliseconds
-
     if (!frame)
         return E_FAIL;
-
-    int64_t frameTime = 0; // in 100-nanosecond units
-    COM_CHECK(frame->GetSampleTime(&frameTime));
-    assert(frameTime == timeStamp);
-
-    int64_t frameDuration = 0; // in 100-nanosecond units
-    COM_CHECK(frame->GetSampleDuration(&frameDuration));
-    wprintf(L"  Frame duration: %f ms\n", frameDuration * 0.1f / 1000); // convert to milliseconds
 
     if (m_frame_cb)
         m_frame_cb(*this, *frame);
