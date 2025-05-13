@@ -171,7 +171,13 @@ HRESULT Mpeg4Receiver::ReceiveFrame() {
         IMFMediaTypePtr nativeType;
         COM_CHECK(m_reader->GetNativeMediaType(streamIdx, 0, &nativeType));
 
-        COM_CHECK(MFGetAttributeSize(nativeType, MF_MT_FRAME_SIZE, &m_resolution[0], &m_resolution[1]));
+        uint32_t width = 0, height = 0;
+        COM_CHECK(MFGetAttributeSize(nativeType, MF_MT_FRAME_SIZE, &width, &height));
+        if ((width != m_resolution[0]) || (height != m_resolution[1]))
+            m_metadata_changed = true;
+
+        m_resolution[0] = width;
+        m_resolution[1] = height;
     }
 
     if (!frame)
@@ -180,15 +186,16 @@ HRESULT Mpeg4Receiver::ReceiveFrame() {
     if (m_frame_cb)
         m_frame_cb(*this, *frame);
 
+    m_metadata_changed = false; // clear flag after m_frame_cb have been called
+
     return S_OK;
 }
 
 void Mpeg4Receiver::OnStartTimeDpiChanged(uint64_t startTime, double dpi) {
     if (startTime != m_startTime)
-        wprintf(L"Start time: %hs (UTC)\n", TimeString1904(startTime).c_str());
-
+        m_metadata_changed = true;
     if (dpi != m_dpi)
-        wprintf(L"Frame DPI:  %f\n", dpi);
+        m_metadata_changed = true;
 
     m_startTime = startTime;
     m_dpi = dpi;

@@ -35,7 +35,7 @@ public:
 
     HRESULT ReceiveFrame();
 
-    uint64_t GetStartTimeDpi() const {
+    uint64_t GetStartTime() const {
         return m_startTime;
     }
 
@@ -47,6 +47,10 @@ public:
         return m_resolution;
     }
 
+    bool HasMetadataChanged() const {
+        return m_metadata_changed;
+    }
+
 private:
     void OnStartTimeDpiChanged(uint64_t startTime, double dpi) override;
 
@@ -55,4 +59,5 @@ private:
     double             m_dpi = 0;       // pixel spacing
     std::array<uint32_t, 2> m_resolution;  // horizontal & vertical pixel count
     ProcessFrameCb     m_frame_cb = nullptr;
+    bool               m_metadata_changed = false; // 
 };

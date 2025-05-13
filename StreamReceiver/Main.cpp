@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include "Mpeg4Receiver.hpp"
 #include "../AppWebStream/ComUtil.hpp"
+#include "../AppWebStream/MP4Utils.hpp"
+
 
 static unsigned int Align16(unsigned int size) {
     if ((size % 16) == 0)
@@ -12,8 +14,14 @@ static unsigned int Align16(unsigned int size) {
 
 
 static void OnProcessFrame(Mpeg4Receiver& receiver, IMFSample& frame) {
+    uint64_t startTime = receiver.GetStartTime();
+    double dpi = receiver.GetDpi();
     auto resolution = receiver.GetResolution();
-    wprintf(L"  Frame resolution: %u x %u\n", resolution[0], resolution[1]);
+    if (receiver.HasMetadataChanged()) {
+        wprintf(L"Start time: %hs (UTC)\n", TimeString1904(startTime).c_str());
+        wprintf(L"Frame DPI:  %f\n", dpi);
+        wprintf(L"Frame resolution: %u x %u\n", resolution[0], resolution[1]);
+    }
 
     int64_t frameTime = 0; // in 100-nanosecond units
     COM_CHECK(frame.GetSampleTime(&frameTime));
@@ -37,7 +45,6 @@ static void OnProcessFrame(Mpeg4Receiver& receiver, IMFSample& frame) {
 
         // Call buffer->Lock()... Unlock() to access RGBA pixel data
     }
-
 }
 
 
