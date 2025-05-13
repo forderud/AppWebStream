@@ -211,7 +211,7 @@ int main(int argc, char* argv[]) {
 
     COM_CHECK(MFStartup(MF_VERSION));
 
-    const char* url = argv[1];
+    _bstr_t url = argv[1];
 
     // connect to the MPEG4 H.264 stream
     IMFAttributesPtr attribs;
@@ -235,7 +235,7 @@ int main(int argc, char* argv[]) {
         DWORD createObjFlags = MF_RESOLUTION_READ | MF_RESOLUTION_BYTESTREAM | MF_RESOLUTION_CONTENT_DOES_NOT_HAVE_TO_MATCH_EXTENSION_OR_MIME_TYPE;
         MF_OBJECT_TYPE objectType = MF_OBJECT_INVALID;
         IUnknownPtr source;
-        COM_CHECK(resolver->CreateObjectFromURL(_bstr_t(url), createObjFlags, nullptr, &objectType, &source));
+        COM_CHECK(resolver->CreateObjectFromURL(url, createObjFlags, nullptr, &objectType, &source));
         IMFByteStreamPtr innerStream = source;
 
         auto tmp = CreateLocalInstance<StreamWrapper>();
@@ -244,7 +244,7 @@ int main(int argc, char* argv[]) {
     }
     COM_CHECK(MFCreateSourceReaderFromByteStream(byteStream, attribs, &reader));
 #else
-    COM_CHECK(MFCreateSourceReaderFromURL(_bstr_t(url), attribs, &reader));
+    COM_CHECK(MFCreateSourceReaderFromURL(url, attribs, &reader));
 #endif
 
     DWORD streamIdx = GetFirstVideoStream(reader);
