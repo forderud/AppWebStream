@@ -30,6 +30,14 @@ public:
 
     HRESULT ReceiveFrame();
 
+    uint64_t GetStartTimeDpi() const {
+        return m_startTime;
+    }
+
+    double GetDpi() const {
+        return m_dpi;
+    }
+
 private:
     void ParseFrame(IMFSample& frame);
 
