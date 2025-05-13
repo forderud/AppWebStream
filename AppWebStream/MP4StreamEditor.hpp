@@ -520,7 +520,7 @@ private:
                             ptr += sizeof(uint32_t);
 
                             for (uint32_t entry = 0; entry < entryCount; entry++) {
-                                // entering "avc1" atom
+                                // entering VisualSampleEntry atom with codingname="avc1"
                                 // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/sampleentry/VisualSampleEntry.java
                                 assert(IsAtomType(ptr, "avc1"));
                                 //uint32_t avc1_len = GetAtomSize(ptr);
