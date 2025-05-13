@@ -26,14 +26,6 @@ HRESULT IsVideoStream(IMFSourceReader& reader, DWORD streamIdx, /*out*/bool& isV
             isVideo = true; // found video stream
             return S_OK;
         }
-
-#if 0
-        // other major type
-        wchar_t guid_str[39] = {};
-        int ok = StringFromGUID2(guid, guid_str, (int)std::size(guid_str));
-        assert(ok);
-        wprintf(L"* MajorType: %s\n", guid_str);
-#endif
     }
 }
 
