@@ -17,7 +17,6 @@ void StreamWrapper::Initialize(IMFByteStream* socket, IStartTimeDPIReceiver* not
     m_notifier = notifier;
 }
 
-
 HRESULT StreamWrapper::GetCapabilities(/*out*/DWORD *capabilities) {
     return m_socket->GetCapabilities(capabilities);
 }
