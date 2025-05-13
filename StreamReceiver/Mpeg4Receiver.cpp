@@ -7,6 +7,13 @@
 #pragma comment(lib, "mfuuid.lib")
 
 
+static unsigned int Align16(unsigned int size) {
+    if ((size % 16) == 0)
+        return size;
+    else
+        return size + 16 - (size % 16);
+}
+
 Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, ProcessFrameCb frame_cb) : m_frame_cb(frame_cb) {
     m_resolution.fill(0); // clear array
 
@@ -91,8 +98,34 @@ HRESULT Mpeg4Receiver::ReceiveFrame() {
     if (!frame)
         return E_FAIL;
 
-    if (m_frame_cb)
-        m_frame_cb(*this, *frame, m_metadata_changed);
+    if (m_frame_cb) {
+        int64_t frameTime = 0; // in 100-nanosecond units since startTime
+        COM_CHECK(frame->GetSampleTime(&frameTime));
+
+        int64_t frameDuration = 0; // in 100-nanosecond units
+        COM_CHECK(frame->GetSampleDuration(&frameDuration));
+
+        {
+            DWORD bufferCount = 0;
+            COM_CHECK(frame->GetBufferCount(&bufferCount));
+            assert(bufferCount == 1); // one buffer per frame for video
+        }
+
+        {
+            IMFMediaBufferPtr buffer;
+            COM_CHECK(frame->GetBufferByIndex(0, &buffer)); // only one buffer per frame for video
+
+            BYTE* bufferPtr = nullptr;
+            DWORD bufferSize = 0;
+            COM_CHECK(buffer->Lock(&bufferPtr, nullptr, &bufferSize));
+            assert(bufferSize == 4 * Align16(m_resolution[0]) * Align16(m_resolution[1])); // buffer size is a multiple of MPEG4 16x16 macroblocks
+
+            // call frame data callback function for client-side processing
+            m_frame_cb(*this, frameTime, frameDuration, std::string_view((char*)bufferPtr, bufferSize), m_metadata_changed);
+
+            COM_CHECK(buffer->Unlock());
+        }
+    }
 
     m_metadata_changed = false; // clear flag after m_frame_cb have been called
 

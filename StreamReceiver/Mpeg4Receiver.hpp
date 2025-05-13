@@ -1,5 +1,6 @@
 #pragma once
 #include <array>
+#include <string_view>
 #include <comdef.h> // for __uuidof
 #include <mfapi.h>
 #include <mfidl.h>
@@ -24,7 +25,8 @@ public:
 
 class Mpeg4Receiver; // forward decl.
 
-typedef void (*ProcessFrameCb)(Mpeg4Receiver& receiver, IMFSample& frame, bool metadataChanged);
+/** frameTime is in 100-nanosecond units since startTime. frameDuration is also in 100-nanosecond units. */
+typedef void (*ProcessFrameCb)(Mpeg4Receiver& receiver, int64_t frameTime, int64_t frameDuration, std::string_view buffer, bool metadataChanged);
 
 
 class Mpeg4Receiver : public IStartTimeDPIReceiver {
