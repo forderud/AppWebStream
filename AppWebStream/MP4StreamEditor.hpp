@@ -5,6 +5,8 @@
 
 
 struct TimeHandler {
+    bool updateSampleDuration = false;
+
     uint64_t startTime = 0;       // creation- & modification time
     uint32_t sample_duration = 0; // frame duration (typ 1000)
     uint64_t cur_time = 0;
@@ -787,7 +789,10 @@ private:
 
             for (uint32_t i = 0; i < sample_count; i++) {
                 if (flags & MOV_TRUN_SAMPLE_DURATION) {
-                    m_time.sample_duration = DeSerialize<uint32_t>(payload);
+                    if (m_time.updateSampleDuration)
+                        Serialize<uint32_t>(payload, m_time.sample_duration);
+                    else
+                        m_time.sample_duration = DeSerialize<uint32_t>(payload);
                     payload += sizeof(uint32_t);
                 } else {
                     m_time.sample_duration = 1024; // almost matches MediaFoundation
