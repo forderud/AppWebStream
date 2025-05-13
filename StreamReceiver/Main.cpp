@@ -137,7 +137,7 @@ void ProcessFrames(IMFSourceReader& reader) {
         COM_CHECK(reader.GetPresentationAttribute(streamIdx, MF_PD_LAST_MODIFIED_TIME, &val)); // fails with "The requested attribute was not found."
 #endif
 
-        wprintf(L"  Frame time: %f ms\n", timeStamp*0.1f/1000); // convert to milliseconds
+        wprintf(L"  Frame time:     %f ms\n", timeStamp*0.1f/1000); // convert to milliseconds
 
         if (flags & MF_SOURCE_READERF_ENDOFSTREAM) {
             wprintf(L"\tEnd of stream\n");
