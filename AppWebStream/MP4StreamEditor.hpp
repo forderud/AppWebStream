@@ -605,7 +605,7 @@ private:
         if (!IsAtomType(traf_ptr, "traf")) // track fragment
             throw std::runtime_error("not a \"traf\" atom");
 
-        // "tfhd" atom immediately follows
+        // TrackFragmentHeaderAtom ("tfhd") immediately follows
         char* tfhd_ptr = traf_ptr + HEADER_SIZE;
 
         unsigned long tfhd_idx = static_cast<unsigned long>(tfhd_ptr - moof_ptr);
@@ -636,7 +636,7 @@ private:
         // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/TrackFragmentHeaderBox.java
         uint32_t tfhd_size = GetAtomSize(tfhd_ptr);
         {
-            assert(IsAtomType(tfhd_ptr, "tfhd")); // track fragment header
+            assert(IsAtomType(tfhd_ptr, "tfhd")); // TrackFragmentHeaderAtom
             // process tfhd content
             char* payload = tfhd_ptr + HEADER_SIZE;
             auto version = DeSerialize<uint8_t>(payload);
@@ -644,7 +644,7 @@ private:
             payload += sizeof(uint8_t);
 
             {
-                // "tfhd" atom flags (from https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/isom.h)
+                // TrackFragmentHeaderAtom ("tfhd") flags (from https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/isom.h)
                 constexpr uint32_t MOV_TFHD_BASE_DATA_OFFSET = 0x01;
                 //constexpr uint32_t MOV_TFHD_STSD_ID = 0x02;
 #ifdef ENABLE_FFMPEG
@@ -688,12 +688,12 @@ private:
         if (add_tfdt) {
             ptr -= BASE_DATA_OFFSET_SIZE;
 
-            // move TrackRunAtom ("trun") to make room for a new "tfhd"
+            // move TrackRunAtom ("trun") to make room for a new TrackFragmentHeaderAtom ("tfhd")
             MemMove(ptr+TFDT_SIZE-BASE_DATA_OFFSET_SIZE/*dst*/, ptr/*src*/, buf_size-tfhd_size/*size*/);
         }
 
         if (add_tfdt) {
-            // insert new "tfdt" atom (20bytes)
+            // insert new TrackFragmentHeaderAtom ("tfdt") atom (20bytes)
             // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/TrackFragmentBaseMediaDecodeTimeBox.java
             char* tfdt_ptr = ptr;
 
