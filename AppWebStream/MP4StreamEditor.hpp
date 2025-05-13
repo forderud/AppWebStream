@@ -5,10 +5,10 @@
 
 
 struct TimeHandler {
-    uint64_t startTime = 0; // creation- & modification time
-    uint64_t sample_duration = 0;
+    uint64_t startTime = 0;       // creation- & modification time
+    uint32_t sample_duration = 0; // frame duration (typ 1000)
     uint64_t cur_time = 0;
-    uint32_t timeScale = 0; // time units per second: 1000*fps (50000 = 50fps) [unused]
+    uint32_t timeScale = 0;       // time units per second: 1000*fps (50000 = 50fps) [unused]
 };
 
 /** Process atoms within a MPEG4 MovieFragment (moof) to make the stream comply with ISO base media file format (https://b.goeswhere.com/ISO_IEC_14496-12_2015.pdf , https://github.com/MPEGGroup/isobmff).
@@ -787,7 +787,7 @@ private:
 
             for (uint32_t i = 0; i < sample_count; i++) {
                 if (flags & MOV_TRUN_SAMPLE_DURATION) {
-                    m_time.sample_duration = DeSerialize<uint32_t>(payload); // frame duration (typ 1000)
+                    m_time.sample_duration = DeSerialize<uint32_t>(payload);
                     payload += sizeof(uint32_t);
                 } else {
                     m_time.sample_duration = 1024; // almost matches MediaFoundation
