@@ -6,6 +6,7 @@
 
 struct TimeHandler {
     uint64_t startTime = 0; // creation- & modification time
+    uint64_t sample_duration = 0;
     uint64_t cur_time = 0;
     uint32_t timeScale = 0; // time units per second: 1000*fps (50000 = 50fps) [unused]
 };
@@ -786,14 +787,14 @@ private:
 
             for (uint32_t i = 0; i < sample_count; i++) {
                 if (flags & MOV_TRUN_SAMPLE_DURATION) {
-                    auto sample_dur = DeSerialize<uint32_t>(payload); // frame duration (typ 1000)
+                    m_time.sample_duration = DeSerialize<uint32_t>(payload); // frame duration (typ 1000)
                     payload += sizeof(uint32_t);
-
-                    // update baseMediaDecodeTime for next fragment
-                    m_time.cur_time += sample_dur;
                 } else {
-                    m_time.cur_time += 1024; // almost matches MediaFoundation
+                    m_time.sample_duration = 1024; // almost matches MediaFoundation
                 }
+
+                // update baseMediaDecodeTime for next fragment
+                m_time.cur_time += m_time.sample_duration;
 
                 if (flags & MOV_TRUN_SAMPLE_SIZE) {
                     //auto sample_size = DeSerialize<uint32_t>(payload);
