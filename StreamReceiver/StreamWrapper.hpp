@@ -25,7 +25,7 @@ public:
     StreamWrapper();
     /*NOT virtual*/ ~StreamWrapper();
 
-    void Initialize(IMFByteStream * obj, IStartTimeDPIReceiver* notifier);
+    void Initialize(IMFByteStream * socket, IStartTimeDPIReceiver* notifier);
 
     HRESULT GetCapabilities(/*out*/DWORD *capabilities) override;
 
@@ -63,7 +63,7 @@ public:
 
 private:
     std::string_view m_read_buf; // set by BeginRead
-    IMFByteStreamPtr m_obj;
+    IMFByteStreamPtr m_socket;   // network socket stream to intercept
     MP4StreamEditor  m_stream_editor;
     IStartTimeDPIReceiver* m_notifier = nullptr;
 };
