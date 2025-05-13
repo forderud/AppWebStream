@@ -29,6 +29,7 @@ typedef void (*ProcessFrameCb)(Mpeg4Receiver& receiver, IMFSample& frame, bool m
 
 class Mpeg4Receiver : public IStartTimeDPIReceiver {
 public:
+    /** Connect to requested MPEG4 URL. The "frame_cb" callback will be called from the same thread for every frame received. */
     Mpeg4Receiver(_bstr_t url, ProcessFrameCb frame_cb);
 
     ~Mpeg4Receiver() override;
