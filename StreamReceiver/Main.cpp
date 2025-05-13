@@ -31,9 +31,9 @@ static void OnProcessFrame(Mpeg4Receiver& receiver, IMFSample& frame) {
     COM_CHECK(frame.GetSampleDuration(&frameDuration));
     wprintf(L"  Frame duration: %f ms\n", frameDuration * 0.1f / 1000); // convert to milliseconds
 
-
     DWORD bufferCount = 0;
     COM_CHECK(frame.GetBufferCount(&bufferCount));
+
     for (DWORD idx = 0; idx < bufferCount; idx++) {
         IMFMediaBufferPtr buffer;
         COM_CHECK(frame.GetBufferByIndex(idx, &buffer));
