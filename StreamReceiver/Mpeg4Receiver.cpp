@@ -60,7 +60,6 @@ Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, ProcessFrameCb frame_cb) : m_frame_cb(
         COM_CHECK(attribs->SetUINT32(MF_SOURCE_READER_ENABLE_VIDEO_PROCESSING, TRUE)); // enable YUV to RGB-32 conversion
     }
 
-#if 1
     // Create intermediate IMFByteStream object allow parsing of the underlying MPEG4 bitstream.
     // Needed to access CreationTime & DPI parameters that doesn't seem to be exposed through the MediaFoundation API.
     IMFByteStreamPtr byteStream;
@@ -79,9 +78,6 @@ Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, ProcessFrameCb frame_cb) : m_frame_cb(
         COM_CHECK(tmp.QueryInterface(&byteStream));
     }
     COM_CHECK(MFCreateSourceReaderFromByteStream(byteStream, attribs, &m_reader));
-#else
-    COM_CHECK(MFCreateSourceReaderFromURL(url, attribs, &m_reader));
-#endif
 
     DWORD streamIdx = GetFirstVideoStream(m_reader);
     ConfigureOutputType(m_reader, streamIdx);
