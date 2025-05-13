@@ -62,7 +62,7 @@ public:
     END_COM_MAP()
 
 private:
-    char*            m_read_buf = nullptr; // set by BeginRead
+    std::string_view m_read_buf; // set by BeginRead
     IMFByteStreamPtr m_obj;
     MP4StreamEditor  m_stream_editor;
     IStartTimeDPIReceiver* m_notifier = nullptr;

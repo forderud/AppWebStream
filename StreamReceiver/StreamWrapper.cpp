@@ -46,14 +46,16 @@ HRESULT StreamWrapper::Read(/*out*/BYTE* pb, /*in*/ULONG cb, /*out*/ULONG* bRead
 }
 
 HRESULT StreamWrapper::BeginRead(/*out*/BYTE* pb, /*in*/ULONG cb, /*in*/IMFAsyncCallback* callback, /*in*/IUnknown* unkState) {
-    m_read_buf = (char*)pb;
-    return m_obj->BeginRead(pb, cb, callback, unkState);
+    HRESULT hr = m_obj->BeginRead(pb, cb, callback, unkState);
+    m_read_buf = std::string_view((char*)pb, cb);
+    return hr;
 }
 
 HRESULT StreamWrapper::EndRead(/*in*/IMFAsyncResult* result, /*out*/ULONG* cbRead) {
     HRESULT hr = m_obj->EndRead(result, cbRead);
-    // Inspect m_read_buf bitstream
-    bool updated = m_stream_editor.ParseStream(std::string_view(m_read_buf, *cbRead));
+
+    // inspect MPEG4 bitstream
+    bool updated = m_stream_editor.ParseStream(m_read_buf.substr(0, *cbRead));
     if (m_notifier && updated)
         m_notifier->OnStartTimeDpiChanged(m_stream_editor.GetStartTime(), m_stream_editor.GetDPI());
 
