@@ -35,6 +35,7 @@ static void OnProcessFrame(Mpeg4Receiver& receiver, IMFSample& frame, bool metad
 
     DWORD bufferCount = 0;
     COM_CHECK(frame.GetBufferCount(&bufferCount));
+    assert(bufferCount == 1); // one buffer per frame for video
 
     for (DWORD idx = 0; idx < bufferCount; idx++) {
         IMFMediaBufferPtr buffer;
