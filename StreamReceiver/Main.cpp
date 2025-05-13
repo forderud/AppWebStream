@@ -1,3 +1,4 @@
+#include <atlbase.h>
 #include <stdio.h>
 #include "Mpeg4Receiver.hpp"
 

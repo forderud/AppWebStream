@@ -1,5 +1,6 @@
 #include "Mpeg4Receiver.hpp"
 #include "StreamWrapper.hpp"
+#include "../AppWebStream/ComUtil.hpp"
 
 #pragma comment(lib, "Mfplat.lib")
 #pragma comment(lib, "Mfreadwrite.lib")

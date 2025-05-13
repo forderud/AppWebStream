@@ -1,9 +1,9 @@
 #pragma once
+#include <comdef.h> // for __uuidof
 #include <mfapi.h>
 #include <mfidl.h>
 #include <mferror.h>
 #include <mfreadwrite.h>
-#include "../AppWebStream/ComUtil.hpp"
 
 // define smart-pointers with "Ptr" suffix
 _COM_SMARTPTR_TYPEDEF(IMFAttributes, __uuidof(IMFAttributes));
