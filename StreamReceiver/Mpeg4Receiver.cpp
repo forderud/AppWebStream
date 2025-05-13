@@ -112,7 +112,10 @@ HRESULT Mpeg4Receiver::ReceiveFrame() {
         return E_FAIL;
     }
     if (flags & MF_SOURCE_READERF_NEWSTREAM) {
-        wprintf(L"INFO: New stream\n");
+        wprintf(L"INFO: New stream created\n");
+        hr = ConfigureOutputType(*m_reader, streamIdx);
+        if (FAILED(hr))
+            return E_FAIL;
     }
     if (flags & MF_SOURCE_READERF_NATIVEMEDIATYPECHANGED) {
         wprintf(L"ERROR: Native media type changed\n");
