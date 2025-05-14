@@ -1,10 +1,22 @@
 #include <atlbase.h>
 #include <stdio.h>
+#include <thread>
 #include "Mpeg4Receiver.hpp"
 #include "../AppWebStream/ComUtil.hpp"
 #include "../AppWebStream/MP4Utils.hpp"
 #include "DisplayWindow.hpp"
 
+
+void ThreadStart(_bstr_t url, DisplayWindow* wnd) {
+    // connect to MPEG4 H.264 stream
+    using namespace std::placeholders;
+    Mpeg4Receiver receiver(url, std::bind(&DisplayWindow::OnNewFrame, wnd, _1, _2, _3, _4, _5));
+
+    HRESULT hr = S_OK;
+    while (SUCCEEDED(hr)) {
+        hr = receiver.ReceiveFrame();
+    }
+}
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
@@ -15,20 +27,17 @@ int main(int argc, char* argv[]) {
     DisplayWindow wnd;
 
     _bstr_t url = argv[1];
-    // connect to MPEG4 H.264 stream
-    using namespace std::placeholders;
-    Mpeg4Receiver receiver(url, std::bind(&DisplayWindow::OnNewFrame, &wnd, _1, _2, _3, _4, _5));
 
-    HRESULT hr = S_OK;
-    while (SUCCEEDED(hr)) {
-        hr = receiver.ReceiveFrame();
+    std::thread t(&ThreadStart, url, &wnd);
 
-        // non-blocking message loop
-        MSG msg{};
-        while (BOOL ret = PeekMessageW(&msg, wnd, 0, 0, PM_REMOVE) != 0) {
-            TranslateMessage(&msg);
-            DispatchMessageW(&msg);
-        }
+    // message loop
+    MSG msg{};
+    while (BOOL ret = GetMessageW(&msg, wnd, 0, 0) > 0) {
+        if (ret == -1) // error occured
+            break;
+
+        TranslateMessage(&msg);
+        DispatchMessageW(&msg);
     }
 }
 
