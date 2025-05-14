@@ -74,6 +74,8 @@ private:
         RECT rc{};
         GetClientRect(m_wnd, &rc);
 
+        InvalidateRect(m_wnd, &rc, false);
+
         PAINTSTRUCT ps{};
         HDC dc = BeginPaint(m_wnd, &ps);
         {
