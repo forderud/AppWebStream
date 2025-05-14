@@ -1,3 +1,5 @@
+#include <mfidl.h>
+#include <mfreadwrite.h>
 #include <mfapi.h>
 #include <mferror.h>
 #include "Mpeg4Receiver.hpp"
@@ -15,6 +17,7 @@ _COM_SMARTPTR_TYPEDEF(IMFSample, __uuidof(IMFSample));
 _COM_SMARTPTR_TYPEDEF(IMFByteStream, __uuidof(IMFByteStream));
 _COM_SMARTPTR_TYPEDEF(IMFSourceResolver, __uuidof(IMFSourceResolver));
 _COM_SMARTPTR_TYPEDEF(IMFMediaBuffer, __uuidof(IMFMediaBuffer));
+_COM_SMARTPTR_TYPEDEF(IMFSourceReader, __uuidof(IMFSourceReader));
 
 
 static unsigned int Align16(unsigned int size) {
@@ -57,7 +60,7 @@ Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, ProcessFrameCb frame_cb) : m_frame_cb(
     }
     COM_CHECK(MFCreateSourceReaderFromByteStream(byteStream, attribs, &m_reader));
 
-    COM_CHECK(ConfigureOutputType(m_reader, (DWORD)MF_SOURCE_READER_FIRST_VIDEO_STREAM));
+    COM_CHECK(ConfigureOutputType(*m_reader, (DWORD)MF_SOURCE_READER_FIRST_VIDEO_STREAM));
 }
 
 Mpeg4Receiver::~Mpeg4Receiver() {

@@ -2,13 +2,10 @@
 #include <array>
 #include <functional>
 #include <string_view>
-#include <comdef.h> // for __uuidof
-#include <mfidl.h>
-#include <mfreadwrite.h>
+#include <atlbase.h> // for CComPtr
+#include <comdef.h>  // for __uuidof, _bstr_t
 
-// define smart-pointers with "Ptr" suffix
-_COM_SMARTPTR_TYPEDEF(IMFSourceReader, __uuidof(IMFSourceReader));
-
+struct IMFSourceReader; // forward decl.
 
 class IStartTimeDPIReceiver {
 public:
@@ -45,7 +42,7 @@ private:
     void OnStartTimeDpiChanged(uint64_t startTime, double dpi) override;
     HRESULT ConfigureOutputType(IMFSourceReader& reader, DWORD dwStreamIndex);
 
-    IMFSourceReaderPtr m_reader;
+    CComPtr<IMFSourceReader> m_reader = nullptr;
     uint64_t           m_startTime = 0;   // SECONDS since midnight, Jan. 1, 1904
     double             m_dpi = 0;         // pixel spacing
     std::array<uint32_t, 2> m_resolution; // horizontal & vertical pixel count
