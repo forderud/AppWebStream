@@ -146,6 +146,14 @@ HRESULT Mpeg4Receiver::ReceiveFrame() {
     return S_OK;
 }
 
+std::array<uint32_t, 2> Mpeg4Receiver::GetResolution() const {
+    // return resolution of output buffer, that's a multiple of MPEG4 16x16 macroblocks 
+    std::array<uint32_t, 2> result;
+    result[0] = Align16(m_resolution[0]);
+    result[1] = Align16(m_resolution[1]);
+    return result;
+}
+
 void Mpeg4Receiver::OnStartTimeDpiChanged(uint64_t startTime, double dpi) {
     if (startTime != m_startTime)
         m_metadata_changed = true;

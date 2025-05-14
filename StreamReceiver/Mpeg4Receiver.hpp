@@ -30,9 +30,7 @@ public:
         return m_dpi;
     }
 
-    std::array<uint32_t, 2> GetResolution() const {
-        return m_resolution;
-    }
+    std::array<uint32_t, 2> GetResolution() const;
 
 private:
     void OnStartTimeDpiChanged(uint64_t startTime, double dpi);
