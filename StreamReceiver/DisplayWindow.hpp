@@ -68,7 +68,7 @@ public:
     }
 
 private:
-    /** WARNING: This function doesn't work yet! */
+    /** WARNING: Image is displayed upside-down. */
     void DrawBitmap(std::array<uint32_t, 2> resolution, std::string_view buffer) {
         RECT rc{};
         GetClientRect(m_wnd, &rc);
@@ -87,7 +87,7 @@ private:
             bmi.bmiHeader.biClrUsed = 0;
             bmi.bmiHeader.biClrImportant = 0;
 
-            int lines = StretchDIBits(dc, 0, 0, rc.right, rc.bottom, 0, 0, 2, 2, buffer.data(), &bmi, DIB_RGB_COLORS, SRCCOPY);
+            int lines = StretchDIBits(dc, 0, 0, rc.right, rc.bottom, 0, 0, resolution[0], resolution[1], buffer.data(), &bmi, DIB_RGB_COLORS, SRCCOPY);
             assert(lines == (int)resolution[1]);
         }
         EndPaint(m_wnd, &ps);
