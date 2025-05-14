@@ -33,7 +33,9 @@ public:
         assert(m_wnd);
 
         // show window
+#if 0
         ShowWindow(m_wnd, SW_SHOW);
+#endif
     }
 
     ~DisplayWindow() {
@@ -46,14 +48,14 @@ public:
         double dpi = receiver.GetDpi();
         auto resolution = receiver.GetResolution();
         if (metadataChanged) {
-#if 0
-            // resize window
+            // resize window to new resolution
             CRect rect; // outer rectangle
             GetWindowRect(m_wnd, &rect);
             CRect crect; // inner client rectangle
             GetClientRect(m_wnd, &crect);
             MoveWindow(m_wnd, rect.left, rect.top, resolution[0] + (rect.Width() - crect.Width()), resolution[1] + (rect.Height() - crect.Height()), /*repaint*/false);
-#endif
+
+            // log new frame metadata
             wprintf(L"  Start time: %hs (UTC)\n", TimeString1904(startTime).c_str());
             wprintf(L"  Frame DPI:  %f\n", dpi);
             wprintf(L"  Frame resolution: %u x %u\n", resolution[0], resolution[1]);
