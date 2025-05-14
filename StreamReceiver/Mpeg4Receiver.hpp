@@ -9,13 +9,7 @@
 #include <mfreadwrite.h>
 
 // define smart-pointers with "Ptr" suffix
-_COM_SMARTPTR_TYPEDEF(IMFAttributes, __uuidof(IMFAttributes));
 _COM_SMARTPTR_TYPEDEF(IMFSourceReader, __uuidof(IMFSourceReader));
-_COM_SMARTPTR_TYPEDEF(IMFMediaType, __uuidof(IMFMediaType));
-_COM_SMARTPTR_TYPEDEF(IMFSample, __uuidof(IMFSample));
-_COM_SMARTPTR_TYPEDEF(IMFByteStream, __uuidof(IMFByteStream));
-_COM_SMARTPTR_TYPEDEF(IMFSourceResolver, __uuidof(IMFSourceResolver));
-_COM_SMARTPTR_TYPEDEF(IMFMediaBuffer, __uuidof(IMFMediaBuffer));
 
 
 class IStartTimeDPIReceiver {
