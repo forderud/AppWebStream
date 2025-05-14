@@ -24,10 +24,11 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
+    // create on-screen window for image display
     DisplayWindow wnd;
 
+    // start MPEG4 stream receive thread
     _bstr_t url = argv[1];
-
     std::thread t(ReceiveMovieThread, url, &wnd);
 
     // message loop
