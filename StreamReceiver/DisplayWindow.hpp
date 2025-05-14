@@ -68,7 +68,6 @@ public:
     }
 
 private:
-    /** WARNING: Image is displayed upside-down. */
     void DrawBitmap(std::array<uint32_t, 2> resolution, std::string_view buffer) {
         RECT rc{};
         GetClientRect(m_wnd, &rc);
@@ -79,7 +78,7 @@ private:
             BITMAPINFO bmi = {};
             bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
             bmi.bmiHeader.biWidth = resolution[0];
-            bmi.bmiHeader.biHeight = resolution[1];
+            bmi.bmiHeader.biHeight = -(int)resolution[1]; // negative to indicate origin in upper left corner
             bmi.bmiHeader.biPlanes = 1;
             bmi.bmiHeader.biBitCount = 32;
             bmi.bmiHeader.biCompression = BI_RGB;
