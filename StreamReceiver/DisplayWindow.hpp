@@ -64,11 +64,35 @@ public:
         wprintf(L"  Frame time:     %f ms\n", frameTime * 0.1f / 1000); // convert to milliseconds
         wprintf(L"  Frame duration: %f ms\n", frameDuration * 0.1f / 1000); // convert to milliseconds
 
-        // TODO: Display RGBA pixel data from "buffer" in window
-        buffer;
+        DrawBitmap(resolution, buffer);
     }
 
 private:
+    /** WARNING: This function doesn't work yet! */
+    void DrawBitmap(std::array<uint32_t, 2> resolution, std::string_view buffer) {
+        RECT rc{};
+        GetClientRect(m_wnd, &rc);
+
+        PAINTSTRUCT ps{};
+        HDC dc = BeginPaint(m_wnd, &ps);
+        {
+            BITMAPINFO bmi = {};
+            bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+            bmi.bmiHeader.biWidth = resolution[0];
+            bmi.bmiHeader.biHeight = resolution[1];
+            bmi.bmiHeader.biPlanes = 1;
+            bmi.bmiHeader.biBitCount = 32;
+            bmi.bmiHeader.biCompression = BI_RGB;
+            bmi.bmiHeader.biSizeImage = (DWORD)buffer.size();
+            bmi.bmiHeader.biClrUsed = 0;
+            bmi.bmiHeader.biClrImportant = 0;
+
+            int lines = StretchDIBits(dc, 0, 0, rc.right, rc.bottom, 0, 0, 2, 2, buffer.data(), &bmi, DIB_RGB_COLORS, SRCCOPY);
+            assert(lines == (int)resolution[1]);
+        }
+        EndPaint(m_wnd, &ps);
+    }
+
     /** Window procedure for processing messages. */
     static LRESULT WindowProc(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         switch (msg) {
