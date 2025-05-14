@@ -47,7 +47,7 @@ Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, ProcessFrameCb frame_cb) : m_frame_cb(
         COM_CHECK(MFCreateSourceResolver(&resolver));
 
         // create innerStream that connects to the URL
-        DWORD createObjFlags = MF_RESOLUTION_READ | MF_RESOLUTION_BYTESTREAM | MF_RESOLUTION_CONTENT_DOES_NOT_HAVE_TO_MATCH_EXTENSION_OR_MIME_TYPE;
+        DWORD createObjFlags = MF_RESOLUTION_BYTESTREAM;
         MF_OBJECT_TYPE objectType = MF_OBJECT_INVALID;
         IUnknownPtr source;
         COM_CHECK(resolver->CreateObjectFromURL(url, createObjFlags, nullptr, &objectType, &source));
