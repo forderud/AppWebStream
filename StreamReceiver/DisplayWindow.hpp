@@ -82,7 +82,7 @@ private:
             bmi.bmiHeader.biPlanes = 1;
             bmi.bmiHeader.biBitCount = 32;
             bmi.bmiHeader.biCompression = BI_RGB;
-            bmi.bmiHeader.biSizeImage = (DWORD)buffer.size();
+            bmi.bmiHeader.biSizeImage = 0; // zero for uncompressed RGB bitmaps
             bmi.bmiHeader.biClrUsed = 0;
             bmi.bmiHeader.biClrImportant = 0;
 
