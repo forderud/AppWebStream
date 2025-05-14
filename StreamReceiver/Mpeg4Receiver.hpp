@@ -43,9 +43,9 @@ private:
     HRESULT ConfigureOutputType(IMFSourceReader& reader, DWORD dwStreamIndex);
 
     CComPtr<IMFSourceReader> m_reader = nullptr;
-    uint64_t           m_startTime = 0;   // SECONDS since midnight, Jan. 1, 1904
-    double             m_dpi = 0;         // pixel spacing
-    std::array<uint32_t, 2> m_resolution; // horizontal & vertical pixel count
-    ProcessFrameCb     m_frame_cb = nullptr;
-    bool               m_metadata_changed = false; // metadata changed since previous frame
+    uint64_t                 m_startTime = 0;   // SECONDS since midnight, Jan. 1, 1904
+    double                   m_dpi = 0;         // pixel spacing
+    std::array<uint32_t, 2>  m_resolution; // horizontal & vertical pixel count
+    ProcessFrameCb           m_frame_cb = nullptr;
+    bool                     m_metadata_changed = false; // metadata changed since previous frame
 };
