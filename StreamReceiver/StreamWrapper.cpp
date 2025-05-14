@@ -12,7 +12,7 @@ StreamWrapper::StreamWrapper() {
 StreamWrapper::~StreamWrapper() {
 }
 
-void StreamWrapper::Initialize(IMFByteStream* socket, IStartTimeDPIReceiver* notifier) {
+void StreamWrapper::Initialize(IMFByteStream* socket, StartTimeDpiChangedCb notifier) {
     m_socket = socket;
     m_notifier = notifier;
 }
@@ -57,7 +57,7 @@ HRESULT StreamWrapper::EndRead(/*in*/IMFAsyncResult* result, /*out*/ULONG* cbRea
         // inspect MPEG4 bitstream
         bool updated = m_stream_editor.ParseStream(m_read_buf.substr(0, *cbRead));
         if (m_notifier && updated)
-            m_notifier->OnStartTimeDpiChanged(m_stream_editor.GetStartTime(), m_stream_editor.GetDPI());
+            m_notifier(m_stream_editor.GetStartTime(), m_stream_editor.GetDPI());
     }
     return hr;
 }

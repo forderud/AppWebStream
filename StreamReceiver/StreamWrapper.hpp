@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 #include <memory>
 #include <atlbase.h>
 #include <atlcom.h>
@@ -8,7 +9,8 @@
 
 _COM_SMARTPTR_TYPEDEF(IMFByteStream, __uuidof(IMFByteStream));
 
-class IStartTimeDPIReceiver; // forward decl
+typedef std::function<void(uint64_t startTime, double dpi)> StartTimeDpiChangedCb;
+
 
 /** IMFByteStream wrapper to allow parsing of the underlying MPEG4 bitstream.
     Used to access CreationTime & DPI parameters that doesn't seem to be exposed through the MediaFoundation API. */
@@ -20,7 +22,7 @@ public:
     StreamWrapper();
     /*NOT virtual*/ ~StreamWrapper();
 
-    void Initialize(IMFByteStream * socket, IStartTimeDPIReceiver* notifier);
+    void Initialize(IMFByteStream * socket, StartTimeDpiChangedCb notifier);
 
     HRESULT GetCapabilities(/*out*/DWORD *capabilities) override;
 
@@ -57,8 +59,8 @@ public:
     END_COM_MAP()
 
 private:
-    IMFByteStreamPtr       m_socket;   // network socket stream to intercept
-    MP4StreamEditor        m_stream_editor;
-    std::string_view       m_read_buf; // set by BeginRead
-    IStartTimeDPIReceiver* m_notifier = nullptr;
+    IMFByteStreamPtr      m_socket;   // network socket stream to intercept
+    MP4StreamEditor       m_stream_editor;
+    std::string_view      m_read_buf; // set by BeginRead
+    StartTimeDpiChangedCb m_notifier;
 };
