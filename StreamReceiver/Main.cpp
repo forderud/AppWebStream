@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
 
     _bstr_t url = argv[1];
 
-    std::thread t(&ReceiveMovieThread, url, &wnd);
+    std::thread t(ReceiveMovieThread, url, &wnd);
 
     // message loop
     MSG msg{};
