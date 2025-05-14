@@ -32,8 +32,7 @@ int main(int argc, char* argv[]) {
 
     // message loop
     MSG msg{};
-    BOOL ret = 0;
-    while ((ret = GetMessageW(&msg, wnd, 0, 0)) != 0) {
+    while (BOOL ret = GetMessageW(&msg, wnd, 0, 0)) {
         if (ret == -1) // error occured
             break;
 
