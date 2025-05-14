@@ -1,3 +1,5 @@
+#include <mfapi.h>
+#include <mferror.h>
 #include "Mpeg4Receiver.hpp"
 #include "StreamWrapper.hpp"
 #include "../AppWebStream/ComUtil.hpp"

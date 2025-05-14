@@ -3,9 +3,7 @@
 #include <functional>
 #include <string_view>
 #include <comdef.h> // for __uuidof
-#include <mfapi.h>
 #include <mfidl.h>
-#include <mferror.h>
 #include <mfreadwrite.h>
 
 // define smart-pointers with "Ptr" suffix
