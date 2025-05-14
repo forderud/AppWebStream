@@ -33,12 +33,14 @@ public:
         assert(m_wnd);
 
         // show window
-#if 0
         ShowWindow(m_wnd, SW_SHOW);
-#endif
     }
 
     ~DisplayWindow() {
+    }
+
+    operator HWND () {
+        return m_wnd;
     }
 
     void OnNewFrame(Mpeg4Receiver& receiver, int64_t frameTime, int64_t frameDuration, std::string_view buffer, bool metadataChanged) {

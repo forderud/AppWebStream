@@ -22,6 +22,13 @@ int main(int argc, char* argv[]) {
     HRESULT hr = S_OK;
     while (SUCCEEDED(hr)) {
         hr = receiver.ReceiveFrame();
+
+        // non-blocking message loop
+        MSG msg{};
+        while (BOOL ret = PeekMessageW(&msg, wnd, 0, 0, PM_REMOVE) != 0) {
+            TranslateMessage(&msg);
+            DispatchMessageW(&msg);
+        }
     }
 }
 
