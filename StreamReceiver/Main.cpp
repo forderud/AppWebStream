@@ -7,7 +7,7 @@
 #include "DisplayWindow.hpp"
 
 
-void ThreadStart(_bstr_t url, DisplayWindow* wnd) {
+void ReceiveMovieThread(_bstr_t url, DisplayWindow* wnd) {
     // connect to MPEG4 H.264 stream
     using namespace std::placeholders;
     Mpeg4Receiver receiver(url, std::bind(&DisplayWindow::OnNewFrame, wnd, _1, _2, _3, _4, _5));
@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
 
     _bstr_t url = argv[1];
 
-    std::thread t(&ThreadStart, url, &wnd);
+    std::thread t(&ReceiveMovieThread, url, &wnd);
 
     // message loop
     MSG msg{};
