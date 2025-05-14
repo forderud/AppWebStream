@@ -2,7 +2,7 @@
 #include <cassert>
 #include <windows.h>
 
-
+/** Window for displaying received RGBA images. */
 class DisplayWindow {
 public:
     DisplayWindow() {
@@ -35,6 +35,27 @@ public:
     }
 
     ~DisplayWindow() {
+    }
+
+    void OnNewFrame(Mpeg4Receiver& receiver, int64_t frameTime, int64_t frameDuration, std::string_view buffer, bool metadataChanged) {
+        wprintf(L"Frame received:\n");
+
+        uint64_t startTime = receiver.GetStartTime(); // SECONDS since midnight, Jan. 1, 1904
+        double dpi = receiver.GetDpi();
+        auto resolution = receiver.GetResolution();
+        if (metadataChanged) {
+            // TODO: Resize window
+
+            wprintf(L"  Start time: %hs (UTC)\n", TimeString1904(startTime).c_str());
+            wprintf(L"  Frame DPI:  %f\n", dpi);
+            wprintf(L"  Frame resolution: %u x %u\n", resolution[0], resolution[1]);
+        }
+
+        wprintf(L"  Frame time:     %f ms\n", frameTime * 0.1f / 1000); // convert to milliseconds
+        wprintf(L"  Frame duration: %f ms\n", frameDuration * 0.1f / 1000); // convert to milliseconds
+
+        // TODO: Display RGBA pixel data from "buffer" in window
+        buffer;
     }
 
 private:
