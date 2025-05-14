@@ -139,9 +139,9 @@ HRESULT Mpeg4Receiver::ReceiveFrame() {
 
             COM_CHECK(buffer->Unlock());
         }
-    }
 
-    m_metadata_changed = false; // clear flag after m_frame_cb have been called
+        m_metadata_changed = false; // clear flag after m_frame_cb have been called
+    }
 
     return S_OK;
 }
