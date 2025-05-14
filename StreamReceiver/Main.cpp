@@ -3,6 +3,7 @@
 #include "Mpeg4Receiver.hpp"
 #include "../AppWebStream/ComUtil.hpp"
 #include "../AppWebStream/MP4Utils.hpp"
+#include "DisplayWindow.hpp"
 
 
 static void OnProcessFrame(Mpeg4Receiver& receiver, int64_t frameTime, int64_t frameDuration, std::string_view buffer, bool metadataChanged) {
@@ -20,7 +21,7 @@ static void OnProcessFrame(Mpeg4Receiver& receiver, int64_t frameTime, int64_t f
     wprintf(L"  Frame time:     %f ms\n", frameTime * 0.1f / 1000); // convert to milliseconds
     wprintf(L"  Frame duration: %f ms\n", frameDuration * 0.1f / 1000); // convert to milliseconds
 
-    // TODO: Access RGBA pixel data in buffer
+    // TODO: Display RGBA pixel data from "buffer" in window
     buffer;
 }
 
@@ -30,6 +31,10 @@ int main(int argc, char* argv[]) {
         wprintf(L"Usage: StreamReceiver.exe URL (e.g. StreamReceiver.exe http://localhost:8080/movie.mp4)\n");
         return -1;
     }
+
+#if 0
+    DisplayWindow wnd;
+#endif
 
     _bstr_t url = argv[1];
     // connect to MPEG4 H.264 stream

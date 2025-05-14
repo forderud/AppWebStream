@@ -8,5 +8,6 @@
   <ItemGroup>
     <ClInclude Include="StreamWrapper.hpp" />
     <ClInclude Include="Mpeg4Receiver.hpp" />
+    <ClInclude Include="DisplayWindow.hpp" />
   </ItemGroup>
 </Project>

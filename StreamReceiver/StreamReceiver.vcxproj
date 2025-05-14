@@ -77,6 +77,7 @@
     <ClCompile Include="StreamWrapper.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DisplayWindow.hpp" />
     <ClInclude Include="Mpeg4Receiver.hpp" />
     <ClInclude Include="StreamWrapper.hpp" />
   </ItemGroup>
