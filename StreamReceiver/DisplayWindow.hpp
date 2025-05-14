@@ -1,6 +1,8 @@
 #pragma once
 #include <cassert>
 #include <windows.h>
+#include <atltypes.h>
+
 
 /** Window for displaying received RGBA images. */
 class DisplayWindow {
@@ -17,7 +19,7 @@ public:
         RegisterClassW(&wc);
 
         // create offscreen window 
-        HWND wnd = CreateWindowExW(0, // optional window styles
+        m_wnd = CreateWindowExW(0, // optional window styles
             CLASS_NAME,               // window class
             L"StreamReceiver",        // window text
             WS_OVERLAPPEDWINDOW,      // window style
@@ -28,10 +30,10 @@ public:
             instance,  // instance handle
             NULL       // additional data
         );
-        assert(wnd);
+        assert(m_wnd);
 
         // show window
-        ShowWindow(wnd, SW_SHOW);
+        ShowWindow(m_wnd, SW_SHOW);
     }
 
     ~DisplayWindow() {
@@ -44,8 +46,14 @@ public:
         double dpi = receiver.GetDpi();
         auto resolution = receiver.GetResolution();
         if (metadataChanged) {
-            // TODO: Resize window
-
+#if 0
+            // resize window
+            CRect rect; // outer rectangle
+            GetWindowRect(m_wnd, &rect);
+            CRect crect; // inner client rectangle
+            GetClientRect(m_wnd, &crect);
+            MoveWindow(m_wnd, rect.left, rect.top, resolution[0] + (rect.Width() - crect.Width()), resolution[1] + (rect.Height() - crect.Height()), /*repaint*/false);
+#endif
             wprintf(L"  Start time: %hs (UTC)\n", TimeString1904(startTime).c_str());
             wprintf(L"  Frame DPI:  %f\n", dpi);
             wprintf(L"  Frame resolution: %u x %u\n", resolution[0], resolution[1]);
@@ -69,4 +77,6 @@ private:
 
         return DefWindowProc(wnd, msg, wParam, lParam);
     }
+
+    HWND m_wnd = 0;
 };
