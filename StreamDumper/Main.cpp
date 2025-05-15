@@ -15,6 +15,8 @@ int main(int argc, char* argv[]) {
 
     ClientSocket sock(servername.c_str(), port.c_str());
 
+    sock.WriteHttpGet(resource);
+
     for (;;) {
         BYTE buffer[1024]{};
 
