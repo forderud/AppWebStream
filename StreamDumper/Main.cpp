@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <vector>
 #include "ClientSocket.hpp"
 
 #pragma comment(lib, "comsuppw.lib")
@@ -18,9 +19,9 @@ int main(int argc, char* argv[]) {
     sock.WriteHttpGet(resource);
 
     for (;;) {
-        BYTE buffer[1024]{};
+        std::vector<BYTE> buffer(1024*1024, (BYTE)0); // 1MB
 
-        uint32_t res = sock.Read(buffer, std::size(buffer));
+        uint32_t res = sock.Read(buffer.data(), (ULONG)buffer.size());
         printf("Read %u bytes.\n", res);
         if (res == 0)
             break;
