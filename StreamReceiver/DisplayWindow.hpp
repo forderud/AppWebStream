@@ -1,5 +1,6 @@
 #pragma once
 #include <cassert>
+#include <mutex>
 #include <windows.h>
 #include <atltypes.h>
 
@@ -47,6 +48,10 @@ public:
     }
 
     void OnNewFrame(Mpeg4Receiver& receiver, int64_t frameTime, int64_t frameDuration, std::string_view buffer, bool metadataChanged) {
+        std::lock_guard<std::mutex> guard(m_mutex);
+        if (!m_active)
+            return;
+
         wprintf(L"Frame received:\n");
 
         uint64_t startTime = receiver.GetStartTime(); // SECONDS since midnight, Jan. 1, 1904
@@ -103,12 +108,21 @@ private:
 
         switch (msg) {
         case WM_DESTROY:
-            PostQuitMessage(0);
+            assert(obj);
+            {
+                // first wait for existing OnNewFrame calls to complete
+                std::lock_guard<std::mutex> guard(obj->m_mutex);
+
+                obj->m_active = false; // block new OnNewFrame calls
+                PostQuitMessage(0);    // close the window
+            }
             return 0;
         }
 
         return DefWindowProc(wnd, msg, wParam, lParam);
     }
 
-    HWND m_wnd = 0;
+    std::mutex m_mutex;
+    bool       m_active = true;
+    HWND       m_wnd = 0;
 };
