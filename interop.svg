@@ -24,7 +24,7 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      inkscape:zoom="1.0467522"
-     inkscape:cx="395.03141"
+     inkscape:cx="394.55374"
      inkscape:cy="408.88378"
      inkscape:window-width="1799"
      inkscape:window-height="1208"
@@ -103,15 +103,15 @@
        y="39.359859" />
     <text
        xml:space="preserve"
-       style="font-size:5.64444444px;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#ffffff;stroke-width:0.264999;stroke-dasharray:none;-inkscape-font-specification:'Arial, Normal';font-family:Arial;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
-       x="110.20921"
-       y="51.492622"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64444px;font-family:Arial;-inkscape-font-specification:'Arial, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#ffffff;stroke-width:0.264999;stroke-dasharray:none"
+       x="103.13177"
+       y="50.987091"
        id="text2-7"><tspan
          sodipodi:role="line"
          id="tspan2-1"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Arial;-inkscape-font-specification:'Arial, Normal';stroke-width:0.265;font-size:5.64444444px;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
-         x="110.20921"
-         y="51.492622">VLC</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64444px;font-family:Arial;-inkscape-font-specification:'Arial, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.265"
+         x="103.13177"
+         y="50.987091">ffplay, VLC</tspan></text>
     <rect
        style="fill:#225500;stroke-width:0.264999;stroke-dasharray:none"
        id="rect2-7"
