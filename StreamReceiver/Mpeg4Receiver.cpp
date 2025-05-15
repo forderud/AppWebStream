@@ -20,6 +20,7 @@ _COM_SMARTPTR_TYPEDEF(IMFSourceResolver, __uuidof(IMFSourceResolver));
 _COM_SMARTPTR_TYPEDEF(IMFMediaBuffer, __uuidof(IMFMediaBuffer));
 _COM_SMARTPTR_TYPEDEF(IMFSourceReader, __uuidof(IMFSourceReader));
 _COM_SMARTPTR_TYPEDEF(IPropertyStore, __uuidof(IPropertyStore));
+_COM_SMARTPTR_TYPEDEF(IMFMediaSource, __uuidof(IMFMediaSource));
 
 
 static unsigned int Align16(unsigned int size) {
@@ -91,7 +92,7 @@ Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, ProcessFrameCb frame_cb) : m_frame_cb(
         }
 
         // create innerStream that connects to the URL
-        DWORD createObjFlags = MF_RESOLUTION_BYTESTREAM;
+        DWORD createObjFlags = MF_RESOLUTION_BYTESTREAM; // MF_RESOLUTION_BYTESTREAM for IMFByteStream and MF_RESOLUTION_MEDIASOURCE for IMFMediaSource
         MF_OBJECT_TYPE objectType = MF_OBJECT_INVALID;
         IUnknownPtr source;
         COM_CHECK(resolver->CreateObjectFromURL(url, createObjFlags, props, &objectType, &source));
