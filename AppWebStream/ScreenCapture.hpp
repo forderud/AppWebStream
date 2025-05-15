@@ -4,9 +4,9 @@
 
 class window_dc {
 public:
-    window_dc(HWND h) : wnd(h) {
-        m_dc = GetDC(wnd);
-        if (wnd) {
+    window_dc(HWND h) : m_wnd(h) {
+        m_dc = GetDC(m_wnd);
+        if (m_wnd) {
             if (!GetClientRect(h, &m_rect))
                 throw std::runtime_error("GetClientRect failed");
         } else {
@@ -16,7 +16,7 @@ public:
         }
     }
     ~window_dc() {
-        ReleaseDC(wnd, m_dc);
+        ReleaseDC(m_wnd, m_dc);
     }
 
     unsigned int width() const {
@@ -26,7 +26,7 @@ public:
         return m_rect.bottom - m_rect.top;
     }
 
-    HWND wnd = nullptr;
+    HWND m_wnd = nullptr;
     HDC  m_dc = nullptr;
 private:
     RECT m_rect = {};
