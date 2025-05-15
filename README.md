@@ -47,8 +47,8 @@ The video stream adheres to the MPEG4 standard, so it should be supported by all
 * Google Chrome
 * Microsoft Edge
 * Firefox
-* VLC media player (open stream as `http://localhost:port/movie.mp4`)
-* `ffplay.exe -flags low_delay -i "http://localhost:port/movie.mp4"`
+* [VLC media player](https://www.videolan.org/vlc/): Open stream as `http://localhost:port/movie.mp4`
+* [ffplay](https://ffmpeg.org/ffplay.html): `ffplay.exe -flags low_delay -i "http://localhost:port/movie.mp4"`
 * StreamReceiver project (in this repo)
 
 Unsupported clients:
