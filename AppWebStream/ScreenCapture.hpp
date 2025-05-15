@@ -35,7 +35,7 @@ private:
 
 class offscreen_bmp {
 public:
-    offscreen_bmp(HDC ref_dc, LONG width, LONG height) {
+    offscreen_bmp(HDC ref_dc, LONG width, LONG height) : m_width(width), m_height(height) {
         dc = CreateCompatibleDC(ref_dc);
         if (!dc)
             throw std::runtime_error("CreateCompatibleDC has failed");
@@ -53,16 +53,16 @@ public:
         DeleteDC(dc);
     }
 
-    int CopyToRGBABuffer(window_dc& src, /*out*/uint32_t* dst_ptr) {
+    int CopyToRGBABuffer(HDC src, /*out*/uint32_t* dst_ptr) {
         // copy window content to bitmap
-        if (!BitBlt(/*dst*/dc, 0, 0, src.width(), src.height(), /*src*/src.dc, 0, 0, SRCCOPY))
+        if (!BitBlt(/*dst*/dc, 0, 0, m_width, m_height, /*src*/src, 0, 0, SRCCOPY))
             return -1;
 
         BITMAPINFO bmp_info = {};
         bmp_info.bmiHeader.biSize = sizeof(bmp_info.bmiHeader);
         {
             // call GetDIBits to fill "bmp_info" struct 
-            int ok = GetDIBits(dc, bmp, 0, src.height(), nullptr, &bmp_info, DIB_RGB_COLORS);
+            int ok = GetDIBits(dc, bmp, 0, m_height, nullptr, &bmp_info, DIB_RGB_COLORS);
             if (!ok)
                 return E_FAIL;
             bmp_info.bmiHeader.biBitCount = 32;     // request 32bit RGBA image 
@@ -75,12 +75,14 @@ public:
         }
 
         // copy bitmap content to destination buffer
-        int scan_lines = GetDIBits(dc, bmp, 0, src.height(), dst_ptr, &bmp_info, DIB_RGB_COLORS);
+        int scan_lines = GetDIBits(dc, bmp, 0, m_height, dst_ptr, &bmp_info, DIB_RGB_COLORS);
         return scan_lines;
     }
 
     HDC     dc = nullptr;
     HBITMAP bmp = nullptr;
 private:
+    LONG    m_width = 0;
+    LONG    m_height = 0;
     HGDIOBJ prev = nullptr;
 };

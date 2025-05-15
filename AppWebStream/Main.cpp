@@ -11,7 +11,7 @@ static HRESULT EncodeFrame (VideoEncoder & encoder, window_dc & wnd_dc) {
 
     // copy window content encoder buffer
     auto * img_ptr = encoder.WriteFrameBegin();
-    int scan_lines = bmp.CopyToRGBABuffer(wnd_dc, (uint32_t*)img_ptr);
+    int scan_lines = bmp.CopyToRGBABuffer(wnd_dc.dc, (uint32_t*)img_ptr);
     if (scan_lines != wnd_dc.height()) {
         encoder.AbortWrite(); // still need to unlock buffer
         return E_FAIL;
