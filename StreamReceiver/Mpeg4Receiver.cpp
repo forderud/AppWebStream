@@ -44,7 +44,7 @@ Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, ProcessFrameCb frame_cb) : m_frame_cb(
         COM_CHECK(attribs->SetUINT32(MF_SOURCE_READER_ENABLE_VIDEO_PROCESSING, TRUE)); // enable YUV to RGB-32 conversion
     }
 
-    IMFByteStreamPtr byteStream;
+    IMFMediaSourcePtr mediaSource;
     {
         IMFSourceResolverPtr resolver;
         COM_CHECK(MFCreateSourceResolver(&resolver));
@@ -103,9 +103,18 @@ Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, ProcessFrameCb frame_cb) : m_frame_cb(
         auto tmp = CreateLocalInstance<StreamWrapper>();
         using namespace std::placeholders;
         tmp->Initialize(innerStream, std::bind(&Mpeg4Receiver::OnStartTimeDpiChanged, this, _1, _2));
+        IMFByteStreamPtr byteStream;
         COM_CHECK(tmp.QueryInterface(&byteStream));
+
+        // wrap byteStream-wrapper in an additional mediaSource wrapper
+        objectType = MF_OBJECT_INVALID;
+        obj.Release();
+        COM_CHECK(resolver->CreateObjectFromByteStream(byteStream, NULL, MF_RESOLUTION_MEDIASOURCE | MF_RESOLUTION_CONTENT_DOES_NOT_HAVE_TO_MATCH_EXTENSION_OR_MIME_TYPE, props, &objectType, &obj));
+        assert(objectType == MF_OBJECT_MEDIASOURCE);
+        mediaSource = obj;
+
     }
-    COM_CHECK(MFCreateSourceReaderFromByteStream(byteStream, attribs, &m_reader));
+    COM_CHECK(MFCreateSourceReaderFromMediaSource(mediaSource, attribs, &m_reader));
 
     COM_CHECK(ConfigureOutputType(*m_reader, (DWORD)MF_SOURCE_READER_FIRST_VIDEO_STREAM));
 }
