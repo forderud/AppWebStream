@@ -53,9 +53,9 @@ public:
         DeleteDC(dc);
     }
 
-    int CopyToRGBABuffer(HDC src, /*out*/uint32_t* dst_ptr) {
+    int CopyToRGBABuffer(window_dc& src, /*out*/uint32_t* dst_ptr) {
         // copy window content to bitmap
-        if (!BitBlt(/*dst*/dc, 0, 0, m_width, m_height, /*src*/src, 0, 0, SRCCOPY))
+        if (!BitBlt(/*dst*/dc, 0, 0, m_width, m_height, /*src*/src.dc, 0, 0, SRCCOPY))
             return -1;
 
         BITMAPINFO bmp_info = {};

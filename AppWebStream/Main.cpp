@@ -5,13 +5,13 @@
 #include "ScreenCapture.hpp"
 
 
-static HRESULT EncodeFrame (VideoEncoder & encoder, window_dc & wnd_dc, unsigned int dims[2]) {
+static HRESULT EncodeFrame (VideoEncoder& encoder, window_dc& wnd_dc, unsigned int dims[2]) {
     // create offscreen bitmap for screen capture (pad window size to be compatible with FFMPEG encoder)
     offscreen_bmp bmp(wnd_dc.dc, dims[0], dims[1]);
 
     // copy window content encoder buffer
     auto * img_ptr = encoder.WriteFrameBegin();
-    int scan_lines = bmp.CopyToRGBABuffer(wnd_dc.dc, (uint32_t*)img_ptr);
+    int scan_lines = bmp.CopyToRGBABuffer(wnd_dc, (uint32_t*)img_ptr);
     if (scan_lines != (int)dims[1]) {
         encoder.AbortWrite(); // still need to unlock buffer
         return E_FAIL;
