@@ -54,6 +54,12 @@ int main (int argc, char *argv[]) {
         return -1;
     }
 
+    if (!win_handle) {
+        // clamp resolution to 1920x1080 if capturing entire desktop
+        dims[0] = min(dims[0], 1920);
+        dims[1] = min(dims[1], 1080);
+    }
+
     const unsigned int FPS = 50;
 
     // create H.264/MPEG4 encoder
