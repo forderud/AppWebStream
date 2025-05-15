@@ -63,6 +63,19 @@ Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, ProcessFrameCb frame_cb) : m_frame_cb(
             COM_CHECK(props->SetValue(key, val));
             COM_CHECK(props->Commit());
         }
+        {
+            // reduce max buffering from 40000 to 100 milliseconds
+            PROPERTYKEY key{};
+            key.fmtid = MFNETSOURCE_MAXBUFFERTIMEMS;
+            key.pid = 0;
+
+            PROPVARIANT val{};
+            val.vt = VT_I4;
+            val.lVal = 100; // 100ms (40000 is default)
+
+            COM_CHECK(props->SetValue(key, val));
+            COM_CHECK(props->Commit());
+        }
 
         // create innerStream that connects to the URL
         DWORD createObjFlags = MF_RESOLUTION_BYTESTREAM;
