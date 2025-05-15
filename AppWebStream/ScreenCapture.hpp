@@ -5,7 +5,7 @@
 class window_dc {
 public:
     window_dc(HWND h) : wnd(h) {
-        dc = GetDC(wnd);
+        m_dc = GetDC(wnd);
         if (wnd) {
             if (!GetClientRect(h, &m_rect))
                 throw std::runtime_error("GetClientRect failed");
@@ -16,7 +16,7 @@ public:
         }
     }
     ~window_dc() {
-        ReleaseDC(wnd, dc);
+        ReleaseDC(wnd, m_dc);
     }
 
     unsigned int width() const {
@@ -27,7 +27,7 @@ public:
     }
 
     HWND wnd = nullptr;
-    HDC  dc = nullptr;
+    HDC  m_dc = nullptr;
 private:
     RECT m_rect = {};
 };
@@ -55,7 +55,7 @@ public:
 
     int CopyToRGBABuffer(window_dc& src, /*out*/uint32_t* dst_ptr) {
         // copy window content to bitmap
-        if (!BitBlt(/*dst*/m_dc, 0, 0, m_width, m_height, /*src*/src.dc, 0, 0, SRCCOPY))
+        if (!BitBlt(/*dst*/m_dc, 0, 0, m_width, m_height, /*src*/src.m_dc, 0, 0, SRCCOPY))
             return -1;
 
         BITMAPINFO bmp_info = {};

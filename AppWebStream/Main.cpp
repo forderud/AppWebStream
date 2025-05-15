@@ -7,7 +7,7 @@
 
 static HRESULT EncodeFrame (VideoEncoder& encoder, window_dc& wnd_dc, unsigned int dims[2]) {
     // create offscreen bitmap for screen capture (pad window size to be compatible with FFMPEG encoder)
-    offscreen_bmp bmp(wnd_dc.dc, dims[0], dims[1]);
+    offscreen_bmp bmp(wnd_dc.m_dc, dims[0], dims[1]);
 
     // copy window content encoder buffer
     auto * img_ptr = encoder.WriteFrameBegin();
@@ -49,7 +49,7 @@ int main (int argc, char *argv[]) {
     // check window handle
     window_dc wnd_dc(win_handle);
     unsigned int dims[2] = {VideoEncoder::Align2(wnd_dc.width()), VideoEncoder::Align2(wnd_dc.height())};
-    if (!wnd_dc.dc) {
+    if (!wnd_dc.m_dc) {
         fprintf(stderr, "ERROR: Invalid window handle\n");
         return -1;
     }
