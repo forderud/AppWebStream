@@ -61,7 +61,7 @@ Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, ProcessFrameCb frame_cb) : m_frame_cb(
             val.lVal = 1; // 1 second (5 is default)
 
             COM_CHECK(props->SetValue(key, val));
-            COM_CHECK(props->Commit());
+            //COM_CHECK(props->Commit());
         }
         {
             // reduce max buffering from 40000 to 100 milliseconds
@@ -74,7 +74,7 @@ Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, ProcessFrameCb frame_cb) : m_frame_cb(
             val.lVal = 100; // 100ms (40000 is default)
 
             COM_CHECK(props->SetValue(key, val));
-            COM_CHECK(props->Commit());
+            //COM_CHECK(props->Commit());
         }
 
         // create innerStream that connects to the URL
