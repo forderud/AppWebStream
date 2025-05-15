@@ -78,6 +78,9 @@ public:
             return -1;
         }
 
+#ifndef _NDEBUG
+        printf("."); // log "x" to signal that a TCP packet have been transmitted
+#endif
         return byte_count;
     }
 
