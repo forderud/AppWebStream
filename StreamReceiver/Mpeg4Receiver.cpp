@@ -51,7 +51,20 @@ Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, ProcessFrameCb frame_cb) : m_frame_cb(
         IPropertyStorePtr props;
         COM_CHECK(PSCreateMemoryPropertyStore(__uuidof(IPropertyStore), (void**)&props));
         {
-            // reduce network buffering from 5 to 1 second
+            // reduce startup latency
+            PROPERTYKEY key{};
+            key.fmtid = MFNETSOURCE_ACCELERATEDSTREAMINGDURATION;
+            key.pid = 0;
+
+            PROPVARIANT val{};
+            val.vt = VT_I4;
+            val.lVal = 100; // 100 milliseconds (10,000 is default)
+
+            COM_CHECK(props->SetValue(key, val));
+            //COM_CHECK(props->Commit());
+        }
+        {
+            // reduce network buffering
             PROPERTYKEY key{};
             key.fmtid = MFNETSOURCE_BUFFERINGTIME;
             key.pid = 0;
@@ -64,14 +77,14 @@ Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, ProcessFrameCb frame_cb) : m_frame_cb(
             //COM_CHECK(props->Commit());
         }
         {
-            // reduce max buffering from 40000 to 100 milliseconds
+            // reduce max buffering
             PROPERTYKEY key{};
             key.fmtid = MFNETSOURCE_MAXBUFFERTIMEMS;
             key.pid = 0;
 
             PROPVARIANT val{};
             val.vt = VT_I4;
-            val.lVal = 100; // 100ms (40000 is default)
+            val.lVal = 100; // 100ms (40,000 is default)
 
             COM_CHECK(props->SetValue(key, val));
             //COM_CHECK(props->Commit());
