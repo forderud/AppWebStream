@@ -27,7 +27,7 @@ int main(int argc, char* argv[]) {
     // connect to MPEG4 H.264 stream
     _bstr_t url = argv[1];
     using namespace std::placeholders;
-    Mpeg4Receiver receiver(url, std::bind(&DisplayWindow::OnNewFrame, wnd, _1, _2, _3, _4, _5));
+    Mpeg4Receiver receiver(url, std::bind(&DisplayWindow::OnNewFrame, &wnd, _1, _2, _3, _4, _5));
 
     // start MPEG4 stream receive thread
     std::thread t(ReceiveMovieThread, &receiver);
