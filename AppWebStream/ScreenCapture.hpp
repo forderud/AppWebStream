@@ -40,16 +40,16 @@ public:
         if (!dc)
             throw std::runtime_error("CreateCompatibleDC has failed");
 
-        bmp = CreateCompatibleBitmap(ref_dc, width, height);
-        if (!bmp)
+        m_bmp = CreateCompatibleBitmap(ref_dc, width, height);
+        if (!m_bmp)
             throw std::runtime_error("CreateCompatibleBitmap Failed");
 
         // make bitmap current for dc
-        prev = SelectObject(dc, bmp);
+        m_prev = SelectObject(dc, m_bmp);
     }
     ~offscreen_bmp() {
-        SelectObject(dc, prev);
-        DeleteObject(bmp);
+        SelectObject(dc, m_prev);
+        DeleteObject(m_bmp);
         DeleteDC(dc);
     }
 
@@ -62,7 +62,7 @@ public:
         bmp_info.bmiHeader.biSize = sizeof(bmp_info.bmiHeader);
         {
             // call GetDIBits to fill "bmp_info" struct 
-            int ok = GetDIBits(dc, bmp, 0, m_height, nullptr, &bmp_info, DIB_RGB_COLORS);
+            int ok = GetDIBits(dc, m_bmp, 0, m_height, nullptr, &bmp_info, DIB_RGB_COLORS);
             if (!ok)
                 return E_FAIL;
             bmp_info.bmiHeader.biBitCount = 32;     // request 32bit RGBA image 
@@ -75,14 +75,14 @@ public:
         }
 
         // copy bitmap content to destination buffer
-        int scan_lines = GetDIBits(dc, bmp, 0, m_height, dst_ptr, &bmp_info, DIB_RGB_COLORS);
+        int scan_lines = GetDIBits(dc, m_bmp, 0, m_height, dst_ptr, &bmp_info, DIB_RGB_COLORS);
         return scan_lines;
     }
 
     HDC     dc = nullptr;
-    HBITMAP bmp = nullptr;
+    HBITMAP      m_bmp = nullptr;
 private:
     unsigned int m_width = 0;
     unsigned int m_height = 0;
-    HGDIOBJ prev = nullptr;
+    HGDIOBJ      m_prev = nullptr;
 };
