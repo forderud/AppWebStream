@@ -366,8 +366,8 @@ public:
             assert(m_enc->pix_fmt == AV_PIX_FMT_YUV420P);
 
             // RGB to YCbCR conversion
-            for (int y = 0; y < m_height; y++) {
-                for (int x = 0; x < m_width; x++) {
+            for (unsigned int y = 0; y < m_height; y++) {
+                for (unsigned int x = 0; x < m_width; x++) {
                     R8G8B8A8 rgb = m_rgb_buf[y* m_enc->width + x];
                     unsigned char Y=0, Cb=0, Cr=0;
                     RGB_to_YCbCr(rgb, Y, Cb, Cr);
