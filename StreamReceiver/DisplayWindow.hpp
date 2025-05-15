@@ -32,6 +32,9 @@ public:
         );
         assert(m_wnd);
 
+        // make object accessible from window procedure
+        SetWindowLongPtrW(m_wnd, GWLP_USERDATA, (LONG_PTR)this);
+
         // show window
         ShowWindow(m_wnd, SW_SHOW);
     }
@@ -96,6 +99,8 @@ private:
 
     /** Window procedure for processing messages. */
     static LRESULT WindowProc(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+        auto* obj = (DisplayWindow*)GetWindowLongPtrW(wnd, GWLP_USERDATA);
+
         switch (msg) {
         case WM_DESTROY:
             PostQuitMessage(0);
