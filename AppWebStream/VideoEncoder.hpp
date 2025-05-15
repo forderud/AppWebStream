@@ -137,7 +137,6 @@ public:
         COM_CHECK(attribs->SetUINT32(MF_LOW_LATENCY, TRUE)); // zero frame encoding latency
         COM_CHECK(attribs->SetUINT32(MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS, TRUE)); // GPU accelerated encoding
 
-        // create sink writer with specified output format
         IMFMediaTypePtr mediaTypeOut;
         {
             COM_CHECK(MFCreateMediaType(&mediaTypeOut));
@@ -150,10 +149,11 @@ public:
             COM_CHECK(MFSetAttributeRatio(mediaTypeOut, MF_MT_FRAME_RATE, fps, 1));
             COM_CHECK(MFSetAttributeRatio(mediaTypeOut, MF_MT_PIXEL_ASPECT_RATIO, 1, 1));
         }
-        COM_CHECK(MFCreateFMPEG4MediaSink(stream, mediaTypeOut, nullptr, &m_media_sink));
+        COM_CHECK(MFCreateFMPEG4MediaSink(stream, /*videoType*/mediaTypeOut, /*audioType*/nullptr, &m_media_sink));
+
+        // create sink writer with specified output format
         COM_CHECK(MFCreateSinkWriterFromMediaSink(m_media_sink, attribs, &m_sink_writer));
 
-        // connect input to output
         IMFMediaTypePtr mediaTypeIn;
         {
             // configure input format. Frame size is aligned to avoid crash
