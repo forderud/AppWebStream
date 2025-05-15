@@ -55,9 +55,9 @@ int main (int argc, char *argv[]) {
     }
 
     if (!win_handle) {
-        // clamp resolution to 1920x1080 if capturing entire desktop
-        dims[0] = min(dims[0], 1920);
-        dims[1] = min(dims[1], 1080);
+        // clamp resolution to 1280x720 if capturing entire desktop
+        dims[0] = min(dims[0], 1280);
+        dims[1] = min(dims[1], 720);
     }
 
     const unsigned int FPS = 50;
