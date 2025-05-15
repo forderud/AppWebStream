@@ -169,7 +169,7 @@ public:
             COM_CHECK(MFSetAttributeRatio(mediaTypeIn, MF_MT_FRAME_RATE, fps, 1));
             COM_CHECK(MFSetAttributeRatio(mediaTypeIn, MF_MT_PIXEL_ASPECT_RATIO, 1, 1));
 
-            COM_CHECK(m_sink_writer->SetInputMediaType(m_stream_index, mediaTypeIn, nullptr));
+            COM_CHECK(m_sink_writer->SetInputMediaType(m_stream_index, mediaTypeIn, /*encParams*/nullptr));
         }
         {
 #if 0
