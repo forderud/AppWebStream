@@ -7,12 +7,12 @@ public:
     window_dc(HWND h) : wnd(h) {
         dc = GetDC(wnd);
         if (wnd) {
-            if (!GetClientRect(h, &rect))
+            if (!GetClientRect(h, &m_rect))
                 throw std::runtime_error("GetClientRect failed");
         } else {
             // primary monitor resolution
-            rect.right = GetSystemMetrics(SM_CXSCREEN);
-            rect.bottom = GetSystemMetrics(SM_CYSCREEN);
+            m_rect.right = GetSystemMetrics(SM_CXSCREEN);
+            m_rect.bottom = GetSystemMetrics(SM_CYSCREEN);
         }
     }
     ~window_dc() {
@@ -20,16 +20,16 @@ public:
     }
 
     unsigned int width() const {
-        return rect.right - rect.left;
+        return m_rect.right - m_rect.left;
     }
     unsigned int height() const {
-        return rect.bottom - rect.top;
+        return m_rect.bottom - m_rect.top;
     }
 
     HWND wnd = nullptr;
     HDC  dc = nullptr;
 private:
-    RECT rect = {};
+    RECT m_rect = {};
 };
 
 
