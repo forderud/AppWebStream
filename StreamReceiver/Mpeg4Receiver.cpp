@@ -94,10 +94,10 @@ Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, ProcessFrameCb frame_cb) : m_frame_cb(
         // create innerStream that connects to the URL
         DWORD createObjFlags = MF_RESOLUTION_BYTESTREAM; // MF_RESOLUTION_BYTESTREAM for IMFByteStream and MF_RESOLUTION_MEDIASOURCE for IMFMediaSource
         MF_OBJECT_TYPE objectType = MF_OBJECT_INVALID;
-        IUnknownPtr source;
-        COM_CHECK(resolver->CreateObjectFromURL(url, createObjFlags, props, &objectType, &source));
+        IUnknownPtr obj;
+        COM_CHECK(resolver->CreateObjectFromURL(url, createObjFlags, props, &objectType, &obj));
         assert(objectType == MF_OBJECT_BYTESTREAM);
-        IMFByteStreamPtr innerStream = source;
+        IMFByteStreamPtr innerStream = obj;
 
         // wrap innerStream om byteStream-wrapper to allow parsing of the underlying MPEG4 bitstream
         auto tmp = CreateLocalInstance<StreamWrapper>();
