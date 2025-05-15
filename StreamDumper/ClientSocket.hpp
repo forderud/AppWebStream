@@ -1,4 +1,7 @@
 #pragma once
+#include <tuple>
+#include <string>
+#include <stdexcept>
 #include <ws2tcpip.h>
 
 #pragma comment (lib, "Ws2_32.lib")

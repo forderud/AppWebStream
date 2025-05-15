@@ -1,5 +1,5 @@
-#include <iostream>
-#include  <comutil.h>
+#include <cstdio>
+#include "ClientSocket.hpp"
 
 #pragma comment(lib, "comsuppw.lib")
 
@@ -10,6 +10,20 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    _bstr_t url = argv[1];
-    printf("TODO: Write tool for dumping network stream sessions to file.\n");
+    std::string servername, port, resource;
+    std::tie(servername, port, resource) = ParseURL(argv[1]);
+
+    ClientSocket sock(servername.c_str(), port.c_str());
+
+    for (;;) {
+        BYTE buffer[1024]{};
+
+        uint32_t res = sock.Read(buffer, std::size(buffer));
+        printf("Read %u bytes.\n", res);
+        if (res == 0)
+            break;
+
+        // sleep for 5 seconds to aid debugging
+        Sleep(5000);
+    }
 }
