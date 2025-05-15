@@ -95,6 +95,7 @@ Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, ProcessFrameCb frame_cb) : m_frame_cb(
         MF_OBJECT_TYPE objectType = MF_OBJECT_INVALID;
         IUnknownPtr source;
         COM_CHECK(resolver->CreateObjectFromURL(url, createObjFlags, props, &objectType, &source));
+        assert(objectType == MF_OBJECT_BYTESTREAM);
         IMFByteStreamPtr innerStream = source;
 
         // wrap innerStream om byteStream-wrapper to allow parsing of the underlying MPEG4 bitstream
