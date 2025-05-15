@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
     Mpeg4Receiver receiver(url, std::bind(&DisplayWindow::OnNewFrame, &wnd, _1, _2, _3, _4, _5));
 
     // start MPEG4 stream receive thread
-    std::thread t(ReceiveMovieThread, &receiver);
+    std::thread receiveThread(ReceiveMovieThread, &receiver);
 
     // message loop
     MSG msg{};
@@ -43,7 +43,7 @@ int main(int argc, char* argv[]) {
     }
 
     receiver.Stop();
-    t.join();
+    receiveThread.join();
 }
 
 
