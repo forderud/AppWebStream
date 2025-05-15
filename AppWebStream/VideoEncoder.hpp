@@ -68,7 +68,7 @@ public:
 #endif
     }
 
-    VideoEncoder (unsigned short dimensions[2]) : m_width(dimensions[0]), m_height(dimensions[1]) {
+    VideoEncoder (unsigned int dimensions[2]) : m_width(dimensions[0]), m_height(dimensions[1]) {
     }
 
     virtual ~VideoEncoder () = default;
@@ -115,8 +115,8 @@ public:
     }
 
 protected:
-    const unsigned short m_width;  ///< horizontal img. resolution (excluding padding)
-    const unsigned short m_height; ///< vertical img. resolution (excluding padding)
+    const unsigned int m_width;  ///< horizontal img. resolution (excluding padding)
+    const unsigned int m_height; ///< vertical img. resolution (excluding padding)
 };
 
 
@@ -125,7 +125,7 @@ protected:
 class VideoEncoderMF : public VideoEncoder {
 public:
     /** Stream-based video encoding. */
-    VideoEncoderMF (unsigned short dimensions[2], unsigned int fps, IMFByteStream * stream) : VideoEncoder(dimensions) {
+    VideoEncoderMF (unsigned int dimensions[2], unsigned int fps, IMFByteStream * stream) : VideoEncoder(dimensions) {
         COM_CHECK(MFStartup(MF_VERSION));
         COM_CHECK(MFFrameRateToAverageTimePerFrame(fps, 1, const_cast<unsigned long long*>(&m_frame_duration)));
 
@@ -285,7 +285,7 @@ public:
         return buf_size;
     }
 
-    VideoEncoderFF (unsigned short dimensions[2], unsigned int fps, IMFByteStream * socket) : VideoEncoder(dimensions), m_fps(fps) {
+    VideoEncoderFF (unsigned int dimensions[2], unsigned int fps, IMFByteStream * socket) : VideoEncoder(dimensions), m_fps(fps) {
         //av_log_set_level(AV_LOG_VERBOSE);
 
         /* allocate the output media context */

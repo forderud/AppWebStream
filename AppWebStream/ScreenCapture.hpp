@@ -19,10 +19,10 @@ public:
         ReleaseDC(wnd, dc);
     }
 
-    LONG width() const {
+    ULONG width() const {
         return rect.right - rect.left;
     }
-    LONG height() const {
+    ULONG height() const {
         return rect.bottom - rect.top;
     }
 
