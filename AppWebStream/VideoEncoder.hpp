@@ -131,12 +131,6 @@ public:
 
         const unsigned int bit_rate = static_cast<unsigned int>(0.78f*fps*m_width*m_height); // yields 40Mb/s for 1920x1080@25fps
 
-        CComPtr<IMFAttributes> attribs;
-        COM_CHECK(MFCreateAttributes(&attribs, 0));
-        COM_CHECK(attribs->SetGUID(MF_TRANSCODE_CONTAINERTYPE, MFTranscodeContainerType_FMPEG4));
-        COM_CHECK(attribs->SetUINT32(MF_LOW_LATENCY, TRUE)); // zero frame encoding latency
-        COM_CHECK(attribs->SetUINT32(MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS, TRUE)); // GPU accelerated encoding
-
         {
             // configure H.264 output
             IMFMediaTypePtr mediaTypeOut;
@@ -152,10 +146,16 @@ public:
 
             COM_CHECK(MFCreateFMPEG4MediaSink(stream, /*videoType*/mediaTypeOut, /*audioType*/nullptr, &m_media_sink));
         }
+        {
+            // create sink writer with specified output format
+            CComPtr<IMFAttributes> attribs;
+            COM_CHECK(MFCreateAttributes(&attribs, 0));
+            COM_CHECK(attribs->SetGUID(MF_TRANSCODE_CONTAINERTYPE, MFTranscodeContainerType_FMPEG4));
+            COM_CHECK(attribs->SetUINT32(MF_LOW_LATENCY, TRUE)); // zero frame encoding latency
+            COM_CHECK(attribs->SetUINT32(MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS, TRUE)); // GPU accelerated encoding
 
-        // create sink writer with specified output format
-        COM_CHECK(MFCreateSinkWriterFromMediaSink(m_media_sink, attribs, &m_sink_writer));
-
+            COM_CHECK(MFCreateSinkWriterFromMediaSink(m_media_sink, attribs, &m_sink_writer));
+        }
         {
             // configure RGBA input
             IMFMediaTypePtr mediaTypeIn;
@@ -171,7 +171,6 @@ public:
 
             COM_CHECK(m_sink_writer->SetInputMediaType(m_stream_index, mediaTypeIn, nullptr));
         }
-
         {
 #if 0
             // access H.264 encoder directly (https://msdn.microsoft.com/en-us/library/windows/desktop/dd797816.aspx)
