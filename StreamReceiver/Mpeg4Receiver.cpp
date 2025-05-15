@@ -9,6 +9,7 @@
 #pragma comment(lib, "Mfplat.lib")
 #pragma comment(lib, "Mfreadwrite.lib")
 #pragma comment(lib, "mfuuid.lib")
+#pragma comment(lib, "Propsys.lib")
 
 // define smart-pointers with "Ptr" suffix
 _COM_SMARTPTR_TYPEDEF(IMFAttributes, __uuidof(IMFAttributes));
@@ -18,6 +19,7 @@ _COM_SMARTPTR_TYPEDEF(IMFByteStream, __uuidof(IMFByteStream));
 _COM_SMARTPTR_TYPEDEF(IMFSourceResolver, __uuidof(IMFSourceResolver));
 _COM_SMARTPTR_TYPEDEF(IMFMediaBuffer, __uuidof(IMFMediaBuffer));
 _COM_SMARTPTR_TYPEDEF(IMFSourceReader, __uuidof(IMFSourceReader));
+_COM_SMARTPTR_TYPEDEF(IPropertyStore, __uuidof(IPropertyStore));
 
 
 static unsigned int Align16(unsigned int size) {
@@ -46,11 +48,27 @@ Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, ProcessFrameCb frame_cb) : m_frame_cb(
         IMFSourceResolverPtr resolver;
         COM_CHECK(MFCreateSourceResolver(&resolver));
 
+        IPropertyStorePtr props;
+        COM_CHECK(PSCreateMemoryPropertyStore(__uuidof(IPropertyStore), (void**)&props));
+        {
+            // reduce network buffering from 5 to 1 second
+            PROPERTYKEY key{};
+            key.fmtid = MFNETSOURCE_BUFFERINGTIME;
+            key.pid = 0;
+
+            PROPVARIANT val{};
+            val.vt = VT_I4;
+            val.lVal = 1; // 1 second (5 is default)
+
+            COM_CHECK(props->SetValue(key, val));
+            COM_CHECK(props->Commit());
+        }
+
         // create innerStream that connects to the URL
         DWORD createObjFlags = MF_RESOLUTION_BYTESTREAM;
         MF_OBJECT_TYPE objectType = MF_OBJECT_INVALID;
         IUnknownPtr source;
-        COM_CHECK(resolver->CreateObjectFromURL(url, createObjFlags, nullptr, &objectType, &source));
+        COM_CHECK(resolver->CreateObjectFromURL(url, createObjFlags, props, &objectType, &source));
         IMFByteStreamPtr innerStream = source;
 
         // wrap innerStream om byteStream-wrapper to allow parsing of the underlying MPEG4 bitstream
