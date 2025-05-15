@@ -73,17 +73,13 @@ public:
             ptr += ftyp_size;
         }
 
-        if (!IsAtomType(ptr, "uuid"))
-            return false;
-        {
+        if (IsAtomType(ptr, "uuid")) {
             // "uuid" atom
             uint32_t uuid_size = GetAtomSize(ptr);
             ptr += uuid_size;
         }
 
-        if (!IsAtomType(ptr, "pdin"))
-            return false;
-        {
+        if (IsAtomType(ptr, "pdin")) {
             // "pdin" atom
             uint32_t pdin_size = GetAtomSize(ptr);
             ptr += pdin_size;
