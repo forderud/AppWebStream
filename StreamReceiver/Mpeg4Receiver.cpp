@@ -55,7 +55,8 @@ Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, ProcessFrameCb frame_cb) : m_frame_cb(
 
         // wrap innerStream om byteStream-wrapper to allow parsing of the underlying MPEG4 bitstream
         auto tmp = CreateLocalInstance<StreamWrapper>();
-        StartTimeDpiChangedCb cb = std::bind(&Mpeg4Receiver::OnStartTimeDpiChanged, this, std::placeholders::_1, std::placeholders::_2);
+        using namespace std::placeholders;
+        StartTimeDpiChangedCb cb = std::bind(&Mpeg4Receiver::OnStartTimeDpiChanged, this, _1, _2);
         tmp->Initialize(innerStream, cb);
         COM_CHECK(tmp.QueryInterface(&byteStream));
     }
