@@ -19,10 +19,10 @@ public:
         ReleaseDC(wnd, dc);
     }
 
-    ULONG width() const {
+    unsigned int width() const {
         return rect.right - rect.left;
     }
-    ULONG height() const {
+    unsigned int height() const {
         return rect.bottom - rect.top;
     }
 
@@ -82,7 +82,7 @@ public:
     HDC     dc = nullptr;
     HBITMAP bmp = nullptr;
 private:
-    LONG    m_width = 0;
-    LONG    m_height = 0;
+    unsigned int m_width = 0;
+    unsigned int m_height = 0;
     HGDIOBJ prev = nullptr;
 };
