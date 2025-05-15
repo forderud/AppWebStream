@@ -36,8 +36,8 @@ private:
 class offscreen_bmp {
 public:
     offscreen_bmp(HDC ref_dc, LONG width, LONG height) : m_width(width), m_height(height) {
-        dc = CreateCompatibleDC(ref_dc);
-        if (!dc)
+        m_dc = CreateCompatibleDC(ref_dc);
+        if (!m_dc)
             throw std::runtime_error("CreateCompatibleDC has failed");
 
         m_bmp = CreateCompatibleBitmap(ref_dc, width, height);
@@ -45,24 +45,24 @@ public:
             throw std::runtime_error("CreateCompatibleBitmap Failed");
 
         // make bitmap current for dc
-        m_prev = SelectObject(dc, m_bmp);
+        m_prev = SelectObject(m_dc, m_bmp);
     }
     ~offscreen_bmp() {
-        SelectObject(dc, m_prev);
+        SelectObject(m_dc, m_prev);
         DeleteObject(m_bmp);
-        DeleteDC(dc);
+        DeleteDC(m_dc);
     }
 
     int CopyToRGBABuffer(window_dc& src, /*out*/uint32_t* dst_ptr) {
         // copy window content to bitmap
-        if (!BitBlt(/*dst*/dc, 0, 0, m_width, m_height, /*src*/src.dc, 0, 0, SRCCOPY))
+        if (!BitBlt(/*dst*/m_dc, 0, 0, m_width, m_height, /*src*/src.dc, 0, 0, SRCCOPY))
             return -1;
 
         BITMAPINFO bmp_info = {};
         bmp_info.bmiHeader.biSize = sizeof(bmp_info.bmiHeader);
         {
             // call GetDIBits to fill "bmp_info" struct 
-            int ok = GetDIBits(dc, m_bmp, 0, m_height, nullptr, &bmp_info, DIB_RGB_COLORS);
+            int ok = GetDIBits(m_dc, m_bmp, 0, m_height, nullptr, &bmp_info, DIB_RGB_COLORS);
             if (!ok)
                 return E_FAIL;
             bmp_info.bmiHeader.biBitCount = 32;     // request 32bit RGBA image 
@@ -75,11 +75,11 @@ public:
         }
 
         // copy bitmap content to destination buffer
-        int scan_lines = GetDIBits(dc, m_bmp, 0, m_height, dst_ptr, &bmp_info, DIB_RGB_COLORS);
+        int scan_lines = GetDIBits(m_dc, m_bmp, 0, m_height, dst_ptr, &bmp_info, DIB_RGB_COLORS);
         return scan_lines;
     }
 
-    HDC     dc = nullptr;
+    HDC          m_dc = nullptr;
     HBITMAP      m_bmp = nullptr;
 private:
     unsigned int m_width = 0;
