@@ -71,7 +71,14 @@ Mpeg4Receiver::~Mpeg4Receiver() {
     COM_CHECK(MFShutdown());
 }
 
+void Mpeg4Receiver::Stop() {
+    m_active = false;
+}
+
 HRESULT Mpeg4Receiver::ReceiveFrame() {
+    if (!m_active)
+        return E_FAIL;
+
     DWORD streamIdx = 0;
     DWORD flags = 0;       // MF_SOURCE_READER_FLAG bitmask
     int64_t timeStamp = 0; // in 100-nanosecond units

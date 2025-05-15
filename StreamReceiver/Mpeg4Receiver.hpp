@@ -19,6 +19,8 @@ public:
 
     ~Mpeg4Receiver();
 
+    void Stop();
+
     /** Receive frames. The "frame_cb" callback will be called from the same thread when new frames are received. */
     HRESULT ReceiveFrame();
 
@@ -42,4 +44,5 @@ private:
     std::array<uint32_t, 2>  m_resolution; // horizontal & vertical pixel count
     ProcessFrameCb           m_frame_cb = nullptr;
     bool                     m_metadata_changed = false; // metadata changed since previous frame
+    bool                     m_active = true;
 };

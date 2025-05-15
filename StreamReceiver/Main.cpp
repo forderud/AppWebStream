@@ -35,12 +35,15 @@ int main(int argc, char* argv[]) {
     // message loop
     MSG msg{};
     while (BOOL ret = GetMessageW(&msg, wnd, 0, 0)) {
-        if (ret == -1) // error occured
+        if (ret == -1) // winodw close
             break;
 
         TranslateMessage(&msg);
         DispatchMessageW(&msg);
     }
+
+    receiver.Stop();
+    t.join();
 }
 
 
