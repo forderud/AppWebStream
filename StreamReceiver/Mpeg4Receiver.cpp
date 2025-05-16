@@ -30,7 +30,7 @@ static unsigned int Align16(unsigned int size) {
         return size + 16 - (size % 16);
 }
 
-Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, ProcessFrameCb frame_cb) : m_frame_cb(frame_cb) {
+Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, NewFrameCb frame_cb) : m_frame_cb(frame_cb) {
     m_resolution.fill(0); // clear array
 
     COM_CHECK(MFStartup(MF_VERSION));
