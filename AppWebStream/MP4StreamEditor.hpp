@@ -725,7 +725,7 @@ private:
 
             // check baseMediaDecodeTime
             auto baseMediaDecodeTime = DeSerialize<uint64_t>(tfdt_ptr);
-            assert(baseMediaDecodeTime == m_time.cur_time);
+            assert(baseMediaDecodeTime == m_time.cur_time); baseMediaDecodeTime;
             tfdt_ptr += sizeof(uint64_t);
 
             assert(tfdt_ptr == ptr + tfdt_size);
@@ -744,9 +744,9 @@ private:
             auto version = DeSerialize<uint8_t>(payload);
             payload += sizeof(uint8_t);
 #ifdef ENABLE_FFMPEG
-            assert(version == 0);   // check version
+            assert(version == 0); version; // check version
 #else
-            assert(version == 1);   // check version
+            assert(version == 1); version; // check version
 #endif
 
             // TrackRunAtom ("trun") flags (from https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/isom.h)
@@ -813,7 +813,7 @@ private:
                 }
             }
 
-            assert(payload == trun_ptr + trun_size);
+            assert(payload == trun_ptr + trun_size); trun_size;
         }
     }
 
