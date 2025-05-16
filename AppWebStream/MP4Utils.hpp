@@ -1,4 +1,5 @@
 #pragma once
+#include <cassert>
 #include <ctime>
 #include <string>
 #include <Windows.h>
