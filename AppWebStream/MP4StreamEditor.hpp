@@ -91,7 +91,7 @@ public:
             // Movie box (moov)
             uint32_t moov_size = GetAtomSize(ptr);
             std::string_view moov_buf = buffer.substr(ptr - buffer.data());
-            assert(moov_size <= moov_buf.size());
+            assert(moov_size <= moov_buf.size()); moov_size;
             return ParseMoov(moov_buf);
         }
     }
@@ -105,14 +105,14 @@ public:
         // REF: https://developer.apple.com/documentation/quicktime-file-format/movie_atom
         if (IsAtomType(buffer.data(), "moov")) {
             uint32_t atom_size = GetAtomSize(buffer.data());
-            assert(atom_size == buffer.size());
+            assert(atom_size == buffer.size()); atom_size;
 
             // Movie box (moov)
             ModifyMoov(buffer);
             return buffer;
         } else if (IsAtomType(buffer.data(), "moof")) {
             uint32_t atom_size = GetAtomSize(buffer.data());
-            assert(atom_size <= buffer.size());
+            assert(atom_size <= buffer.size()); atom_size;
 
             // Movie Fragment (moof)
 #ifdef ENABLE_FFMPEG
@@ -202,7 +202,7 @@ private:
             ptr += 4;
 
             // end of "mvhd" atom
-            assert(ptr == buffer.data() + HEADER_SIZE + mvhd_len);
+            assert(ptr == buffer.data() + HEADER_SIZE + mvhd_len); mvhd_len;
         }
 
         // NOTE: Optional "clip" atom here
@@ -285,11 +285,11 @@ private:
                             ptr += HEADER_SIZE; // skip size & type
 
                             auto version = DeSerialize<uint8_t>(ptr);
-                            assert(version == 0);
+                            assert(version == 0); version;
                             ptr += sizeof(uint8_t);
 
                             uint32_t flags = DeSerialize<uint24_t>(ptr);
-                            assert(flags == 0);
+                            assert(flags == 0); flags;
                             ptr += sizeof(uint24_t);
 
                             uint32_t entryCount = DeSerialize<uint32_t>(ptr);
@@ -326,7 +326,7 @@ private:
                                 // read horizontal and vertical video DPI in fixed-point 16+16 format
                                 m_dpi = ReadFixed1616(ptr);
                                 double vdpi = ReadFixed1616(ptr + 4);
-                                assert(m_dpi == vdpi); // same horizontal and vertical DPI
+                                assert(m_dpi == vdpi); vdpi; // same horizontal and vertical DPI
 
                                 // ignore the remaining parameters
                             }
@@ -401,7 +401,7 @@ private:
             ptr += 4;
 
             // end of "mvhd" atom
-            assert(ptr == buffer.data() + HEADER_SIZE + mvhd_len);
+            assert(ptr == buffer.data() + HEADER_SIZE + mvhd_len); mvhd_len;
         }
 
         // NOTE: Optional "clip" atom here
@@ -505,11 +505,11 @@ private:
                             ptr += HEADER_SIZE; // skip size & type
 
                             auto version = DeSerialize<uint8_t>(ptr);
-                            assert(version == 0);
+                            assert(version == 0); version;
                             ptr += sizeof(uint8_t);
 
                             uint32_t flags = DeSerialize<uint24_t>(ptr);
-                            assert(flags == 0);
+                            assert(flags == 0); flags;
                             ptr += sizeof(uint24_t);
 
                             uint32_t entryCount = DeSerialize<uint32_t>(ptr);
@@ -601,7 +601,7 @@ private:
             seq_nr;
             ptr += sizeof(uint32_t);
 
-            assert(ptr == moof_ptr + HEADER_SIZE + mfhd_size);
+            assert(ptr == moof_ptr + HEADER_SIZE + mfhd_size); mfhd_size;
         }
 
         // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/boxes/iso14496/part12/TrackFragmentBox.java
@@ -645,7 +645,7 @@ private:
             // process tfhd content
             char* payload = tfhd_ptr + HEADER_SIZE;
             auto version = DeSerialize<uint8_t>(payload);
-            assert(version == 0);
+            assert(version == 0); version;
             payload += sizeof(uint8_t);
 
             {
