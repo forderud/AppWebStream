@@ -47,6 +47,8 @@ public:
         return m_wnd;
     }
 
+    /** Called when a new frame have been received.
+        Typically called from a non-main thread, so access need to be serialized. */
     void OnNewFrame(Mpeg4Receiver& receiver, int64_t frameTime, int64_t frameDuration, std::string_view buffer, bool metadataChanged) {
         std::lock_guard<std::mutex> guard(m_mutex);
         if (!m_active)
