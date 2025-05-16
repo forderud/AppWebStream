@@ -96,6 +96,7 @@ private:
             bmi.bmiHeader.biCompression = BI_RGB;
             bmi.bmiHeader.biSizeImage = 0; // zero for uncompressed RGB bitmaps
 
+            // draw RGBA pixels from "buffer" to "m_wnd"
             int lines = StretchDIBits(dc, 0, 0, rc.right, rc.bottom, 0, 0, resolution[0], resolution[1], buffer.data(), &bmi, DIB_RGB_COLORS, SRCCOPY);
             assert(lines == (int)resolution[1]); lines;
         }
