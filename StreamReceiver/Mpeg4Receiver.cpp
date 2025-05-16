@@ -100,10 +100,10 @@ Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, ProcessFrameCb frame_cb) : m_frame_cb(
         IMFByteStreamPtr innerStream = obj;
 
         // wrap innerStream om byteStream-wrapper to allow parsing of the underlying MPEG4 bitstream
-        auto tmp = CreateLocalInstance<StreamWrapper>();
+        auto wrapper = CreateLocalInstance<StreamWrapper>();
         using namespace std::placeholders;
-        tmp->Initialize(innerStream, std::bind(&Mpeg4Receiver::OnStartTimeDpiChanged, this, _1, _2));
-        COM_CHECK(tmp.QueryInterface(&byteStream));
+        wrapper->Initialize(innerStream, std::bind(&Mpeg4Receiver::OnStartTimeDpiChanged, this, _1, _2));
+        COM_CHECK(wrapper.QueryInterface(&byteStream));
     }
     COM_CHECK(MFCreateSourceReaderFromByteStream(byteStream, attribs, &m_reader));
 
