@@ -64,7 +64,7 @@ int main() {
 
         ULARGE_INTEGER diff{};
         diff.QuadPart = FileTimeToUlarge(winTime).QuadPart - FileTimeToUlarge(winTime2).QuadPart;
-        if (std::llabs(diff.QuadPart) > 10000000) // difference should never exceed 1sec
+        if (std::llabs(diff.QuadPart) >= FILETIME_PER_SECONDS) // difference should never exceed 1sec
             throw std::runtime_error("Time conversion error");
     }
 
