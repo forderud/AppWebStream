@@ -171,19 +171,17 @@ inline uint64_t Mpeg4TimeToUnixTime(uint64_t mpeg4Time) {
 /** Convert from 100-nanosecond intervals since January 1, 1601 (UTC) to MPEG4 time.
     Typically called with GetSystemTimeAsFileTime() as input. */
 inline uint64_t WindowsTimeToMpeg4Time(FILETIME winTime) {
-    ULARGE_INTEGER epochTime{}; // MPEG4 1904 epoch
+    FILETIME epochTime{}; // MPEG4 1904 epoch
     {
         SYSTEMTIME st{};
         st.wYear = 1904;
         st.wMonth = 1;
         st.wDay = 1;
-        FILETIME tmp{};
-        SystemTimeToFileTime(&st, &tmp);
-        epochTime = FileTimeToUint(tmp);
+        SystemTimeToFileTime(&st, &epochTime);
     }
 
     ULARGE_INTEGER diff{}; // 100ns resolution
-    diff.QuadPart = FileTimeToUint(winTime).QuadPart - epochTime.QuadPart;
+    diff.QuadPart = FileTimeToUint(winTime).QuadPart - FileTimeToUint(epochTime).QuadPart;
 
     // convert to seconds
     return diff.QuadPart / 10000000;
