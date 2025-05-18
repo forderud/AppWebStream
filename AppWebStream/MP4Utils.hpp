@@ -171,7 +171,9 @@ inline uint64_t WindowsTimeToMpeg4Time(FILETIME winTime) {
     ULARGE_INTEGER diff{}; // 100ns resolution
     diff.HighPart = winTime.dwHighDateTime - epochTime.dwHighDateTime;
     diff.LowPart = winTime.dwLowDateTime - epochTime.dwLowDateTime;
-    return diff.QuadPart / 10000000; // convert to seconds
+
+    // convert to seconds
+    return diff.QuadPart / 10000000;
 }
 
 /**  MPEG4 file uses time counting in SECONDS since midnight, Jan. 1, 1904. */
