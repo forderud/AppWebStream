@@ -31,7 +31,7 @@ class VideoEncoderMF;
 
 class Mpeg4Transmitter {
 public:
-    Mpeg4Transmitter(unsigned int dimensions[2], unsigned int fps, const char* port_filename);
+    Mpeg4Transmitter(unsigned int dimensions[2], double dpi, unsigned int fps, const char* port_filename);
     ~Mpeg4Transmitter();
 
     R8G8B8A8* WriteFrameBegin();
