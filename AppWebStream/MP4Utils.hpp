@@ -153,18 +153,9 @@ inline uint64_t Mpeg4TimeToUnixTime(uint64_t mpeg4Time) {
     return unixTime;
 }
 
-/**  MPEG4 file uses time counting in SECONDS since midnight, Jan. 1, 1904. */
-inline uint64_t CurrentTime1904() {
-    FILETIME curTime{};
+inline uint64_t WindowsTimeToMpeg4Time(FILETIME winTime) {
+    FILETIME epochTime{}; // MPEG4 1904 epoch
     {
-        SYSTEMTIME st{};
-        GetSystemTime(&st);
-        SystemTimeToFileTime(&st, &curTime);
-    }
-
-    FILETIME epochTime{};
-    {
-        // unix 1970 epoch
         SYSTEMTIME st{};
         st.wYear = 1904;
         st.wMonth = 1;
@@ -177,9 +168,21 @@ inline uint64_t CurrentTime1904() {
     }
 
     ULARGE_INTEGER diff{}; // 100ns resolution
-    diff.HighPart = curTime.dwHighDateTime - epochTime.dwHighDateTime;
-    diff.LowPart = curTime.dwLowDateTime - epochTime.dwLowDateTime;
-    return diff.QuadPart / 10000000;
+    diff.HighPart = winTime.dwHighDateTime - epochTime.dwHighDateTime;
+    diff.LowPart = winTime.dwLowDateTime - epochTime.dwLowDateTime;
+    return diff.QuadPart / 10000000; // convert to seconds
+}
+
+/**  MPEG4 file uses time counting in SECONDS since midnight, Jan. 1, 1904. */
+inline uint64_t CurrentTime1904() {
+    FILETIME curTime{};
+    {
+        SYSTEMTIME st{};
+        GetSystemTime(&st);
+        SystemTimeToFileTime(&st, &curTime);
+    }
+
+    return WindowsTimeToMpeg4Time(curTime);
 }
 
 inline std::string TimeString1904(uint64_t mpeg4Time) {
