@@ -168,6 +168,8 @@ inline uint64_t Mpeg4TimeToUnixTime(uint64_t mpeg4Time) {
     return unixTime;
 }
 
+constexpr uint64_t FILETIME_PER_SECONDS = 10000000;
+
 /** Convert from 100-nanosecond intervals since January 1, 1601 (UTC) to MPEG4 time.
     Typically called with GetSystemTimeAsFileTime() as input. */
 inline uint64_t WindowsTimeToMpeg4Time(FILETIME winTime) {
@@ -184,7 +186,7 @@ inline uint64_t WindowsTimeToMpeg4Time(FILETIME winTime) {
     diff.QuadPart = FileTimeToUint(winTime).QuadPart - FileTimeToUint(epochTime).QuadPart;
 
     // convert to seconds
-    return diff.QuadPart / 10000000;
+    return diff.QuadPart / FILETIME_PER_SECONDS;
 }
 
 inline FILETIME Mpeg4TimeToWindowsTime(uint64_t mpeg4Time) {
@@ -198,7 +200,7 @@ inline FILETIME Mpeg4TimeToWindowsTime(uint64_t mpeg4Time) {
     }
 
     ULARGE_INTEGER winTime = FileTimeToUint(epochTime);
-    winTime.QuadPart += mpeg4Time * 10000000;
+    winTime.QuadPart += mpeg4Time * FILETIME_PER_SECONDS;
     return UintToFileTime(winTime);
 }
 
