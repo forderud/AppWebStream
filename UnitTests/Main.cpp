@@ -63,7 +63,7 @@ int main() {
         FILETIME winTime2 = Mpeg4TimeToWindowsTime(mpegTime);
 
         ULARGE_INTEGER diff{};
-        diff.QuadPart = FileTimeToUint(winTime).QuadPart - FileTimeToUint(winTime2).QuadPart;
+        diff.QuadPart = FileTimeToUlarge(winTime).QuadPart - FileTimeToUlarge(winTime2).QuadPart;
         if (std::llabs(diff.QuadPart) > 10000000) // difference should never exceed 1sec
             throw std::runtime_error("Time conversion error");
     }

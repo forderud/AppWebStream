@@ -139,7 +139,7 @@ struct matrix {
     }
 };
 
-inline ULARGE_INTEGER FileTimeToUint(FILETIME winTime) {
+inline ULARGE_INTEGER FileTimeToUlarge(FILETIME winTime) {
     ULARGE_INTEGER res{};
     res.HighPart = winTime.dwHighDateTime;
     res.LowPart = winTime.dwLowDateTime;
@@ -183,7 +183,7 @@ inline uint64_t WindowsTimeToMpeg4Time(FILETIME winTime) {
     }
 
     ULARGE_INTEGER diff{}; // 100ns resolution
-    diff.QuadPart = FileTimeToUint(winTime).QuadPart - FileTimeToUint(epochTime).QuadPart;
+    diff.QuadPart = FileTimeToUlarge(winTime).QuadPart - FileTimeToUlarge(epochTime).QuadPart;
 
     // convert to seconds
     return diff.QuadPart / FILETIME_PER_SECONDS;
@@ -199,7 +199,7 @@ inline FILETIME Mpeg4TimeToWindowsTime(uint64_t mpeg4Time) {
         SystemTimeToFileTime(&st, &epochTime);
     }
 
-    ULARGE_INTEGER winTime = FileTimeToUint(epochTime);
+    ULARGE_INTEGER winTime = FileTimeToUlarge(epochTime);
     winTime.QuadPart += mpeg4Time * FILETIME_PER_SECONDS;
     return UintToFileTime(winTime);
 }
