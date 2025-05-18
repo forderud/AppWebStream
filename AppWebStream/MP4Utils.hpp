@@ -139,21 +139,23 @@ struct matrix {
     }
 };
 
+/** Convert from Unix epoch to MPEG-4 epoch in seconds since midnight, Jan. 1, 1904.
+    Typically called with time(NULL) as input. */
 inline uint64_t UnixTimeToMpeg4Time(uint64_t unixTime) {
-    // Convert from unix epoch to MPEG-4 epoch since midnight, Jan. 1, 1904.
     // Seconds between 1904-01-01 and Unix 1970 Epoch: (66 * 365 + 17) * (24 * 60 * 60) = 2082844800 (from https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/mov.c)
     uint64_t mpeg4Time = unixTime + (66 * 365 + 17) * (24 * 60 * 60);
     return mpeg4Time;
 }
 
+/** Convert from MPEG4 epoch to Unix epoch in since midnight, Jan. 1, 1970. */
 inline uint64_t Mpeg4TimeToUnixTime(uint64_t mpeg4Time) {
-    // Convert from MPEg-4 epoch to Unix epoch since midnight, Jan. 1, 1970.
     // Seconds between 1904-01-01 and Unix 1970 Epoch: (66 * 365 + 17) * (24 * 60 * 60) = 2082844800 (from https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/mov.c)
     uint64_t unixTime = mpeg4Time - (66 * 365 + 17) * (24 * 60 * 60);
     return unixTime;
 }
 
-/** Convert from 100-nanosecond intervals since January 1, 1601 (UTC) to MPEG4 time. */
+/** Convert from 100-nanosecond intervals since January 1, 1601 (UTC) to MPEG4 time.
+    Typically called with GetSystemTimeAsFileTime() as input. */
 inline uint64_t WindowsTimeToMpeg4Time(FILETIME winTime) {
     FILETIME epochTime{}; // MPEG4 1904 epoch
     {
@@ -176,17 +178,6 @@ inline uint64_t WindowsTimeToMpeg4Time(FILETIME winTime) {
     return diff.QuadPart / 10000000;
 }
 
-/**  MPEG4 file uses time counting in SECONDS since midnight, Jan. 1, 1904. */
-inline uint64_t CurrentTime1904() {
-    FILETIME curTime{};
-    {
-        SYSTEMTIME st{};
-        GetSystemTime(&st);
-        SystemTimeToFileTime(&st, &curTime);
-    }
-
-    return WindowsTimeToMpeg4Time(curTime);
-}
 
 inline std::string TimeString1904(uint64_t mpeg4Time) {
     time_t unixTime = Mpeg4TimeToUnixTime(mpeg4Time);
