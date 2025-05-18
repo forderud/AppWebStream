@@ -147,6 +147,10 @@ void OutputStream::SetNextFrameTime(uint64_t timeStamp) {
     m_stream_editor->SetNextFrameTime(timeStamp);
 }
 
+void OutputStream::SetNextFrameDPI(double dpi) {
+    m_stream_editor->SetDPI(dpi);
+}
+
 HRESULT OutputStream::GetCapabilities(/*out*/DWORD *capabilities) {
     *capabilities = MFBYTESTREAM_IS_WRITABLE | MFBYTESTREAM_IS_REMOTE;
     return S_OK;

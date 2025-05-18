@@ -140,6 +140,9 @@ public:
     double GetDPI() const {
         return m_dpi;
     }
+    void SetDPI(double dpi) {
+        m_dpi = dpi;
+    }
     uint64_t GetStartTime() const {
         return m_time.startTime;
     }

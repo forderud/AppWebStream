@@ -34,6 +34,9 @@ public:
     Mpeg4Transmitter(unsigned int dimensions[2], double dpi, unsigned int fps, const char* port_filename);
     ~Mpeg4Transmitter();
 
+    /** Update DPI for the next frame. */
+    void SetDPI(double dpi);
+
     R8G8B8A8* WriteFrameBegin();
     HRESULT   WriteFrameEnd();
     void      AbortWrite();

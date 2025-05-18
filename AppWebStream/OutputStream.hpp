@@ -34,6 +34,8 @@ public:
 
     void SetNextFrameTime(uint64_t timeStamp);
 
+    void SetNextFrameDPI(double dpi);
+
     HRESULT GetCapabilities(/*out*/DWORD *capabilities) override;
 
     HRESULT GetLength(/*out*/QWORD* length) override;

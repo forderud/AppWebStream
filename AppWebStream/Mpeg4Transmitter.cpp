@@ -18,6 +18,10 @@ Mpeg4Transmitter::Mpeg4Transmitter(unsigned int dimensions[2], double dpi, unsig
 Mpeg4Transmitter::~Mpeg4Transmitter() {
 }
 
+void Mpeg4Transmitter::SetDPI(double dpi) {
+    m_stream->SetNextFrameDPI(dpi);
+}
+
 R8G8B8A8* Mpeg4Transmitter::WriteFrameBegin() {
     return m_encoder->WriteFrameBegin();
 }
