@@ -139,6 +139,20 @@ struct matrix {
     }
 };
 
+inline uint64_t UnixTimeToMpeg4Time(uint64_t unixTime) {
+    // Convert from unix epoch to MPEG-4 epoch since midnight, Jan. 1, 1904.
+    // Seconds between 1904-01-01 and Unix 1970 Epoch: (66 * 365 + 17) * (24 * 60 * 60) = 2082844800 (from https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/mov.c)
+    uint64_t mpeg4Time = unixTime + (66 * 365 + 17) * (24 * 60 * 60);
+    return mpeg4Time;
+}
+
+inline uint64_t Mpeg4TimeToUnixTime(uint64_t mpeg4Time) {
+    // Convert from MPEg-4 epoch to Unix epoch since midnight, Jan. 1, 1970.
+    // Seconds between 1904-01-01 and Unix 1970 Epoch: (66 * 365 + 17) * (24 * 60 * 60) = 2082844800 (from https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/mov.c)
+    uint64_t unixTime = mpeg4Time - (66 * 365 + 17) * (24 * 60 * 60);
+    return unixTime;
+}
+
 /**  MPEG4 file uses time counting in SECONDS since midnight, Jan. 1, 1904. */
 inline uint64_t CurrentTime1904() {
 #if 0
@@ -169,15 +183,12 @@ inline uint64_t CurrentTime1904() {
     return diff.QuadPart / 10000000;
 #else
     time_t now = time(NULL); // unix epoch since 1970-01-01
-    // Convert from unix epoch to MPEG-4 epoch since midnight, Jan. 1, 1904.
-    // Seconds between 1904-01-01 and Unix 1970 Epoch: (66 * 365 + 17) * (24 * 60 * 60) = 2082844800 (from https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/mov.c)
-    uint64_t mpeg4Time = now + (66 * 365 + 17) * (24 * 60 * 60);
-    return mpeg4Time;
+    return UnixTimeToMpeg4Time(now);
 #endif
 }
 
 inline std::string TimeString1904(uint64_t mpeg4Time) {
-    time_t unixTime = mpeg4Time - (66 * 365 + 17) * (24 * 60 * 60);
+    time_t unixTime = Mpeg4TimeToUnixTime(mpeg4Time);
 
     tm timeStruct{}; // in UTC time
     errno_t res = gmtime_s(&timeStruct, &unixTime);
