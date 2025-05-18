@@ -52,6 +52,7 @@ int main (int argc, char *argv[]) {
         fprintf(stderr, "ERROR: Invalid window handle\n");
         return -1;
     }
+    printf("Window handle: %08llx\n", (size_t)win_handle);
 
     if (!win_handle) {
         // clamp resolution to 1280x720 if capturing entire desktop
@@ -63,8 +64,6 @@ int main (int argc, char *argv[]) {
     constexpr double DPI = 96.0;
 
     // create H.264/MPEG4 encoder
-    printf("Window handle: %08llx\n", (size_t)win_handle);
-
     Mpeg4Transmitter encoder(dims, DPI, FPS, port_filename);
     printf("Connecting to client...\n");
 
