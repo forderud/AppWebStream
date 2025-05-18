@@ -8,7 +8,7 @@ int main() {
 
     {
         // test time conversion to & from MPE4 epoch
-        uint64_t unixTime = time(NULL); // unix epoch since 1970-01-01
+        uint64_t unixTime = time(NULL); // current time in seconds since 1970-01-01
         uint64_t mpegTime = UnixTimeToMpeg4Time(unixTime);
         uint64_t unixTime2 = Mpeg4TimeToUnixTime(mpegTime);
         if (unixTime2 != unixTime)
