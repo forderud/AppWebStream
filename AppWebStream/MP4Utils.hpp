@@ -2,6 +2,7 @@
 #include <cassert>
 #include <ctime>
 #include <string>
+#include <tuple>
 #include <Windows.h>
 
 
@@ -195,7 +196,7 @@ inline std::string TimeString1904(uint64_t mpeg4Time) {
 
 /** Mofified version of "memmove" that clears the abandoned bytes, as well as intermediate data.
 WARNING: Only use for contiguous/overlapping moves, or else it will clear more than excpected. */
-static void MemMove(char* dest, const char* source, size_t num) {
+inline void MemMove(char* dest, const char* source, size_t num) {
     // move memory block
     memmove(dest, source, num);
 
@@ -212,16 +213,16 @@ static char* GetAtomType(const char* atom_ptr) {
 }
 
 /** Check if an MPEG4 atom is of a given type. */
-static bool IsAtomType(const char* atom_ptr, const char type[4]) {
+inline bool IsAtomType(const char* atom_ptr, const char type[4]) {
     return memcmp(GetAtomType(atom_ptr), type, 4) == 0; // atom type is stored at offset 4-7
 }
 
 /** Get the size of an MPEG4 atom. */
-static uint32_t GetAtomSize(const char* atom_ptr) {
+inline uint32_t GetAtomSize(const char* atom_ptr) {
     return DeSerialize<uint32_t>(atom_ptr);
 }
 
-static char* UpdateCreateModifyTime(char* ptr, uint8_t version, uint64_t newTime) {
+inline char* UpdateCreateModifyTime(char* ptr, uint8_t version, uint64_t newTime) {
     // seconds since Fri Jan 1 00:00:00 1904
     if (version == 1) {
         Serialize<uint64_t>(ptr, newTime);
@@ -241,7 +242,7 @@ static char* UpdateCreateModifyTime(char* ptr, uint8_t version, uint64_t newTime
     return ptr;
 }
 
-static std::tuple<uint64_t, uint64_t, const char*> ParseCreateModifyTime(const char* ptr, uint8_t version) {
+inline std::tuple<uint64_t, uint64_t, const char*> ParseCreateModifyTime(const char* ptr, uint8_t version) {
     // seconds since Fri Jan 1 00:00:00 1904
     uint64_t creationTime = 0;
     uint64_t modificationTime = 0;
