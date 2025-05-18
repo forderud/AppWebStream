@@ -3,9 +3,9 @@
 #include "VideoEncoder.hpp"
 
 
-Mpeg4Transmitter::Mpeg4Transmitter(unsigned int dimensions[2], double dpi, unsigned int fps, const char* port_filename) {
+Mpeg4Transmitter::Mpeg4Transmitter(unsigned int dimensions[2], unsigned int fps, const char* port_filename) {
     m_stream = CreateLocalInstance<OutputStream>();
-    m_stream->Initialize(dpi, CurrentTime1904()); // DPI & start time
+    m_stream->Initialize(CurrentTime1904()); // start time
     m_stream->SetPortOrFilename(port_filename); // blocking call
 
 #ifdef ENABLE_FFMPEG

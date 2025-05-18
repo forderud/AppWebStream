@@ -64,7 +64,8 @@ int main (int argc, char *argv[]) {
     constexpr double DPI = 96.0;
 
     // create H.264/MPEG4 encoder
-    Mpeg4Transmitter encoder(dims, DPI, FPS, port_filename);
+    Mpeg4Transmitter encoder(dims, FPS, port_filename);
+    encoder.SetDPI(DPI);
     printf("Connecting to client...\n");
 
     // encode & transmit frames

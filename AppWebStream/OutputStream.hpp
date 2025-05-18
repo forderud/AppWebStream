@@ -28,7 +28,7 @@ public:
     /*NOT virtual*/ ~OutputStream();
 
     /** Configure resolution in dots per inch (DPI) & start time in seconds since 1904. */
-    void Initialize(double dpi, uint64_t startTime1904);
+    void Initialize(uint64_t startTime1904);
 
     void SetPortOrFilename(const char * port_or_filename);
 

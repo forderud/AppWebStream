@@ -52,8 +52,8 @@ class MP4StreamEditor {
 public:
     MP4StreamEditor() = default;
 
-    MP4StreamEditor(double dpi, uint64_t startTime1904) {
-        m_dpi = dpi;
+    /** SetDPI() needs to be called after construction. */
+    MP4StreamEditor(uint64_t startTime1904) {
         m_time.startTime = startTime1904;
     }
 
