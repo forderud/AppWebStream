@@ -37,7 +37,7 @@ public:
     /** Update DPI for the next frame. */
     void SetDPI(double dpi);
 
-    R8G8B8A8* WriteFrameBegin();
+    R8G8B8A8* WriteFrameBegin(FILETIME* curTime);
     HRESULT   WriteFrameEnd();
     void      AbortWrite();
 

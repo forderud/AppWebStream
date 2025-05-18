@@ -145,8 +145,15 @@ void OutputStream::SetPortOrFilename(const char * port_or_filename) {
     }
 }
 
-void OutputStream::SetNextFrameTime(uint64_t timeStamp) {
-    m_stream_editor->SetNextFrameTime(timeStamp);
+void OutputStream::SetNextFrameTime(FILETIME timeStamp) {
+    // compute 100-nanosecond intervals since startTime
+    ULARGE_INTEGER duration = FileTimeToUint(timeStamp);
+    duration.QuadPart -= FileTimeToUint(m_startTime).QuadPart;
+
+    uint32_t timeScale = m_stream_editor->GetTimeScale();
+
+    uint64_t mpegTime = duration.QuadPart * timeScale / FILETIME_PER_SECONDS;
+    m_stream_editor->SetNextFrameTime(mpegTime);
 }
 
 void OutputStream::SetNextFrameDPI(double dpi) {

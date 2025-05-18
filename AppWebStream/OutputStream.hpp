@@ -32,7 +32,7 @@ public:
 
     void SetPortOrFilename(const char * port_or_filename);
 
-    void SetNextFrameTime(uint64_t timeStamp);
+    void SetNextFrameTime(FILETIME timeStamp);
 
     void SetNextFrameDPI(double dpi);
 
