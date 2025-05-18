@@ -152,7 +152,7 @@ void OutputStream::SetNextFrameTime(FILETIME timeStamp) {
 
     uint32_t timeScale = m_stream_editor->GetTimeScale();
 
-    uint64_t mpegTime = duration.QuadPart * timeScale / FILETIME_PER_SECONDS;
+    uint64_t mpegTime = (duration.QuadPart * timeScale)/FILETIME_PER_SECONDS;
     m_stream_editor->SetNextFrameTime(mpegTime);
 }
 
