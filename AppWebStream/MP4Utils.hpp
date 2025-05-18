@@ -145,7 +145,7 @@ inline ULARGE_INTEGER FileTimeToUlarge(FILETIME winTime) {
     res.LowPart = winTime.dwLowDateTime;
     return res;
 }
-inline FILETIME UintToFileTime(ULARGE_INTEGER winTime) {
+inline FILETIME UlargeToFileTime(ULARGE_INTEGER winTime) {
     FILETIME ft{};
     ft.dwHighDateTime = winTime.HighPart;
     ft.dwLowDateTime = winTime.LowPart;
@@ -201,7 +201,7 @@ inline FILETIME Mpeg4TimeToWindowsTime(uint64_t mpeg4Time) {
 
     ULARGE_INTEGER winTime = FileTimeToUlarge(epochTime);
     winTime.QuadPart += mpeg4Time * FILETIME_PER_SECONDS;
-    return UintToFileTime(winTime);
+    return UlargeToFileTime(winTime);
 }
 
 
