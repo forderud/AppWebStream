@@ -3,14 +3,10 @@
 #include "VideoEncoder.hpp"
 
 
-static CComPtr<OutputStream> CreateOutputStream(const char* port_filename) {
-    auto os = CreateLocalInstance<OutputStream>();
-    os->Initialize(96.0, CurrentTime1904()); // DPI & start time
-    os->SetPortOrFilename(port_filename); // blocking call
-    return os;
-}
-
-Mpeg4Transmitter::Mpeg4Transmitter(unsigned int dimensions[2], unsigned int fps, const char* port_filename) : m_stream(CreateOutputStream(port_filename)) {
+Mpeg4Transmitter::Mpeg4Transmitter(unsigned int dimensions[2], unsigned int fps, const char* port_filename) {
+    m_stream = CreateLocalInstance<OutputStream>();
+    m_stream->Initialize(96.0, CurrentTime1904()); // DPI & start time
+    m_stream->SetPortOrFilename(port_filename); // blocking call
 
 #ifdef ENABLE_FFMPEG
     m_encoder = std::make_unique<VideoEncoderFF>(dimensions, fps, m_stream);
