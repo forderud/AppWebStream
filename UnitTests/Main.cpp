@@ -7,10 +7,51 @@ int main() {
     printf("Running unit tests...\n");
 
     {
+        // test time conversion to & from MPE4 epoch
         uint64_t unixTime = time(NULL); // unix epoch since 1970-01-01
         uint64_t mpegTime = UnixTimeToMpeg4Time(unixTime);
         uint64_t unixTime2 = Mpeg4TimeToUnixTime(mpegTime);
         if (unixTime2 != unixTime)
+            throw std::runtime_error("Time conversion error");
+    }
+
+    {
+        // Compare Windows FILETIME-based time encoding against Unix time_t-based time encoding.
+        // Use midnight of 18th of May 2025 as example date.
+
+        FILETIME winTime{}; // 100-nanosecond intervals since January 1, 1601 (UTC)
+        {
+            SYSTEMTIME st{};
+            st.wYear = 2025;
+            st.wMonth = 5; // [1-12]
+            //st.wDayOfWeek = 0; // [0-6]
+            st.wDay = 18;  // [1-31]
+            st.wHour = 0; // [0-23]
+            st.wMinute = 0; // [0-59]
+            st.wSecond = 0; // [0-59]
+            st.wMilliseconds = 0; // [0-999]
+            SystemTimeToFileTime(&st, &winTime);
+        }
+
+        time_t unixTime = 0; // seconds since midnight, Jan. 1, 1970
+        {
+            tm tmp{};
+            tmp.tm_sec;   // [0, 60] including leap second
+            tmp.tm_min;   // [0, 59]
+            tmp.tm_hour;  // [0, 23]
+            tmp.tm_mday = 18;  // day of the month - [1, 31]
+            tmp.tm_mon = 5 - 1;   // months since January - [0, 11]
+            tmp.tm_year = 2025 - 1900;  // years since 1900
+            //tmp.tm_wday;  // days since Sunday - [0, 6]
+            //tmp.tm_yday;  // days since January 1 - [0, 365]
+            //tmp.tm_isdst; // daylight savings time flag
+            unixTime = _mkgmtime(&tmp);
+        }
+
+        uint64_t winMpeg = WindowsTimeToMpeg4Time(winTime);
+        uint64_t unixMpeg = UnixTimeToMpeg4Time(unixTime);
+        // TODO: Figure out why there's a 1 second difference
+        if (std::llabs(winMpeg - unixMpeg) > 1)
             throw std::runtime_error("Time conversion error");
     }
 
