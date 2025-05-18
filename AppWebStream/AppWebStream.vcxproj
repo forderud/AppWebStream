@@ -80,11 +80,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Mpeg4Transmitter.cpp" />
     <ClCompile Include="OutputStream.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ComUtil.hpp" />
     <ClInclude Include="MP4StreamEditor.hpp" />
+    <ClInclude Include="Mpeg4Transmitter.hpp" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="MP4Utils.hpp" />
     <ClInclude Include="ScreenCapture.hpp" />

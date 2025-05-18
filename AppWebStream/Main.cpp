@@ -1,11 +1,10 @@
 #include <sstream>
 #include <iostream>
-#include "VideoEncoder.hpp"
-#include "OutputStream.hpp"
+#include "Mpeg4Transmitter.hpp"
 #include "ScreenCapture.hpp"
 
 
-static HRESULT EncodeFrame (VideoEncoder& encoder, window_dc& wnd_dc, unsigned int dims[2]) {
+static HRESULT EncodeFrame (Mpeg4Transmitter& encoder, window_dc& wnd_dc, unsigned int dims[2]) {
     // create offscreen bitmap for screen capture (pad window size to be compatible with FFMPEG encoder)
     offscreen_bmp bmp(wnd_dc.m_dc, dims[0], dims[1]);
 
@@ -48,7 +47,7 @@ int main (int argc, char *argv[]) {
 
     // check window handle
     window_dc wnd_dc(win_handle);
-    unsigned int dims[2] = {VideoEncoder::Align2(wnd_dc.width()), VideoEncoder::Align2(wnd_dc.height())};
+    unsigned int dims[2] = {Align2(wnd_dc.width()), Align2(wnd_dc.height())};
     if (!wnd_dc.m_dc) {
         fprintf(stderr, "ERROR: Invalid window handle\n");
         return -1;
@@ -64,15 +63,8 @@ int main (int argc, char *argv[]) {
 
     // create H.264/MPEG4 encoder
     printf("Window handle: %08llx\n", (size_t)win_handle);
-    auto os = CreateLocalInstance<OutputStream>();
-    os->Initialize(96.0, CurrentTime1904()); // DPI & start time
-#ifdef ENABLE_FFMPEG
-    os->SetPortOrFilename(port_filename); // blocking call
-    VideoEncoderFF encoder(dims, FPS, os);
-#else
-    os->SetPortOrFilename(port_filename); // blocking call
-    VideoEncoderMF encoder(dims, FPS, os);
-#endif
+
+    Mpeg4Transmitter encoder(dims, FPS, port_filename);
     printf("Connecting to client...\n");
 
     // encode & transmit frames
@@ -80,8 +72,6 @@ int main (int argc, char *argv[]) {
         HRESULT hr = EncodeFrame(encoder, wnd_dc, dims);
         if (FAILED(hr))
             break;
-
-        os->Flush();
 
         // synchronize framerate
         Sleep(1000/FPS);

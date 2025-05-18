@@ -3,6 +3,7 @@
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="OutputStream.cpp" />
+    <ClCompile Include="Mpeg4Transmitter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MP4StreamEditor.hpp" />
@@ -13,6 +14,7 @@
     <ClInclude Include="MP4Utils.hpp" />
     <ClInclude Include="ComUtil.hpp" />
     <ClInclude Include="ScreenCapture.hpp" />
+    <ClInclude Include="Mpeg4Transmitter.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="WebStream.html" />
