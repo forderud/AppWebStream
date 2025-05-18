@@ -153,6 +153,7 @@ inline uint64_t Mpeg4TimeToUnixTime(uint64_t mpeg4Time) {
     return unixTime;
 }
 
+/** Convert from 100-nanosecond intervals since January 1, 1601 (UTC) to MPEG4 time. */
 inline uint64_t WindowsTimeToMpeg4Time(FILETIME winTime) {
     FILETIME epochTime{}; // MPEG4 1904 epoch
     {
