@@ -3,6 +3,11 @@
 #include "Mpeg4Transmitter.hpp"
 #include "ScreenCapture.hpp"
 
+inline FILETIME CurrentTime() {
+    FILETIME now{};
+    GetSystemTimeAsFileTime(&now);
+    return now;
+}
 
 static HRESULT EncodeFrame (Mpeg4Transmitter& encoder, window_dc& wnd_dc, unsigned int dims[2]) {
     // create offscreen bitmap for screen capture (pad window size to be compatible with FFMPEG encoder)
@@ -64,7 +69,7 @@ int main (int argc, char *argv[]) {
     constexpr double DPI = 96.0;
 
     // create H.264/MPEG4 encoder
-    Mpeg4Transmitter encoder(dims, FPS, port_filename);
+    Mpeg4Transmitter encoder(dims, FPS, CurrentTime(), port_filename);
     encoder.SetDPI(DPI);
     printf("Connecting to client...\n");
 

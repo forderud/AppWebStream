@@ -3,11 +3,10 @@
 #include "VideoEncoder.hpp"
 
 
-Mpeg4Transmitter::Mpeg4Transmitter(unsigned int dimensions[2], unsigned int fps, const char* port_filename) {
+Mpeg4Transmitter::Mpeg4Transmitter(unsigned int dimensions[2], unsigned int fps, FILETIME startTime, const char* port_filename) {
     m_stream = CreateLocalInstance<OutputStream>();
 
-    time_t now = time(NULL); // unix epoch since 1970-01-01
-    m_stream->Initialize(UnixTimeToMpeg4Time(now)); // start time
+    m_stream->Initialize(startTime); // start time
 
     m_stream->SetPortOrFilename(port_filename); // blocking call
 

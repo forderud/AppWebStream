@@ -27,8 +27,8 @@ public:
     OutputStream();
     /*NOT virtual*/ ~OutputStream();
 
-    /** Configure resolution in dots per inch (DPI) & start time in seconds since 1904. */
-    void Initialize(uint64_t startTime1904);
+    /** Configure resolution in dots per inch (DPI) & start time. */
+    void Initialize(FILETIME startTime);
 
     void SetPortOrFilename(const char * port_or_filename);
 
@@ -79,5 +79,7 @@ private:
     std::unique_ptr<ByteWriter> m_writer;
 
     uint64_t                         m_cur_pos = 0;
+
+    FILETIME                         m_startTime{};
     std::unique_ptr<MP4StreamEditor> m_stream_editor;
 };

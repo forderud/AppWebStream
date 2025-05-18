@@ -126,8 +126,10 @@ OutputStream::~OutputStream() {
 }
 
 
-void OutputStream::Initialize(uint64_t startTime1904) {
-    m_stream_editor = std::make_unique<MP4StreamEditor>(startTime1904);
+void OutputStream::Initialize(FILETIME startTime) {
+    uint64_t mpegStartTime = WindowsTimeToMpeg4Time(startTime); // rounds down to nearest second
+    m_startTime = Mpeg4TimeToWindowsTime(mpegStartTime);
+    m_stream_editor = std::make_unique<MP4StreamEditor>(mpegStartTime);
 }
 
 
