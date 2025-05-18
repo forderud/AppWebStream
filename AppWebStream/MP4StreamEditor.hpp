@@ -146,6 +146,11 @@ public:
         return m_time.startTime;
     }
 
+    /** time units per second */
+    uint32_t GetTimeScale() const {
+        return m_time.timeScale;
+    }
+
 private:
     bool ParseMoov(const std::string_view buffer) {
         const char* ptr = (char*)buffer.data();
