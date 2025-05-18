@@ -65,7 +65,7 @@ int main (int argc, char *argv[]) {
         dims[1] = min(dims[1], 720);
     }
 
-    constexpr unsigned int FPS = 50;
+    constexpr unsigned int FPS = 25;
     constexpr double DPI = 96.0;
 
     // create H.264/MPEG4 encoder
