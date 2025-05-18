@@ -155,7 +155,6 @@ inline uint64_t Mpeg4TimeToUnixTime(uint64_t mpeg4Time) {
 
 /**  MPEG4 file uses time counting in SECONDS since midnight, Jan. 1, 1904. */
 inline uint64_t CurrentTime1904() {
-#if 0
     FILETIME curTime{};
     {
         SYSTEMTIME st{};
@@ -181,10 +180,6 @@ inline uint64_t CurrentTime1904() {
     diff.HighPart = curTime.dwHighDateTime - epochTime.dwHighDateTime;
     diff.LowPart = curTime.dwLowDateTime - epochTime.dwLowDateTime;
     return diff.QuadPart / 10000000;
-#else
-    time_t now = time(NULL); // unix epoch since 1970-01-01
-    return UnixTimeToMpeg4Time(now);
-#endif
 }
 
 inline std::string TimeString1904(uint64_t mpeg4Time) {
