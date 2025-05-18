@@ -187,6 +187,21 @@ inline uint64_t WindowsTimeToMpeg4Time(FILETIME winTime) {
     return diff.QuadPart / 10000000;
 }
 
+inline FILETIME Mpeg4TimeToWindowsTime(uint64_t mpeg4Time) {
+    FILETIME epochTime{}; // MPEG4 1904 epoch
+    {
+        SYSTEMTIME st{};
+        st.wYear = 1904;
+        st.wMonth = 1;
+        st.wDay = 1;
+        SystemTimeToFileTime(&st, &epochTime);
+    }
+
+    ULARGE_INTEGER winTime = FileTimeToUint(epochTime);
+    winTime.QuadPart += mpeg4Time * 10000000;
+    return UintToFileTime(winTime);
+}
+
 
 inline std::string TimeString1904(uint64_t mpeg4Time) {
     time_t unixTime = Mpeg4TimeToUnixTime(mpeg4Time);

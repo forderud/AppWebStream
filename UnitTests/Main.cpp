@@ -54,5 +54,19 @@ int main() {
             throw std::runtime_error("Time conversion error");
     }
 
+    {
+        // convert between FILETIME and MPEG4 time
+        FILETIME winTime{};
+        GetSystemTimeAsFileTime(&winTime);
+
+        uint64_t mpegTime = WindowsTimeToMpeg4Time(winTime); // rounds down to the nearest second
+        FILETIME winTime2 = Mpeg4TimeToWindowsTime(mpegTime);
+
+        ULARGE_INTEGER diff{};
+        diff.QuadPart = FileTimeToUint(winTime).QuadPart - FileTimeToUint(winTime2).QuadPart;
+        if (std::llabs(diff.QuadPart) > 10000000) // difference should never exceed 1sec
+            throw std::runtime_error("Time conversion error");
+    }
+
     printf("[success]\n");
 }
