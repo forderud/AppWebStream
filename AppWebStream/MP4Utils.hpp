@@ -161,10 +161,10 @@ inline uint64_t WindowsTimeToMpeg4Time(FILETIME winTime) {
         st.wYear = 1904;
         st.wMonth = 1;
         st.wDay = 1;
-        // for some reason needed to adjust epoch by 7min 10sec to match time(null)
+        // for some reason needed to adjust epoch by 7min 9sec to match time(null)
         st.wHour = 0;
         st.wMinute = 7;
-        st.wSecond = 10;
+        st.wSecond = 9;
         SystemTimeToFileTime(&st, &epochTime);
     }
 

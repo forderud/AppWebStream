@@ -50,8 +50,7 @@ int main() {
 
         uint64_t winMpeg = WindowsTimeToMpeg4Time(winTime);
         uint64_t unixMpeg = UnixTimeToMpeg4Time(unixTime);
-        // TODO: Figure out why there's a 1 second difference
-        if (std::llabs(winMpeg - unixMpeg) > 1)
+        if (winMpeg != unixMpeg)
             throw std::runtime_error("Time conversion error");
     }
 
