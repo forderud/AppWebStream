@@ -202,12 +202,35 @@ public:
     }
 
     /** WARNING: Doesn't work yet. */
-    void StartNewStream(IMFByteStream* /*stream*/) override {
+    void StartNewStream(IMFByteStream* stream) override {
         // TODO: Investigate sample code on https://github.com/microsoft/MixedRealityCompanionKit
 
+#if 1
+        m_buffer.Release();
+
+        // create fragmented MPEG4 sink
+        m_media_sink.Release();
+        COM_CHECK(MFCreateFMPEG4MediaSink(stream, /*videoType*/GetOutputType(), /*audioType*/nullptr, &m_media_sink));
+
+        {
+            // create sink writer with specified output format
+            CComPtr<IMFAttributes> attribs;
+            COM_CHECK(MFCreateAttributes(&attribs, 0));
+            COM_CHECK(attribs->SetGUID(MF_TRANSCODE_CONTAINERTYPE, MFTranscodeContainerType_FMPEG4));
+            COM_CHECK(attribs->SetUINT32(MF_LOW_LATENCY, TRUE)); // zero frame encoding latency
+            COM_CHECK(attribs->SetUINT32(MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS, TRUE)); // GPU accelerated encoding
+
+            m_sink_writer.Release();
+            COM_CHECK(MFCreateSinkWriterFromMediaSink(m_media_sink, attribs, &m_sink_writer));
+        }
+
+        COM_CHECK(m_sink_writer->SetInputMediaType(m_stream_index, GetInputType(), /*encParams*/nullptr));
+        COM_CHECK(m_sink_writer->BeginWriting());
+#else
         // add new stream (will increment m_stream_index)
         COM_CHECK(m_sink_writer->AddStream(GetOutputType(), &m_stream_index));
         COM_CHECK(m_sink_writer->SetInputMediaType(m_stream_index, GetInputType(), /*encParams*/nullptr));
+#endif
     }
 
     R8G8B8A8* WriteFrameBegin () override {
