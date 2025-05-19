@@ -513,21 +513,19 @@ private:
     }
 
     static AVFrame* allocate_frame(/*in*/const AVCodecContext *ctx) {
-        /* allocate and init a re-usable frame */
+        // allocate and init a re-usable frame
         AVFrame* frame = av_frame_alloc();
-        {
-            assert(frame);
+        assert(frame);
 
-            assert(ctx->pix_fmt == AV_PIX_FMT_YUV420P);
-            frame->format = ctx->pix_fmt;
-            frame->width = ctx->width;
-            frame->height = ctx->height;
+        assert(ctx->pix_fmt == AV_PIX_FMT_YUV420P);
+        frame->format = ctx->pix_fmt;
+        frame->width = ctx->width;
+        frame->height = ctx->height;
 
-            // allocate the buffers for the frame data
-            int ret = av_frame_get_buffer(frame, 32);
-            if (ret < 0)
-                throw std::runtime_error("Could not allocate frame data");
-        }
+        // allocate the buffers for the frame data
+        int ret = av_frame_get_buffer(frame, /*align*/32);
+        if (ret < 0)
+            throw std::runtime_error("Could not allocate frame data");
 
         return frame;
     }
