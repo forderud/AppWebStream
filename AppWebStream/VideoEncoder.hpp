@@ -295,16 +295,6 @@ private:
 /** FFMPEG-based H.264 video encoder. */
 class VideoEncoderFF : public VideoEncoder {
 public:
-    /** Stream writing callback. */
-    static int WritePackage (void *opaque, const uint8_t *buf, int buf_size) {
-        IMFByteStream * stream = reinterpret_cast<IMFByteStream*>(opaque);
-        ULONG bytes_written = 0;
-        if (FAILED(stream->Write(buf, buf_size, &bytes_written)))
-            return -1;
-
-        return buf_size;
-    }
-
     VideoEncoderFF (unsigned int dimensions[2], unsigned int fps, IMFByteStream * socket) : VideoEncoder(dimensions), m_fps(fps) {
         //av_log_set_level(AV_LOG_VERBOSE);
 
@@ -536,6 +526,16 @@ private:
         Y = av_clip_uint8((  16000 + 257*rgb.r + 504*rgb.g +  98*rgb.b)/1000);
         Cb = av_clip_uint8((128000 - 148*rgb.r - 291*rgb.g + 439*rgb.b)/1000);
         Cr = av_clip_uint8((128000 + 439*rgb.r - 368*rgb.g -  71*rgb.b)/1000);
+    }
+
+    /** Stream writing callback. */
+    static int WritePackage(void* opaque, const uint8_t* buf, int buf_size) {
+        IMFByteStream* stream = reinterpret_cast<IMFByteStream*>(opaque);
+        ULONG bytes_written = 0;
+        if (FAILED(stream->Write(buf, buf_size, &bytes_written)))
+            return -1;
+
+        return buf_size;
     }
 
     unsigned int               m_fps = 0;
