@@ -124,8 +124,7 @@ public:
             COM_CHECK(MFSetAttributeRatio(mediaTypeOut, MF_MT_PIXEL_ASPECT_RATIO, 1, 1));
 
             COM_CHECK(MFCreateFMPEG4MediaSink(stream, /*videoType*/mediaTypeOut, /*audioType*/nullptr, &m_media_sink));
-        }
-        {
+
             // create sink writer with specified output format
             CComPtr<IMFAttributes> attribs;
             COM_CHECK(MFCreateAttributes(&attribs, 0));
@@ -134,6 +133,10 @@ public:
             COM_CHECK(attribs->SetUINT32(MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS, TRUE)); // GPU accelerated encoding
 
             COM_CHECK(MFCreateSinkWriterFromMediaSink(m_media_sink, attribs, &m_sink_writer));
+
+#if 0
+            COM_CHECK(m_sink_writer->AddStream(mediaTypeOut, &m_stream_index));
+#endif
         }
         {
             // configure RGBA input
