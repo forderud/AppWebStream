@@ -103,7 +103,7 @@ protected:
 /** Media-Foundation-based H.264 video encoder. */
 class VideoEncoderMF : public VideoEncoder {
     /* configure RGBA input */
-    IMFMediaTypePtr GetInputType(unsigned int fps) {
+    IMFMediaTypePtr GetInputType() {
         IMFMediaTypePtr mediaTypeIn;
         COM_CHECK(MFCreateMediaType(&mediaTypeIn));
         COM_CHECK(mediaTypeIn->SetGUID(MF_MT_MAJOR_TYPE, MFMediaType_Video));
@@ -112,37 +112,37 @@ class VideoEncoderMF : public VideoEncoder {
         //COM_CHECK(mediaTypeIn->SetUINT32(MF_MT_ALL_SAMPLES_INDEPENDENT, TRUE));
         // Frame size is aligned to avoid crash
         COM_CHECK(MFSetAttributeSize(mediaTypeIn, MF_MT_FRAME_SIZE, Align2(m_width), Align2(m_height)));
-        COM_CHECK(MFSetAttributeRatio(mediaTypeIn, MF_MT_FRAME_RATE, fps, 1));
+        COM_CHECK(MFSetAttributeRatio(mediaTypeIn, MF_MT_FRAME_RATE, m_fps, 1));
         COM_CHECK(MFSetAttributeRatio(mediaTypeIn, MF_MT_PIXEL_ASPECT_RATIO, 1, 1));
         return mediaTypeIn;
     }
 
     /* configure H.264 output */
-    IMFMediaTypePtr GetOutputType(unsigned int fps, const unsigned int bit_rate) {
+    IMFMediaTypePtr GetOutputType() {
         // doc: https://learn.microsoft.com/en-us/windows/win32/medfound/h-264-video-encoder
         IMFMediaTypePtr mediaTypeOut;
         COM_CHECK(MFCreateMediaType(&mediaTypeOut));
         COM_CHECK(mediaTypeOut->SetGUID(MF_MT_MAJOR_TYPE, MFMediaType_Video));
         COM_CHECK(mediaTypeOut->SetGUID(MF_MT_SUBTYPE, MFVideoFormat_H264)); // H.264 format
-        COM_CHECK(mediaTypeOut->SetUINT32(MF_MT_AVG_BITRATE, bit_rate));
+        COM_CHECK(mediaTypeOut->SetUINT32(MF_MT_AVG_BITRATE, m_bitrate));
         COM_CHECK(mediaTypeOut->SetUINT32(MF_MT_INTERLACE_MODE, MFVideoInterlace_Progressive));
         // Frame size is aligned to avoid crash
         COM_CHECK(MFSetAttributeSize(mediaTypeOut, MF_MT_FRAME_SIZE, Align2(m_width), Align2(m_height)));
-        COM_CHECK(MFSetAttributeRatio(mediaTypeOut, MF_MT_FRAME_RATE, fps, 1));
+        COM_CHECK(MFSetAttributeRatio(mediaTypeOut, MF_MT_FRAME_RATE, m_fps, 1));
         COM_CHECK(MFSetAttributeRatio(mediaTypeOut, MF_MT_PIXEL_ASPECT_RATIO, 1, 1));
         return mediaTypeOut;
     }
 
 public:
     /** Stream-based video encoding. */
-    VideoEncoderMF (unsigned int dimensions[2], unsigned int fps, IMFByteStream * stream) : VideoEncoder(dimensions) {
+    VideoEncoderMF (unsigned int dimensions[2], unsigned int fps, IMFByteStream * stream) : VideoEncoder(dimensions), m_fps(fps) {
         COM_CHECK(MFStartup(MF_VERSION));
         COM_CHECK(MFFrameRateToAverageTimePerFrame(fps, 1, const_cast<unsigned long long*>(&m_frame_duration)));
 
-        const unsigned int bit_rate = static_cast<unsigned int>(0.78f*fps*m_width*m_height); // yields 40Mb/s for 1920x1080@25fps
+        m_bitrate = static_cast<unsigned int>(0.78f*fps*m_width*m_height); // yields 40Mb/s for 1920x1080@25fps
 
         // create fragmented MPEG4 sink
-        COM_CHECK(MFCreateFMPEG4MediaSink(stream, /*videoType*/GetOutputType(fps, bit_rate), /*audioType*/nullptr, &m_media_sink));
+        COM_CHECK(MFCreateFMPEG4MediaSink(stream, /*videoType*/GetOutputType(), /*audioType*/nullptr, &m_media_sink));
 
         {
             // create sink writer with specified output format
@@ -155,12 +155,7 @@ public:
             COM_CHECK(MFCreateSinkWriterFromMediaSink(m_media_sink, attribs, &m_sink_writer));
         }
 
-#if 0
-        // TODO: Investigate sample code on https://github.com/microsoft/MixedRealityCompanionKit
-        COM_CHECK(m_sink_writer->AddStream(GetOutputType(fps, bit_rate), &m_stream_index));
-#endif
-
-        COM_CHECK(m_sink_writer->SetInputMediaType(m_stream_index, GetInputType(fps), /*encParams*/nullptr));
+        COM_CHECK(m_sink_writer->SetInputMediaType(m_stream_index, GetInputType(), /*encParams*/nullptr));
 
         {
 #if 0
@@ -202,6 +197,15 @@ public:
         }
 
         COM_CHECK(MFShutdown());
+    }
+
+    /** WARNING: Doesn't work yet. */
+    void StartNewStream() {
+        // TODO: Investigate sample code on https://github.com/microsoft/MixedRealityCompanionKit
+
+        // add new stream (will increment m_stream_index)
+        COM_CHECK(m_sink_writer->AddStream(GetOutputType(), &m_stream_index));
+        COM_CHECK(m_sink_writer->SetInputMediaType(m_stream_index, GetInputType(), /*encParams*/nullptr));
     }
 
     R8G8B8A8* WriteFrameBegin () override {
@@ -253,6 +257,8 @@ public:
     }
 
 private:
+    unsigned int             m_fps = 0;
+    unsigned int             m_bitrate = 0;
     const uint64_t           m_frame_duration = 0; // frame duration in 100-nanosecond units
     int64_t                  m_time_stamp = 0;
 
