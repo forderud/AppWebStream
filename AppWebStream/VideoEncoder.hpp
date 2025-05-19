@@ -137,6 +137,7 @@ public:
             COM_CHECK(MFCreateSinkWriterFromMediaSink(m_media_sink, attribs, &m_sink_writer));
 
 #if 0
+            // TODO: Investigate sample code on https://github.com/microsoft/MixedRealityCompanionKit
             COM_CHECK(m_sink_writer->AddStream(mediaTypeOut, &m_stream_index));
 #endif
         }
@@ -251,7 +252,7 @@ private:
     CComPtr<IMFMediaSink>    m_media_sink;
     IMFSinkWriterPtr         m_sink_writer;
     IMFMediaBufferPtr        m_buffer;
-    unsigned long            m_stream_index = 0;
+    unsigned long            m_stream_index = 0; // default video stream index
 };
 
 #else
