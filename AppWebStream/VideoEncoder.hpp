@@ -336,8 +336,19 @@ public:
             throw std::runtime_error("omit_video_pes_length failed");
 #endif
 
-        // open the video codecs and allocate the necessary encode buffers
-        m_frame = open_video(video_codec, opt, m_enc, m_stream->codecpar);
+        {
+            // open the video codecs and allocate the necessary encode buffers
+            AVDictionary* opt_cpy = nullptr;
+            av_dict_copy(/*out*/&opt_cpy, /*in*/opt, 0);
+
+            // open the codec
+            ret = avcodec_open2(m_enc, /*in*/video_codec, &opt_cpy);
+            av_dict_free(&opt_cpy);
+            if (ret < 0)
+                throw std::runtime_error("Could not open video codec");
+        }
+
+        m_frame = allocate_frame(m_enc, m_stream->codecpar);
 
         m_out_buf.resize(16*1024*1024); // 16MB
         m_socket = socket; // prevent socket from being destroyed before this object
@@ -496,18 +507,7 @@ private:
         return std::tie(codec, stream, enc);
     }
 
-    static AVFrame* open_video (const AVCodec *codec, const AVDictionary *opt_arg, /*in/out*/AVCodecContext *c, /*in/out*/AVCodecParameters *codecpar) {
-        {
-            AVDictionary* opt_cpy = nullptr;
-            av_dict_copy(/*out*/&opt_cpy, /*in*/opt_arg, 0);
-
-            /* open the codec */
-            int ret = avcodec_open2(c, /*in*/codec, &opt_cpy);
-            av_dict_free(&opt_cpy);
-            if (ret < 0)
-                throw std::runtime_error("Could not open video codec");
-        }
-
+    static AVFrame* allocate_frame(/*in/out*/AVCodecContext *c, /*in/out*/AVCodecParameters *codecpar) {
         /* allocate and init a re-usable frame */
         AVFrame* frame = av_frame_alloc();
         {
