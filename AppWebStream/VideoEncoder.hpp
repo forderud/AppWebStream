@@ -535,7 +535,7 @@ private:
         if (FAILED(stream->Write(buf, buf_size, &bytes_written)))
             return -1;
 
-        return buf_size;
+        return buf_size; // don't want to return bytes_written here in case bitstream have grown or shrunk during editing
     }
 
     unsigned int               m_fps = 0;
