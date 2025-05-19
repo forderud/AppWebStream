@@ -52,7 +52,7 @@ public:
 
     virtual ~VideoEncoder () = default;
 
-    virtual void StartNewStream() = 0;
+    virtual void StartNewStream(IMFByteStream* stream) = 0;
 
     virtual R8G8B8A8* WriteFrameBegin () = 0;
     virtual HRESULT   WriteFrameEnd () = 0;
@@ -202,7 +202,7 @@ public:
     }
 
     /** WARNING: Doesn't work yet. */
-    void StartNewStream() override {
+    void StartNewStream(IMFByteStream* /*stream*/) override {
         // TODO: Investigate sample code on https://github.com/microsoft/MixedRealityCompanionKit
 
         // add new stream (will increment m_stream_index)
@@ -350,7 +350,7 @@ public:
         avformat_free_context(m_out_ctx);
     }
 
-    void StartNewStream() override {
+    void StartNewStream(IMFByteStream* /*stream*/) override {
         throw std::runtime_error("StartNewStream not implemented");
     }
 

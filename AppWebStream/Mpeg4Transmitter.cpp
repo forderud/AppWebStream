@@ -23,7 +23,7 @@ Mpeg4Transmitter::~Mpeg4Transmitter() {
 void Mpeg4Transmitter::SetDPI(double dpi) {
     double prevDpi = m_stream->SetNextFrameDPI(dpi);
     if (prevDpi && (dpi != prevDpi))
-        m_encoder->StartNewStream();
+        m_encoder->StartNewStream(m_stream);
 }
 
 R8G8B8A8* Mpeg4Transmitter::WriteFrameBegin(FILETIME curTime) {
