@@ -58,7 +58,7 @@ public:
         if (!BitBlt(/*dst*/m_dc, 0, 0, m_width, m_height, /*src*/src.m_dc, 0, 0, SRCCOPY))
             return -1;
 
-        BITMAPINFO bmp_info = {};
+        BITMAPINFO bmp_info{};
         bmp_info.bmiHeader.biSize = sizeof(bmp_info.bmiHeader);
         {
             // call GetDIBits to fill "bmp_info" struct 
