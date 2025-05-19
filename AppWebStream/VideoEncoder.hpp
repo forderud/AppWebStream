@@ -318,6 +318,8 @@ public:
         // Add the video streams using the default format codecs and initialize the codecs
         const AVCodec * video_codec = nullptr;
         std::tie(video_codec, m_stream, m_enc) = add_stream(m_out_ctx->oformat->video_codec);
+        m_stream->time_base = m_enc->time_base;
+
 
         // REF: https://ffmpeg.org/ffmpeg-formats.html#Options-8 (-movflags arguments)
         // REF: https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/movenc.c
@@ -511,7 +513,6 @@ private:
                 enc->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
         }
 
-        stream->time_base = enc->time_base;
         return std::tie(codec, stream, enc);
     }
 
