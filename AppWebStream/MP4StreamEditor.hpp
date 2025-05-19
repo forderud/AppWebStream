@@ -732,7 +732,11 @@ private:
 
             // check baseMediaDecodeTime
             auto baseMediaDecodeTime = DeSerialize<uint64_t>(tfdt_ptr);
+#ifndef ENABLE_FFMPEG
             assert(baseMediaDecodeTime == m_time.cur_time); baseMediaDecodeTime;
+#else
+            baseMediaDecodeTime;
+#endif
             tfdt_ptr += sizeof(uint64_t);
 
             assert(tfdt_ptr == ptr + tfdt_size);
