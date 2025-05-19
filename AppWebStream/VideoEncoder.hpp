@@ -537,12 +537,12 @@ private:
         Cr = av_clip_uint8((128000 + 439*rgb.r - 368*rgb.g -  71*rgb.b)/1000);
     }
 
-    unsigned int         m_fps = 0;
-    int64_t         m_next_pts = 0; // presentation timestamp (PTS) [time_base unit] for the next frame
-    AVFormatContext *m_out_ctx = nullptr;
-    AVStream         *m_stream = nullptr;
-    AVCodecContext      *m_enc = nullptr;
-    AVFrame           *m_frame = nullptr;
+    unsigned int               m_fps = 0;
+    int64_t                    m_next_pts = 0; // presentation timestamp (PTS) [time_base unit] for the next frame
+    AVFormatContext*           m_out_ctx = nullptr;
+    AVStream*                  m_stream = nullptr;
+    AVCodecContext*            m_enc = nullptr;
+    AVFrame*                   m_frame = nullptr;
 
     std::vector<R8G8B8A8>      m_rgb_buf;
     std::vector<unsigned char> m_out_buf;
