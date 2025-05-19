@@ -507,16 +507,16 @@ private:
         return std::tie(codec, stream, enc);
     }
 
-    static AVFrame* allocate_frame(/*in/out*/AVCodecContext *c, /*in/out*/AVCodecParameters *codecpar) {
+    static AVFrame* allocate_frame(/*in*/const AVCodecContext *ctx, /*out*/AVCodecParameters *codecpar) {
         /* allocate and init a re-usable frame */
         AVFrame* frame = av_frame_alloc();
         {
             assert(frame);
 
-            assert(c->pix_fmt == AV_PIX_FMT_YUV420P);
-            frame->format = c->pix_fmt;
-            frame->width = c->width;
-            frame->height = c->height;
+            assert(ctx->pix_fmt == AV_PIX_FMT_YUV420P);
+            frame->format = ctx->pix_fmt;
+            frame->width = ctx->width;
+            frame->height = ctx->height;
 
             // allocate the buffers for the frame data
             int ret = av_frame_get_buffer(frame, 32);
@@ -525,7 +525,7 @@ private:
         }
 
         // copy the stream parameters to the muxer
-        int ret = avcodec_parameters_from_context(/*out*/codecpar, /*in*/c);
+        int ret = avcodec_parameters_from_context(/*out*/codecpar, /*in*/ctx);
         if (ret < 0)
             throw std::runtime_error("Could not copy the stream parameters");
 
