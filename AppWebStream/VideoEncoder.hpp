@@ -112,6 +112,7 @@ public:
 
         {
             // configure H.264 output
+            // doc: https://learn.microsoft.com/en-us/windows/win32/medfound/h-264-video-encoder
             IMFMediaTypePtr mediaTypeOut;
             COM_CHECK(MFCreateMediaType(&mediaTypeOut));
             COM_CHECK(mediaTypeOut->SetGUID(MF_MT_MAJOR_TYPE, MFMediaType_Video));
@@ -123,6 +124,7 @@ public:
             COM_CHECK(MFSetAttributeRatio(mediaTypeOut, MF_MT_FRAME_RATE, fps, 1));
             COM_CHECK(MFSetAttributeRatio(mediaTypeOut, MF_MT_PIXEL_ASPECT_RATIO, 1, 1));
 
+            // create fragmented MPEG4 sink
             COM_CHECK(MFCreateFMPEG4MediaSink(stream, /*videoType*/mediaTypeOut, /*audioType*/nullptr, &m_media_sink));
 
             // create sink writer with specified output format
