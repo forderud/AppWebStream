@@ -120,6 +120,15 @@ class VideoEncoderMF : public VideoEncoder {
         return mediaTypeIn;
     }
 
+    static IMFAttributesPtr SinkWriterAttribs() {
+        IMFAttributesPtr attribs;
+        COM_CHECK(MFCreateAttributes(&attribs, 0));
+        COM_CHECK(attribs->SetGUID(MF_TRANSCODE_CONTAINERTYPE, MFTranscodeContainerType_FMPEG4)); // fragmented MPEG4
+        COM_CHECK(attribs->SetUINT32(MF_LOW_LATENCY, TRUE)); // zero frame encoding latency
+        COM_CHECK(attribs->SetUINT32(MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS, TRUE)); // GPU accelerated encoding
+        return attribs;
+    }
+
     /* configure H.264 output */
     IMFMediaTypePtr GetOutputType() {
         // doc: https://learn.microsoft.com/en-us/windows/win32/medfound/h-264-video-encoder
@@ -147,16 +156,8 @@ public:
         // create fragmented MPEG4 sink
         COM_CHECK(MFCreateFMPEG4MediaSink(stream, /*videoType*/GetOutputType(), /*audioType*/nullptr, &m_media_sink));
 
-        {
-            // create sink writer with specified output format
-            IMFAttributesPtr attribs;
-            COM_CHECK(MFCreateAttributes(&attribs, 0));
-            COM_CHECK(attribs->SetGUID(MF_TRANSCODE_CONTAINERTYPE, MFTranscodeContainerType_FMPEG4));
-            COM_CHECK(attribs->SetUINT32(MF_LOW_LATENCY, TRUE)); // zero frame encoding latency
-            COM_CHECK(attribs->SetUINT32(MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS, TRUE)); // GPU accelerated encoding
-
-            COM_CHECK(MFCreateSinkWriterFromMediaSink(m_media_sink, attribs, &m_sink_writer));
-        }
+        // create sink writer with specified output format
+        COM_CHECK(MFCreateSinkWriterFromMediaSink(m_media_sink, SinkWriterAttribs(), &m_sink_writer));
 
         COM_CHECK(m_sink_writer->SetInputMediaType(m_stream_index, GetInputType(), /*encParams*/nullptr));
 
@@ -216,17 +217,9 @@ public:
         m_media_sink.Release();
         COM_CHECK(MFCreateFMPEG4MediaSink(stream, /*videoType*/GetOutputType(), /*audioType*/nullptr, &m_media_sink));
 
-        {
-            // create sink writer with specified output format
-            IMFAttributesPtr attribs;
-            COM_CHECK(MFCreateAttributes(&attribs, 0));
-            COM_CHECK(attribs->SetGUID(MF_TRANSCODE_CONTAINERTYPE, MFTranscodeContainerType_FMPEG4));
-            COM_CHECK(attribs->SetUINT32(MF_LOW_LATENCY, TRUE)); // zero frame encoding latency
-            COM_CHECK(attribs->SetUINT32(MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS, TRUE)); // GPU accelerated encoding
-
-            m_sink_writer.Release();
-            COM_CHECK(MFCreateSinkWriterFromMediaSink(m_media_sink, attribs, &m_sink_writer));
-        }
+        // create sink writer with specified output format
+        m_sink_writer.Release();
+        COM_CHECK(MFCreateSinkWriterFromMediaSink(m_media_sink, SinkWriterAttribs(), &m_sink_writer));
 
         COM_CHECK(m_sink_writer->SetInputMediaType(m_stream_index, GetInputType(), /*encParams*/nullptr));
         COM_CHECK(m_sink_writer->BeginWriting());
