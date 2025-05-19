@@ -156,8 +156,10 @@ void OutputStream::SetNextFrameTime(FILETIME timeStamp) {
     m_stream_editor->SetNextFrameTime(mpegTime);
 }
 
-void OutputStream::SetNextFrameDPI(double dpi) {
+double OutputStream::SetNextFrameDPI(double dpi) {
+    double prevDpi = m_stream_editor->GetDPI();
     m_stream_editor->SetDPI(dpi);
+    return prevDpi;
 }
 
 HRESULT OutputStream::GetCapabilities(/*out*/DWORD *capabilities) {

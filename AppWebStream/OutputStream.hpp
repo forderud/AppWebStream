@@ -34,7 +34,7 @@ public:
 
     void SetNextFrameTime(FILETIME timeStamp);
 
-    void SetNextFrameDPI(double dpi);
+    double SetNextFrameDPI(double dpi);
 
     HRESULT GetCapabilities(/*out*/DWORD *capabilities) override;
 
