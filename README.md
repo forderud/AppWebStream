@@ -33,7 +33,7 @@ Metadata implementation status:
 
 #### HTTP and authentication
 * Authentication is currently missing.
-* The handcrafted HTTP communication should be replaced by a HTTP library.
+* The handcrafted HTTP communication should be replaced by a HTTP library ([issue #33](../../issues/33)).
 
 #### Media Foundation details
 * **0 frame latency**, except for the first 4 frames (frame N in, frame N out, frame N+1 in, frame N+1 out, frame N+2 in, frame N+2 out, ...)
