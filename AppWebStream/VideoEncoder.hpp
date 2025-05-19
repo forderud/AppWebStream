@@ -315,16 +315,13 @@ public:
 
         m_rgb_buf.resize(Align2(m_width)* Align2(m_height));
 
-        // Add the video streams using the default format codecs and initialize the codecs
         // find the encoder
         const AVCodec* video_codec = avcodec_find_encoder(m_out_ctx->oformat->video_codec);
-        if (!video_codec) {
-            const char* name = avcodec_get_name(m_out_ctx->oformat->video_codec);
-            fprintf(stderr, "ERROR: Could not find encoder for %s\n", name);
-            throw std::runtime_error("Could not find encoder for");
-        }
+        if (!video_codec)
+            throw std::runtime_error("Could not find encoder");
         assert(video_codec->type == AVMEDIA_TYPE_VIDEO);
 
+        // Add the video streams using the default format codecs and initialize the codecs
         m_enc = configure_context(video_codec);
 
         {
