@@ -14,7 +14,7 @@ static HRESULT EncodeFrame (Mpeg4Transmitter& encoder, window_dc& wnd_dc, unsign
     offscreen_bmp bmp(wnd_dc.m_dc, dims[0], dims[1]);
 
     // copy window content encoder buffer
-    auto * img_ptr = encoder.WriteFrameBegin(nullptr);
+    auto* img_ptr = encoder.WriteFrameBegin();
     int scan_lines = bmp.CopyToRGBABuffer(wnd_dc, (uint32_t*)img_ptr);
     if (scan_lines != (int)dims[1]) {
         encoder.AbortWrite(); // still need to unlock buffer
