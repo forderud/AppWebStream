@@ -102,6 +102,37 @@ protected:
 #ifndef ENABLE_FFMPEG
 /** Media-Foundation-based H.264 video encoder. */
 class VideoEncoderMF : public VideoEncoder {
+    /* configure RGBA input */
+    IMFMediaTypePtr GetInputType(unsigned int fps) {
+        IMFMediaTypePtr mediaTypeIn;
+        COM_CHECK(MFCreateMediaType(&mediaTypeIn));
+        COM_CHECK(mediaTypeIn->SetGUID(MF_MT_MAJOR_TYPE, MFMediaType_Video));
+        COM_CHECK(mediaTypeIn->SetGUID(MF_MT_SUBTYPE, MFVideoFormat_RGB32)); // X8R8G8B8 format
+        COM_CHECK(mediaTypeIn->SetUINT32(MF_MT_INTERLACE_MODE, MFVideoInterlace_Progressive));
+        //COM_CHECK(mediaTypeIn->SetUINT32(MF_MT_ALL_SAMPLES_INDEPENDENT, TRUE));
+        // Frame size is aligned to avoid crash
+        COM_CHECK(MFSetAttributeSize(mediaTypeIn, MF_MT_FRAME_SIZE, Align2(m_width), Align2(m_height)));
+        COM_CHECK(MFSetAttributeRatio(mediaTypeIn, MF_MT_FRAME_RATE, fps, 1));
+        COM_CHECK(MFSetAttributeRatio(mediaTypeIn, MF_MT_PIXEL_ASPECT_RATIO, 1, 1));
+        return mediaTypeIn;
+    }
+
+    /* configure H.264 output */
+    IMFMediaTypePtr GetOutputType(unsigned int fps, const unsigned int bit_rate) {
+        // doc: https://learn.microsoft.com/en-us/windows/win32/medfound/h-264-video-encoder
+        IMFMediaTypePtr mediaTypeOut;
+        COM_CHECK(MFCreateMediaType(&mediaTypeOut));
+        COM_CHECK(mediaTypeOut->SetGUID(MF_MT_MAJOR_TYPE, MFMediaType_Video));
+        COM_CHECK(mediaTypeOut->SetGUID(MF_MT_SUBTYPE, MFVideoFormat_H264)); // H.264 format
+        COM_CHECK(mediaTypeOut->SetUINT32(MF_MT_AVG_BITRATE, bit_rate));
+        COM_CHECK(mediaTypeOut->SetUINT32(MF_MT_INTERLACE_MODE, MFVideoInterlace_Progressive));
+        // Frame size is aligned to avoid crash
+        COM_CHECK(MFSetAttributeSize(mediaTypeOut, MF_MT_FRAME_SIZE, Align2(m_width), Align2(m_height)));
+        COM_CHECK(MFSetAttributeRatio(mediaTypeOut, MF_MT_FRAME_RATE, fps, 1));
+        COM_CHECK(MFSetAttributeRatio(mediaTypeOut, MF_MT_PIXEL_ASPECT_RATIO, 1, 1));
+        return mediaTypeOut;
+    }
+
 public:
     /** Stream-based video encoding. */
     VideoEncoderMF (unsigned int dimensions[2], unsigned int fps, IMFByteStream * stream) : VideoEncoder(dimensions) {
@@ -110,23 +141,10 @@ public:
 
         const unsigned int bit_rate = static_cast<unsigned int>(0.78f*fps*m_width*m_height); // yields 40Mb/s for 1920x1080@25fps
 
+        // create fragmented MPEG4 sink
+        COM_CHECK(MFCreateFMPEG4MediaSink(stream, /*videoType*/GetOutputType(fps, bit_rate), /*audioType*/nullptr, &m_media_sink));
+
         {
-            // configure H.264 output
-            // doc: https://learn.microsoft.com/en-us/windows/win32/medfound/h-264-video-encoder
-            IMFMediaTypePtr mediaTypeOut;
-            COM_CHECK(MFCreateMediaType(&mediaTypeOut));
-            COM_CHECK(mediaTypeOut->SetGUID(MF_MT_MAJOR_TYPE, MFMediaType_Video));
-            COM_CHECK(mediaTypeOut->SetGUID(MF_MT_SUBTYPE, MFVideoFormat_H264)); // H.264 format
-            COM_CHECK(mediaTypeOut->SetUINT32(MF_MT_AVG_BITRATE, bit_rate));
-            COM_CHECK(mediaTypeOut->SetUINT32(MF_MT_INTERLACE_MODE, MFVideoInterlace_Progressive));
-            // Frame size is aligned to avoid crash
-            COM_CHECK(MFSetAttributeSize(mediaTypeOut, MF_MT_FRAME_SIZE, Align2(m_width), Align2(m_height)));
-            COM_CHECK(MFSetAttributeRatio(mediaTypeOut, MF_MT_FRAME_RATE, fps, 1));
-            COM_CHECK(MFSetAttributeRatio(mediaTypeOut, MF_MT_PIXEL_ASPECT_RATIO, 1, 1));
-
-            // create fragmented MPEG4 sink
-            COM_CHECK(MFCreateFMPEG4MediaSink(stream, /*videoType*/mediaTypeOut, /*audioType*/nullptr, &m_media_sink));
-
             // create sink writer with specified output format
             CComPtr<IMFAttributes> attribs;
             COM_CHECK(MFCreateAttributes(&attribs, 0));
@@ -135,27 +153,15 @@ public:
             COM_CHECK(attribs->SetUINT32(MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS, TRUE)); // GPU accelerated encoding
 
             COM_CHECK(MFCreateSinkWriterFromMediaSink(m_media_sink, attribs, &m_sink_writer));
+        }
 
 #if 0
-            // TODO: Investigate sample code on https://github.com/microsoft/MixedRealityCompanionKit
-            COM_CHECK(m_sink_writer->AddStream(mediaTypeOut, &m_stream_index));
+        // TODO: Investigate sample code on https://github.com/microsoft/MixedRealityCompanionKit
+        COM_CHECK(m_sink_writer->AddStream(GetOutputType(fps, bit_rate), &m_stream_index));
 #endif
-        }
-        {
-            // configure RGBA input
-            IMFMediaTypePtr mediaTypeIn;
-            COM_CHECK(MFCreateMediaType(&mediaTypeIn));
-            COM_CHECK(mediaTypeIn->SetGUID(MF_MT_MAJOR_TYPE, MFMediaType_Video));
-            COM_CHECK(mediaTypeIn->SetGUID(MF_MT_SUBTYPE, MFVideoFormat_RGB32)); // X8R8G8B8 format
-            COM_CHECK(mediaTypeIn->SetUINT32(MF_MT_INTERLACE_MODE, MFVideoInterlace_Progressive));
-            //COM_CHECK(mediaTypeIn->SetUINT32(MF_MT_ALL_SAMPLES_INDEPENDENT, TRUE));
-            // Frame size is aligned to avoid crash
-            COM_CHECK(MFSetAttributeSize(mediaTypeIn, MF_MT_FRAME_SIZE, Align2(m_width), Align2(m_height)));
-            COM_CHECK(MFSetAttributeRatio(mediaTypeIn, MF_MT_FRAME_RATE, fps, 1));
-            COM_CHECK(MFSetAttributeRatio(mediaTypeIn, MF_MT_PIXEL_ASPECT_RATIO, 1, 1));
 
-            COM_CHECK(m_sink_writer->SetInputMediaType(m_stream_index, mediaTypeIn, /*encParams*/nullptr));
-        }
+        COM_CHECK(m_sink_writer->SetInputMediaType(m_stream_index, GetInputType(fps), /*encParams*/nullptr));
+
         {
 #if 0
             // access H.264 encoder directly (https://msdn.microsoft.com/en-us/library/windows/desktop/dd797816.aspx)
