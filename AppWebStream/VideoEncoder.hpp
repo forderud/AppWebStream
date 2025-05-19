@@ -355,9 +355,10 @@ public:
         if (ret < 0)
             throw std::runtime_error("Could not copy the stream parameters");
 
-        m_out_buf.resize(16*1024*1024); // 16MB
+        constexpr int out_buf_size = 16 * 1024 * 1024; // 16MB
+        m_out_buf = (unsigned char*)av_malloc(out_buf_size);
         m_socket = socket; // prevent socket from being destroyed before this object
-        m_out_ctx->pb = avio_alloc_context(m_out_buf.data(), static_cast<int>(m_out_buf.size()), 1/*writable*/, socket, nullptr/*read*/, WritePackage, nullptr/*seek*/);
+        m_out_ctx->pb = avio_alloc_context(m_out_buf, out_buf_size, 1/*writable*/, socket, nullptr/*read*/, WritePackage, nullptr/*seek*/);
         //out_ctx->flags |= AVFMT_FLAG_CUSTOM_IO;
 
 #ifndef NDEBUG
@@ -384,6 +385,9 @@ public:
 
         avio_context_free(&m_out_ctx->pb);
         avformat_free_context(m_out_ctx);
+
+        av_free(m_out_buf);
+        m_out_buf = nullptr;
     }
 
     void StartNewStream(IMFByteStream* /*stream*/) override {
@@ -545,7 +549,7 @@ private:
     AVFrame*                   m_frame = nullptr;
 
     std::vector<R8G8B8A8>      m_rgb_buf;
-    std::vector<unsigned char> m_out_buf;
+    unsigned char*             m_out_buf = nullptr;
     CComPtr<IMFByteStream>     m_socket;
 };
 
