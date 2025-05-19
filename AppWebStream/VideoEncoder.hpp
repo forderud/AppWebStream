@@ -25,6 +25,7 @@ _COM_SMARTPTR_TYPEDEF(IMFSinkWriter,  __uuidof(IMFSinkWriter));
 _COM_SMARTPTR_TYPEDEF(IMFMediaBuffer, __uuidof(IMFMediaBuffer));
 _COM_SMARTPTR_TYPEDEF(IMFSample,      __uuidof(IMFSample));
 _COM_SMARTPTR_TYPEDEF(IMFMediaType,   __uuidof(IMFMediaType));
+_COM_SMARTPTR_TYPEDEF(IMFAttributes,  __uuidof(IMFAttributes));
 #else
 
 #pragma comment(lib, "avcodec.lib")
@@ -148,7 +149,7 @@ public:
 
         {
             // create sink writer with specified output format
-            CComPtr<IMFAttributes> attribs;
+            IMFAttributesPtr attribs;
             COM_CHECK(MFCreateAttributes(&attribs, 0));
             COM_CHECK(attribs->SetGUID(MF_TRANSCODE_CONTAINERTYPE, MFTranscodeContainerType_FMPEG4));
             COM_CHECK(attribs->SetUINT32(MF_LOW_LATENCY, TRUE)); // zero frame encoding latency
@@ -217,7 +218,7 @@ public:
 
         {
             // create sink writer with specified output format
-            CComPtr<IMFAttributes> attribs;
+            IMFAttributesPtr attribs;
             COM_CHECK(MFCreateAttributes(&attribs, 0));
             COM_CHECK(attribs->SetGUID(MF_TRANSCODE_CONTAINERTYPE, MFTranscodeContainerType_FMPEG4));
             COM_CHECK(attribs->SetUINT32(MF_LOW_LATENCY, TRUE)); // zero frame encoding latency
