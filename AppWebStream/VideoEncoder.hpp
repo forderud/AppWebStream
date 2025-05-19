@@ -326,10 +326,16 @@ public:
         assert(video_codec->type == AVMEDIA_TYPE_VIDEO);
 
 
+        {
+            m_stream = avformat_new_stream(m_out_ctx, NULL);
+            if (!m_stream)
+                throw std::runtime_error("Could not allocate stream");
 
-        std::tie(m_stream, m_enc) = add_stream(video_codec);
+            m_stream->id = m_out_ctx->nb_streams - 1;
+        }
+
+        m_enc = configure_context(video_codec);
         m_stream->time_base = m_enc->time_base;
-
 
         // REF: https://ffmpeg.org/ffmpeg-formats.html#Options-8 (-movflags arguments)
         // REF: https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/movenc.c
@@ -480,13 +486,7 @@ public:
 
 private:
     /* Add an output stream. */
-    std::tuple<AVStream*, AVCodecContext*> add_stream (const AVCodec* codec) {
-        AVStream * stream = avformat_new_stream(m_out_ctx, NULL);
-        if (!stream)
-            throw std::runtime_error("Could not allocate stream");
-
-        stream->id = m_out_ctx->nb_streams-1;
-
+    AVCodecContext* configure_context (const AVCodec* codec) {
         // setup context
         AVCodecContext *enc = avcodec_alloc_context3(codec);
         if (!enc)
@@ -514,7 +514,7 @@ private:
                 enc->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
         }
 
-        return std::tie(stream, enc);
+        return enc;
     }
 
     static AVFrame* allocate_frame(/*in*/const AVCodecContext *ctx) {
