@@ -27,6 +27,18 @@ static HRESULT EncodeFrame (Mpeg4Transmitter& encoder, window_dc& wnd_dc, unsign
 #ifndef _NDEBUG
     printf("f"); // log "f" to signal that a frame have been encoded
 #endif
+
+#ifdef SIMULATE_DPI_CHANGE
+    // simulate DPI change every 100 frames
+    static double s_dpi = 95;
+    static int s_counter = 0;
+
+    if (++s_counter % 100 == 0) {
+        s_dpi += 10.0;
+        encoder.SetDPI(s_dpi);
+    }
+#endif
+
     return hr;
 }
 
