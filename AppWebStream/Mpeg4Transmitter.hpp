@@ -34,7 +34,8 @@ public:
     Mpeg4Transmitter(unsigned int dimensions[2], unsigned int fps, FILETIME startTime, const char* port_filename);
     ~Mpeg4Transmitter();
 
-    /** Update DPI for the next frame. */
+    /** Update DPI for the next frame.
+        WARNING: DPI changes not yet implemented. */
     void SetDPI(double dpi);
 
     R8G8B8A8* WriteFrameBegin(FILETIME curTime = {});
