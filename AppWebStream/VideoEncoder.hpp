@@ -348,7 +348,12 @@ public:
                 throw std::runtime_error("Could not open video codec");
         }
 
-        m_frame = allocate_frame(m_enc, m_stream->codecpar);
+        m_frame = allocate_frame(m_enc);
+
+        // copy the stream parameters to the muxer
+        ret = avcodec_parameters_from_context(/*out*/m_stream->codecpar, /*in*/m_enc);
+        if (ret < 0)
+            throw std::runtime_error("Could not copy the stream parameters");
 
         m_out_buf.resize(16*1024*1024); // 16MB
         m_socket = socket; // prevent socket from being destroyed before this object
@@ -507,7 +512,7 @@ private:
         return std::tie(codec, stream, enc);
     }
 
-    static AVFrame* allocate_frame(/*in*/const AVCodecContext *ctx, /*out*/AVCodecParameters *codecpar) {
+    static AVFrame* allocate_frame(/*in*/const AVCodecContext *ctx) {
         /* allocate and init a re-usable frame */
         AVFrame* frame = av_frame_alloc();
         {
@@ -523,11 +528,6 @@ private:
             if (ret < 0)
                 throw std::runtime_error("Could not allocate frame data");
         }
-
-        // copy the stream parameters to the muxer
-        int ret = avcodec_parameters_from_context(/*out*/codecpar, /*in*/ctx);
-        if (ret < 0)
-            throw std::runtime_error("Could not copy the stream parameters");
 
         return frame;
     }
