@@ -309,7 +309,7 @@ public:
         //av_log_set_level(AV_LOG_VERBOSE);
 
         /* allocate the output media context */
-        avformat_alloc_output_context2(&m_out_ctx, nullptr, "mp4", nullptr);
+        avformat_alloc_output_context2(/*out*/&m_out_ctx, nullptr, "mp4", nullptr);
         if (!m_out_ctx)
             throw std::runtime_error("avformat_alloc_output_context2 failure");
 
@@ -325,6 +325,7 @@ public:
         }
         assert(video_codec->type == AVMEDIA_TYPE_VIDEO);
 
+        m_enc = configure_context(video_codec);
 
         {
             m_stream = avformat_new_stream(m_out_ctx, NULL);
@@ -332,10 +333,8 @@ public:
                 throw std::runtime_error("Could not allocate stream");
 
             m_stream->id = m_out_ctx->nb_streams - 1;
+            m_stream->time_base = m_enc->time_base;
         }
-
-        m_enc = configure_context(video_codec);
-        m_stream->time_base = m_enc->time_base;
 
         // REF: https://ffmpeg.org/ffmpeg-formats.html#Options-8 (-movflags arguments)
         // REF: https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/movenc.c
