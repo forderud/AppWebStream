@@ -489,7 +489,6 @@ private:
         if (!enc)
             throw std::runtime_error("Could not alloc an encoding context");
         {
-            enc->codec_id = codec_id;
             enc->bit_rate = static_cast<unsigned int>(0.78f*m_fps*m_width*m_height); // yields 40Mb/s for 1920x1080@25fps
             // Resolution must be a multiple of two
             enc->width    = Align2(m_width);
