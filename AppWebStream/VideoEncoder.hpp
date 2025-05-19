@@ -316,8 +316,18 @@ public:
         m_rgb_buf.resize(Align2(m_width)* Align2(m_height));
 
         // Add the video streams using the default format codecs and initialize the codecs
-        const AVCodec * video_codec = nullptr;
-        std::tie(video_codec, m_stream, m_enc) = add_stream(m_out_ctx->oformat->video_codec);
+        // find the encoder
+        const AVCodec* video_codec = avcodec_find_encoder(m_out_ctx->oformat->video_codec);
+        if (!video_codec) {
+            const char* name = avcodec_get_name(m_out_ctx->oformat->video_codec);
+            fprintf(stderr, "ERROR: Could not find encoder for %s\n", name);
+            throw std::runtime_error("Could not find encoder for");
+        }
+        assert(video_codec->type == AVMEDIA_TYPE_VIDEO);
+
+
+
+        std::tie(m_stream, m_enc) = add_stream(video_codec);
         m_stream->time_base = m_enc->time_base;
 
 
@@ -470,16 +480,7 @@ public:
 
 private:
     /* Add an output stream. */
-    std::tuple<const AVCodec*,AVStream*, AVCodecContext*> add_stream (AVCodecID codec_id) {
-        // find the encoder
-        const AVCodec *codec = avcodec_find_encoder(codec_id);
-        if (!codec) {
-            const char * name = avcodec_get_name(codec_id);
-            fprintf(stderr, "ERROR: Could not find encoder for %s\n", name);
-            throw std::runtime_error("Could not find encoder for");
-        }
-        assert(codec->type == AVMEDIA_TYPE_VIDEO);
-
+    std::tuple<AVStream*, AVCodecContext*> add_stream (const AVCodec* codec) {
         AVStream * stream = avformat_new_stream(m_out_ctx, NULL);
         if (!stream)
             throw std::runtime_error("Could not allocate stream");
@@ -513,7 +514,7 @@ private:
                 enc->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
         }
 
-        return std::tie(codec, stream, enc);
+        return std::tie(stream, enc);
     }
 
     static AVFrame* allocate_frame(/*in*/const AVCodecContext *ctx) {
