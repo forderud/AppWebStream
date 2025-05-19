@@ -201,11 +201,14 @@ public:
         COM_CHECK(MFShutdown());
     }
 
-    /** WARNING: Doesn't work yet. */
+    /** Must be called after DPI changes. */
     void StartNewStream(IMFByteStream* stream) override {
         // TODO: Investigate sample code on https://github.com/microsoft/MixedRealityCompanionKit
 
 #if 1
+        // Recreate media-sink & sink-writer objects to trigger re-tranmittion of MPEG4 "moov" atoms with updated DPI value.
+        // This is admittedly a more extensive reset than adding a new stream that should in theory be sufficient. However, I've
+        // so far been unable to get IMFSinkWriter::AddStream to work.
         m_buffer.Release();
 
         // create fragmented MPEG4 sink
