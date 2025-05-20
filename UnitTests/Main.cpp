@@ -68,10 +68,40 @@ void TimeConvTests() {
     }
 }
 
+void SerializationTests() {
+    printf("* Serialization tests.\n");
+
+    {
+        // 2 byte data
+        uint16_t val1 = 0x1c28;
+        
+        char buffer[2] = {};
+        char* end = Serialize(buffer, val1);
+        assert(end == buffer + 2);
+
+        auto val2 = DeSerialize<uint16_t>(buffer);
+        if (val2 != val1)
+            throw std::runtime_error("serialization error");
+    }
+    {
+        // 4 byte data
+        uint32_t val1 = 0x11223344;
+
+        char buffer[4] = {};
+        char* end = Serialize(buffer, val1);
+        assert(end == buffer + 4);
+
+        auto val2 = DeSerialize<uint32_t>(buffer);
+        if (val2 != val1)
+            throw std::runtime_error("serialization error");
+    }
+}
+
 
 int main() {
     printf("Running unit tests:\n");
 
+    SerializationTests();
     TimeConvTests();
 
     printf("[success]\n");
