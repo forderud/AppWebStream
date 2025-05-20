@@ -3,9 +3,8 @@
 #include "../AppWebStream/MP4Utils.hpp"
 
 
-int main() {
-    printf("Running unit tests...\n");
-
+void TimeConvTests() {
+    printf("* Time conversion tests.\n");
     {
         // test time conversion to & from MPE4 epoch
         uint64_t unixTime = time(NULL); // current time in seconds since 1970-01-01
@@ -67,6 +66,13 @@ int main() {
         if (std::llabs(diff.QuadPart) >= FILETIME_PER_SECONDS) // difference should never exceed 1sec
             throw std::runtime_error("Time conversion error");
     }
+}
+
+
+int main() {
+    printf("Running unit tests:\n");
+
+    TimeConvTests();
 
     printf("[success]\n");
 }
