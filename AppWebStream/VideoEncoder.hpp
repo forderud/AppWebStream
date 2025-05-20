@@ -451,6 +451,7 @@ private:
             * timebase should be 1/framerate and timestamp increments should be
             * identical to 1. */
             enc->time_base = { 1, static_cast<int>(m_fps) };
+            enc->framerate = { static_cast<int>(m_fps), 1 };
 
             //enc->gop_size = 0; // group of pictures size
             enc->pix_fmt  = AV_PIX_FMT_YUV420P; // default pix_fmt
