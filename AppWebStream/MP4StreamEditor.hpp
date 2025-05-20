@@ -548,7 +548,9 @@ private:
                                 ptr += 2;
                                 auto height = DeSerialize<uint16_t>(ptr);
                                 ptr += 2;
+#ifndef NDEBUG
                                 printf("avc1 frame resolution: (%u x %u)\n", width, height);
+#endif
 
 #if 0
                                 // DPI hardcoded to 72dpi (0x00480000) in FFMPEG encoder (https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/movenc.c)
