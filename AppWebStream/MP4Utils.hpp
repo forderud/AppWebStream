@@ -139,13 +139,13 @@ struct matrix {
     }
 };
 
-inline uint64_t FileTimeToUlarge(FILETIME winTime) {
+inline uint64_t FileTimeToU64(FILETIME winTime) {
     ULARGE_INTEGER res{};
     res.HighPart = winTime.dwHighDateTime;
     res.LowPart = winTime.dwLowDateTime;
     return res.QuadPart;
 }
-inline FILETIME UlargeToFileTime(uint64_t winTime) {
+inline FILETIME U64ToFileTime(uint64_t winTime) {
     ULARGE_INTEGER tmp{};
     tmp.QuadPart = winTime;
 
@@ -185,8 +185,8 @@ inline uint64_t WindowsTimeToMpeg4Time(FILETIME winTime) {
         SystemTimeToFileTime(&st, &epochTime);
     }
 
-    uint64_t mpegTime = FileTimeToUlarge(winTime);
-    mpegTime -= FileTimeToUlarge(epochTime);
+    uint64_t mpegTime = FileTimeToU64(winTime);
+    mpegTime -= FileTimeToU64(epochTime);
 
     // convert frp, 100-nanosecond intervals to seconds
     return mpegTime/FILETIME_PER_SECONDS;
@@ -202,9 +202,9 @@ inline FILETIME Mpeg4TimeToWindowsTime(uint64_t mpeg4Time) {
         SystemTimeToFileTime(&st, &epochTime);
     }
 
-    uint64_t winTime = FileTimeToUlarge(epochTime);
+    uint64_t winTime = FileTimeToU64(epochTime);
     winTime += mpeg4Time * FILETIME_PER_SECONDS;
-    return UlargeToFileTime(winTime);
+    return U64ToFileTime(winTime);
 }
 
 

@@ -61,8 +61,8 @@ void TimeConvTests() {
         uint64_t mpegTime = WindowsTimeToMpeg4Time(winTime); // rounds down to the nearest second
         FILETIME winTime2 = Mpeg4TimeToWindowsTime(mpegTime);
 
-        uint64_t diff = FileTimeToUlarge(winTime);
-        diff -= FileTimeToUlarge(winTime2);
+        uint64_t diff = FileTimeToU64(winTime);
+        diff -= FileTimeToU64(winTime2);
         if (std::llabs(diff) >= FILETIME_PER_SECONDS) // difference should never exceed 1sec
             throw std::runtime_error("Time conversion error");
     }

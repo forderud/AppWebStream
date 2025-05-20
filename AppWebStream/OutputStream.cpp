@@ -147,8 +147,8 @@ void OutputStream::SetPortOrFilename(const char * port_or_filename) {
 
 void OutputStream::SetNextFrameTime(FILETIME timeStamp) {
     // compute 100-nanosecond intervals since startTime
-    uint64_t duration = FileTimeToUlarge(timeStamp);
-    duration -= FileTimeToUlarge(m_startTime);
+    uint64_t duration = FileTimeToU64(timeStamp);
+    duration -= FileTimeToU64(m_startTime);
 
     uint32_t timeScale = m_stream_editor->GetTimeScale();
 
