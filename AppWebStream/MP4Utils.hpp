@@ -139,16 +139,19 @@ struct matrix {
     }
 };
 
-inline ULARGE_INTEGER FileTimeToUlarge(FILETIME winTime) {
+inline uint64_t FileTimeToUlarge(FILETIME winTime) {
     ULARGE_INTEGER res{};
     res.HighPart = winTime.dwHighDateTime;
     res.LowPart = winTime.dwLowDateTime;
-    return res;
+    return res.QuadPart;
 }
-inline FILETIME UlargeToFileTime(ULARGE_INTEGER winTime) {
+inline FILETIME UlargeToFileTime(uint64_t winTime) {
+    ULARGE_INTEGER tmp{};
+    tmp.QuadPart = winTime;
+
     FILETIME ft{};
-    ft.dwHighDateTime = winTime.HighPart;
-    ft.dwLowDateTime = winTime.LowPart;
+    ft.dwHighDateTime = tmp.HighPart;
+    ft.dwLowDateTime = tmp.LowPart;
     return ft;
 }
 
@@ -182,11 +185,11 @@ inline uint64_t WindowsTimeToMpeg4Time(FILETIME winTime) {
         SystemTimeToFileTime(&st, &epochTime);
     }
 
-    ULARGE_INTEGER mpegTime = FileTimeToUlarge(winTime);
-    mpegTime.QuadPart -= FileTimeToUlarge(epochTime).QuadPart;
+    uint64_t mpegTime = FileTimeToUlarge(winTime);
+    mpegTime -= FileTimeToUlarge(epochTime);
 
     // convert frp, 100-nanosecond intervals to seconds
-    return mpegTime.QuadPart / FILETIME_PER_SECONDS;
+    return mpegTime/FILETIME_PER_SECONDS;
 }
 
 inline FILETIME Mpeg4TimeToWindowsTime(uint64_t mpeg4Time) {
@@ -199,8 +202,8 @@ inline FILETIME Mpeg4TimeToWindowsTime(uint64_t mpeg4Time) {
         SystemTimeToFileTime(&st, &epochTime);
     }
 
-    ULARGE_INTEGER winTime = FileTimeToUlarge(epochTime);
-    winTime.QuadPart += mpeg4Time * FILETIME_PER_SECONDS;
+    uint64_t winTime = FileTimeToUlarge(epochTime);
+    winTime += mpeg4Time * FILETIME_PER_SECONDS;
     return UlargeToFileTime(winTime);
 }
 
