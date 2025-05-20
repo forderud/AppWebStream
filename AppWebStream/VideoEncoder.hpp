@@ -60,8 +60,8 @@ public:
     virtual void      AbortWrite() = 0;
 
 protected:
-    const unsigned int m_width;  ///< horizontal img. resolution (excluding padding)
-    const unsigned int m_height; ///< vertical img. resolution (excluding padding)
+    const unsigned int m_width = 0;  ///< horizontal img. resolution (excluding padding)
+    const unsigned int m_height = 0; ///< vertical img. resolution (excluding padding)
     unsigned int       m_fps = 0;
 };
 
