@@ -275,7 +275,7 @@ public:
         assert(video_codec->type == AVMEDIA_TYPE_VIDEO);
 
         // Add the video streams using the default format codecs and initialize the codecs
-        m_enc = configure_context(video_codec);
+        m_codec_ctx = configure_context(video_codec);
 
         {
             m_stream = avformat_new_stream(m_out_ctx, NULL);
@@ -283,7 +283,7 @@ public:
                 throw std::runtime_error("Could not allocate stream");
 
             m_stream->id = m_out_ctx->nb_streams - 1;
-            m_stream->time_base = m_enc->time_base;
+            m_stream->time_base = m_codec_ctx->time_base;
         }
 
         // REF: https://ffmpeg.org/ffmpeg-formats.html#Options-8 (-movflags arguments)
@@ -309,16 +309,16 @@ public:
             av_dict_copy(/*out*/&opt_cpy, /*in*/opt, 0);
 
             // open the codec
-            ret = avcodec_open2(m_enc, /*in*/video_codec, &opt_cpy);
+            ret = avcodec_open2(m_codec_ctx, /*in*/video_codec, &opt_cpy);
             av_dict_free(&opt_cpy);
             if (ret < 0)
                 throw std::runtime_error("Could not open video codec");
         }
 
-        m_frame = allocate_frame(m_enc);
+        m_frame = allocate_frame(m_codec_ctx);
 
         // copy the stream parameters to the muxer
-        ret = avcodec_parameters_from_context(/*out*/m_stream->codecpar, /*in*/m_enc);
+        ret = avcodec_parameters_from_context(/*out*/m_stream->codecpar, /*in*/m_codec_ctx);
         if (ret < 0)
             throw std::runtime_error("Could not copy the stream parameters");
 
@@ -349,7 +349,7 @@ public:
 
         av_frame_free(&m_frame);
 
-        avcodec_free_context(&m_enc);
+        avcodec_free_context(&m_codec_ctx);
 
         avio_context_free(&m_out_ctx->pb);
         avformat_free_context(m_out_ctx);
@@ -375,12 +375,12 @@ public:
             if (av_frame_make_writable(m_frame) < 0)
                 exit(1);
 
-            assert(m_enc->pix_fmt == AV_PIX_FMT_YUV420P);
+            assert(m_codec_ctx->pix_fmt == AV_PIX_FMT_YUV420P);
 
             // RGB to YCbCR conversion
             for (unsigned int y = 0; y < m_height; y++) {
                 for (unsigned int x = 0; x < m_width; x++) {
-                    R8G8B8A8 rgb = m_rgb_buf[y* m_enc->width + x];
+                    R8G8B8A8 rgb = m_rgb_buf[y* m_codec_ctx->width + x];
                     unsigned char Y=0, Cb=0, Cr=0;
                     RGB_to_YCbCr(rgb, Y, Cb, Cr);
                     // write Y value
@@ -401,7 +401,7 @@ public:
         }
 
         // encode frame
-        int ret = avcodec_send_frame(m_enc, has_frame ? m_frame : nullptr);
+        int ret = avcodec_send_frame(m_codec_ctx, has_frame ? m_frame : nullptr);
         if (ret < 0)
             throw std::runtime_error("Error encoding video frame");
 
@@ -409,7 +409,7 @@ public:
 
         // process packages
         for (;;) {
-            ret = avcodec_receive_packet(m_enc, pkt.get());
+            ret = avcodec_receive_packet(m_codec_ctx, pkt.get());
             if (ret == AVERROR(EAGAIN))
                 break; // not yet available
             else if (!has_frame && (ret == AVERROR_EOF))
@@ -418,7 +418,7 @@ public:
                 throw std::runtime_error("avcodec_receive_packet failed");
 
             // rescale output packet timestamp values from codec to stream timebase
-            av_packet_rescale_ts(pkt.get(), m_enc->time_base, m_stream->time_base);
+            av_packet_rescale_ts(pkt.get(), m_codec_ctx->time_base, m_stream->time_base);
             pkt->stream_index = m_stream->index;
 
             // write compressed frame to stream
@@ -502,15 +502,15 @@ private:
         return buf_size; // don't want to return bytes_written here in case bitstream have grown or shrunk during editing
     }
 
-    int64_t                    m_next_pts = 0; // presentation timestamp (PTS) [time_base unit] for the next frame
-    AVFormatContext*           m_out_ctx = nullptr;
-    AVCodecContext*            m_enc = nullptr;
-    AVStream*                  m_stream = nullptr;
-    AVFrame*                   m_frame = nullptr;
+    int64_t                m_next_pts = 0; // presentation timestamp (PTS) [time_base unit] for the next frame
+    AVFormatContext*       m_out_ctx = nullptr;
+    AVCodecContext*        m_codec_ctx = nullptr;
+    AVStream*              m_stream = nullptr;
+    AVFrame*               m_frame = nullptr;
 
-    std::vector<R8G8B8A8>      m_rgb_buf;
-    unsigned char*             m_out_buf = nullptr;
-    CComPtr<IMFByteStream>     m_socket;
+    std::vector<R8G8B8A8>  m_rgb_buf;
+    unsigned char*         m_out_buf = nullptr;
+    CComPtr<IMFByteStream> m_socket;
 };
 
 #endif
