@@ -48,7 +48,7 @@ extern "C" {
 
 class VideoEncoder {
 public:
-    VideoEncoder (unsigned int dimensions[2]) : m_width(dimensions[0]), m_height(dimensions[1]) {
+    VideoEncoder (unsigned int dimensions[2], unsigned int fps) : m_width(dimensions[0]), m_height(dimensions[1]), m_fps(fps) {
     }
 
     virtual ~VideoEncoder () = default;
@@ -62,6 +62,7 @@ public:
 protected:
     const unsigned int m_width;  ///< horizontal img. resolution (excluding padding)
     const unsigned int m_height; ///< vertical img. resolution (excluding padding)
+    unsigned int       m_fps = 0;
 };
 
 
@@ -110,7 +111,7 @@ class VideoEncoderMF : public VideoEncoder {
 
 public:
     /** Stream-based video encoding. */
-    VideoEncoderMF (unsigned int dimensions[2], unsigned int fps, IMFByteStream * stream) : VideoEncoder(dimensions), m_fps(fps) {
+    VideoEncoderMF (unsigned int dimensions[2], unsigned int fps, IMFByteStream * stream) : VideoEncoder(dimensions, fps) {
         COM_CHECK(MFStartup(MF_VERSION));
         COM_CHECK(MFFrameRateToAverageTimePerFrame(fps, 1, const_cast<unsigned long long*>(&m_frame_duration)));
 
@@ -242,7 +243,6 @@ public:
     }
 
 private:
-    unsigned int             m_fps = 0;
     unsigned int             m_bitrate = 0;
     const uint64_t           m_frame_duration = 0; // frame duration in 100-nanosecond units
     int64_t                  m_time_stamp = 0;
@@ -258,7 +258,7 @@ private:
 /** FFMPEG-based H.264 video encoder. */
 class VideoEncoderFF : public VideoEncoder {
 public:
-    VideoEncoderFF (unsigned int dimensions[2], unsigned int fps, IMFByteStream * socket) : VideoEncoder(dimensions), m_fps(fps) {
+    VideoEncoderFF (unsigned int dimensions[2], unsigned int fps, IMFByteStream * socket) : VideoEncoder(dimensions, fps) {
         //av_log_set_level(AV_LOG_VERBOSE);
 
         /* allocate the output media context */
@@ -501,7 +501,6 @@ private:
         return buf_size; // don't want to return bytes_written here in case bitstream have grown or shrunk during editing
     }
 
-    unsigned int               m_fps = 0;
     int64_t                    m_next_pts = 0; // presentation timestamp (PTS) [time_base unit] for the next frame
     AVFormatContext*           m_out_ctx = nullptr;
     AVStream*                  m_stream = nullptr;
