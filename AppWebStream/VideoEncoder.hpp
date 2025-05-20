@@ -324,6 +324,7 @@ public:
 
         constexpr int out_buf_size = 16 * 1024 * 1024; // 16MB
         m_out_buf = (unsigned char*)av_malloc(out_buf_size);
+
         m_socket = socket; // prevent socket from being destroyed before this object
         m_out_ctx->pb = avio_alloc_context(m_out_buf, out_buf_size, 1/*writable*/, socket, nullptr/*read*/, WritePackage, nullptr/*seek*/);
         //out_ctx->flags |= AVFMT_FLAG_CUSTOM_IO;
