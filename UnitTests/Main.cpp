@@ -77,7 +77,8 @@ void SerializationTests() {
         
         char buffer[2] = {};
         char* end = Serialize(buffer, val1);
-        assert(end == buffer + 2);
+        if (end != buffer+2)
+            throw std::runtime_error("serialization error");
 
         auto val2 = DeSerialize<uint16_t>(buffer);
         if (val2 != val1)
@@ -89,7 +90,8 @@ void SerializationTests() {
 
         char buffer[4] = {};
         char* end = Serialize(buffer, val1);
-        assert(end == buffer + 4);
+        if (end != buffer + 4)
+            throw std::runtime_error("serialization error");
 
         auto val2 = DeSerialize<uint32_t>(buffer);
         if (val2 != val1)
