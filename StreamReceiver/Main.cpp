@@ -1,3 +1,5 @@
+#define ENABLE_SCREEN_DISPLAY
+
 #include <atlbase.h>
 #include <stdio.h>
 #include <thread>
@@ -8,12 +10,12 @@
 
 
 void ReceiveMovieThread(Mpeg4Receiver* receiver) {
-
     HRESULT hr = S_OK;
     while (SUCCEEDED(hr)) {
         hr = receiver->ReceiveFrame();
     }
 }
+
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
