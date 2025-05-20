@@ -182,11 +182,11 @@ inline uint64_t WindowsTimeToMpeg4Time(FILETIME winTime) {
         SystemTimeToFileTime(&st, &epochTime);
     }
 
-    ULARGE_INTEGER diff{}; // 100ns resolution
-    diff.QuadPart = FileTimeToUlarge(winTime).QuadPart - FileTimeToUlarge(epochTime).QuadPart;
+    ULARGE_INTEGER mpegTime = FileTimeToUlarge(winTime);
+    mpegTime.QuadPart -= FileTimeToUlarge(epochTime).QuadPart;
 
-    // convert to seconds
-    return diff.QuadPart / FILETIME_PER_SECONDS;
+    // convert frp, 100-nanosecond intervals to seconds
+    return mpegTime.QuadPart / FILETIME_PER_SECONDS;
 }
 
 inline FILETIME Mpeg4TimeToWindowsTime(uint64_t mpeg4Time) {
