@@ -59,43 +59,6 @@ public:
     virtual HRESULT   WriteFrameEnd () = 0;
     virtual void      AbortWrite() = 0;
 
-    HRESULT WriteFrame (const R8G8B8A8* src_data, bool swap_rb) {
-        R8G8B8A8 * buffer_ptr = WriteFrameBegin();
-
-        for (unsigned int j = 0; j < m_height; j++) {
-#ifdef ENABLE_FFMPEG
-            const R8G8B8A8 * src_row = &src_data[j*m_width];
-#else
-            const R8G8B8A8 * src_row = &src_data[(m_height-1-j)*m_width]; // flip upside down
-#endif
-            R8G8B8A8 * dst_row = &buffer_ptr[j*Align2(m_width)];
-
-            if (swap_rb) {
-                for (unsigned int i = 0; i < m_width; i++)
-                    dst_row[i] = SwapRGBAtoBGRA(src_row[i]);
-            } else {
-                // copy scanline as-is
-                memcpy(dst_row, src_row, 4*m_width);
-            }
-
-            // clear padding at end of scanline
-            size_t hor_padding = Align2(m_width) - m_width;
-            if (hor_padding)
-                std::memset(&dst_row[m_width], 0, 4*hor_padding);
-        }
-
-        // clear padding after last scanline
-        size_t vert_padding = Align2(m_height) - m_height;
-        if (vert_padding)
-            std::memset(&buffer_ptr[m_height*Align2(m_width)], 0, 4*Align2(m_width)*vert_padding);
-
-        return WriteFrameEnd();
-    }
-
-    static R8G8B8A8 SwapRGBAtoBGRA (R8G8B8A8 in) {
-        return{ in.b, in.g, in.r, in.a };
-    }
-
 protected:
     const unsigned int m_width;  ///< horizontal img. resolution (excluding padding)
     const unsigned int m_height; ///< vertical img. resolution (excluding padding)
