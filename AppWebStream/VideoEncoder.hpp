@@ -347,9 +347,9 @@ public:
         // write file ending (discard error codes)
         av_write_trailer(m_out_ctx);
 
-        avcodec_free_context(&m_enc);
-
         av_frame_free(&m_frame);
+
+        avcodec_free_context(&m_enc);
 
         avio_context_free(&m_out_ctx->pb);
         avformat_free_context(m_out_ctx);
@@ -504,8 +504,8 @@ private:
 
     int64_t                    m_next_pts = 0; // presentation timestamp (PTS) [time_base unit] for the next frame
     AVFormatContext*           m_out_ctx = nullptr;
-    AVStream*                  m_stream = nullptr;
     AVCodecContext*            m_enc = nullptr;
+    AVStream*                  m_stream = nullptr;
     AVFrame*                   m_frame = nullptr;
 
     std::vector<R8G8B8A8>      m_rgb_buf;
