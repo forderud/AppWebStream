@@ -283,7 +283,7 @@ public:
                 throw std::runtime_error("Could not allocate stream");
 
             m_stream->id = m_out_ctx->nb_streams - 1;
-            m_stream->time_base = m_codec_ctx->time_base;
+            m_stream->time_base = m_codec_ctx->time_base; // affect baseMediaDecodeTime increments
         }
 
         // REF: https://ffmpeg.org/ffmpeg-formats.html#Options-8 (-movflags arguments)
