@@ -103,8 +103,8 @@ inline char* WriteFixed0230(char* buf, double in) {
 }
 
 /* QuickTime transformation matrix.
-a,b,c,d,x,y: divided as 16.16 bits.
-u,v,w;       divided as 2.30 bits
+a,b,c,d,x,y: divided as 16.16 bits.   x' = a*x + c*y + tx
+u,v,w;       divided as 2.30 bits.    y' = b*x + d*y + ty
 // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/support/Matrix.java */
 struct matrix {
     static constexpr uint32_t SIZE = 9 * sizeof(int32_t); // serialization size
@@ -117,12 +117,15 @@ struct matrix {
         a = ReadFixed1616(buf); buf += sizeof(int32_t);
         b = ReadFixed1616(buf); buf += sizeof(int32_t);
         u = ReadFixed0230(buf); buf += sizeof(int32_t);
+        assert(u == 0.0);
         c = ReadFixed1616(buf); buf += sizeof(int32_t);
         d = ReadFixed1616(buf); buf += sizeof(int32_t);
         v = ReadFixed0230(buf); buf += sizeof(int32_t);
+        assert(v == 0.0);
         tx = ReadFixed1616(buf); buf += sizeof(int32_t);
         ty = ReadFixed1616(buf); buf += sizeof(int32_t);
         w = ReadFixed0230(buf); buf += sizeof(int32_t);
+        assert(w == 1.0);
     }
 
     char* Write(char* buf) const {
