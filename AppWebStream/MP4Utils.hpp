@@ -108,6 +108,7 @@ u,v,w;       divided as 2.30 bits.    y' = b*x + d*y + ty
 // REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/support/Matrix.java */
 struct matrix {
     static constexpr uint32_t SIZE = 9 * sizeof(int32_t); // serialization size
+
     double a, b, u;
     double c, d, v;
     double tx, ty, w;
@@ -142,12 +143,17 @@ struct matrix {
     }
 };
 
+
+/** Cast Windows FILETIME to a 64bit integer to ease computations. 
+    Unit: 100-nanosecond intervals since January 1, 1601 (UTC). */
 inline uint64_t FileTimeToU64(FILETIME winTime) {
     ULARGE_INTEGER res{};
     res.HighPart = winTime.dwHighDateTime;
     res.LowPart = winTime.dwLowDateTime;
     return res.QuadPart;
 }
+/** Cast a 64bit integet back to a Windows FILETIME.
+    Unit: 100-nanosecond intervals since January 1, 1601 (UTC). */
 inline FILETIME U64ToFileTime(uint64_t winTime) {
     ULARGE_INTEGER tmp{};
     tmp.QuadPart = winTime;
