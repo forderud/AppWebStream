@@ -10,6 +10,8 @@
 
 
 void ReceiveMovieThread(Mpeg4Receiver* receiver) {
+    SetThreadDescription(GetCurrentThread(), L"ReceiveMovieThread");
+
     HRESULT hr = S_OK;
     while (SUCCEEDED(hr)) {
         hr = receiver->ReceiveFrame();
