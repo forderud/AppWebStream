@@ -10,7 +10,7 @@ class WebStream : public ByteWriter, StreamSockSetter {
 public:
     WebStream(const char * port_str) : m_server(port_str), m_block_ctor(true) {
         // start server thread
-        m_thread = std::thread(&WebStream::WaitForClients, this);
+        m_thread = std::thread(&WebStream::WaitForClientsThread, this);
 
         // wait for video request or socket failure
         std::mutex mutex;
@@ -21,7 +21,9 @@ public:
         // start streaming video
     }
 
-    void WaitForClients () {
+    void WaitForClientsThread() {
+        SetThreadDescription(GetCurrentThread(), L"WaitForClientsThread");
+
         for (;;) {
             auto current = m_server.WaitForClient();
             if (!current)

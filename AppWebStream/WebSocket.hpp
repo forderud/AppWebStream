@@ -135,6 +135,8 @@ public:
 
 private:
     void ConnectionThread (StreamSockSetter* parent) {
+        SetThreadDescription(GetCurrentThread(), L"ConnectionThread");
+
         Connect type;
         do {
             type = Handshake();
