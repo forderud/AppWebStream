@@ -64,6 +64,14 @@ public:
 
         const char* ptr = buffer.data();
 
+        {
+            // Jump to MPEG4 type header, which might be in the middle of the buffer if restarting the stream after a DPI change.
+            // TODO: Figure out how to avoid this sequential search.
+            size_t ftyp_idx = buffer.find("ftypmp42");
+            if (ftyp_idx != buffer.npos)
+                ptr += ftyp_idx - 4; // -4 to keep size prefix
+        }
+
         if (!IsAtomType(ptr, "ftyp"))
             return false;
         {
