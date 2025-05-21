@@ -51,8 +51,8 @@ static char* Serialize(char* buf, T val) {
     REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/tools/IsoTypeReader.java */
 inline double ReadFixed88(const char* buf) {
     int16_t val = 0;
-    val |= buf[0] << 8;
-    val |= buf[1] << 0;
+    val |= (unsigned char)buf[0] << 8;
+    val |= (unsigned char)buf[1] << 0;
 
     return ((double)val) / (1 << 8);
 }
@@ -60,10 +60,10 @@ inline double ReadFixed88(const char* buf) {
     REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/tools/IsoTypeReader.java */
 inline double ReadFixed1616(const char* buf) {
     int32_t val = 0;
-    val |= buf[0] << 24;
-    val |= buf[1] << 16;
-    val |= buf[2] << 8;
-    val |= buf[3] << 0;
+    val |= (unsigned char)buf[0] << 24;
+    val |= (unsigned char)buf[1] << 16;
+    val |= (unsigned char)buf[2] << 8;
+    val |= (unsigned char)buf[3] << 0;
 
     return ((double)val) / (1 << 16);
 }
@@ -71,10 +71,10 @@ inline double ReadFixed1616(const char* buf) {
     REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/tools/IsoTypeReader.java */
 inline double ReadFixed0230(const char* buf) {
     int32_t val = 0;
-    val |= buf[0] << 24;
-    val |= buf[1] << 16;
-    val |= buf[2] << 8;
-    val |= buf[3] << 0;
+    val |= (unsigned char)buf[0] << 24;
+    val |= (unsigned char)buf[1] << 16;
+    val |= (unsigned char)buf[2] << 8;
+    val |= (unsigned char)buf[3] << 0;
 
     return ((double)val) / (1 << 30);
 }
