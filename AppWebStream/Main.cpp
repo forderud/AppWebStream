@@ -35,6 +35,7 @@ static HRESULT EncodeFrame (Mpeg4Transmitter& encoder, window_dc& wnd_dc, unsign
 
     if (++s_counter % 100 == 0) {
         s_dpi += 10.0;
+        printf("New DPI: %f\n", s_dpi);
         encoder.SetDPI(s_dpi);
     }
 #endif
