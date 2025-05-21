@@ -67,9 +67,10 @@ public:
         {
             // Jump to MPEG4 type header, which might be in the middle of the buffer if restarting the stream after a DPI change.
             // TODO: Figure out how to avoid this sequential search.
-            size_t ftyp_idx = buffer.find("ftypmp42");
+            constexpr char PATTERN[] = {0, 0, 0, 24, 'f', 't', 'y', 'p', 'm', 'p', '4', '2' };
+            size_t ftyp_idx = buffer.find(std::string_view(PATTERN, std::size(PATTERN)));
             if (ftyp_idx != buffer.npos)
-                ptr += ftyp_idx - 4; // -4 to keep size prefix
+                ptr += ftyp_idx;
         }
 
         if (!IsAtomType(ptr, "ftyp"))
