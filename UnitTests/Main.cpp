@@ -99,14 +99,15 @@ void SerializationTests() {
 }
 
 void FixedPointTests() {
-    {
+    const double TEST_VALUES[] = {-100, -10.0, -5.0, -1.0, -0.5, 0.0, 0.5, 1.0, 5.0, 10.0, 100};
+
+    for (double val1 : TEST_VALUES) {
         // 16+16 bits
         char buffer[2 * sizeof(uint16_t)] = {};
-        double val1 = 1.0;
         WriteFixed1616(buffer, val1);
         double val2 = ReadFixed1616(buffer);
 
-        if (std::fabs(val2 - val1) > 1e-9)
+        if (std::fabs(val2 - val1) > 1e-12)
             throw std::runtime_error("fixed point error");
     }
 }
