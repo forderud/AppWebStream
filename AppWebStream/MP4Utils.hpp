@@ -58,7 +58,7 @@ inline double ReadFixed88(const char* buf) {
 }
 /** Write big-endian fixed-point 8+8 float. */
 inline char* WriteFixed88(char* buf, double in) {
-    int16_t val = (int16_t)(in * (1 << 8));
+    auto val = (int16_t)(in * (1 << 8));
 
     buf[0] = (val & 0xFF00) >> 8;
     buf[1] = (val & 0x00FF);
@@ -79,7 +79,7 @@ inline double ReadFixed1616(const char* buf) {
 /** Write big-endian fixed-point 16+16 float.
     REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/tools/IsoTypeWriter.java */
 inline char* WriteFixed1616(char* buf, double in) {
-    int32_t val = (int32_t)(in * (1 << 16));
+    auto val = (int32_t)(in * (1 << 16));
 
     buf[0] = (val & 0xFF000000) >> 24;
     buf[1] = (char)((val & 0x00FF0000) >> 16);
@@ -102,7 +102,7 @@ inline double ReadFixed0230(const char* buf) {
 /** Write big-endian fixed-point 2+30 float.
     REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/tools/IsoTypeWriter.java */
 inline char* WriteFixed0230(char* buf, double in) {
-    int32_t val = (int32_t)(in * (1 << 30));
+    auto val = (int32_t)(in * (1 << 30));
 
     buf[0] = (val & 0xFF000000) >> 24;
     buf[1] = (char)((val & 0x00FF0000) >> 16);
