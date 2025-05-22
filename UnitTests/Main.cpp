@@ -99,7 +99,7 @@ void SerializationTests() {
 }
 
 void FixedPointTests() {
-    const double TEST_VALUES_1616[] = {-1000, -100, -10.0, -5.0, -1.0, -0.5, 0.0, 0.5, 1.0, 5.0, 10.0, 100, 1000};
+    const double TEST_VALUES_1616[] = {-32000, -10000, -1000, -100, -10.0, -5.0, -1.0, -0.5, 0.0, 0.5, 1.0, 5.0, 10.0, 100, 1000, 10000, 32000};
     for (double val1 : TEST_VALUES_1616) {
         // 16+16 bits
         char buffer[2 * sizeof(uint16_t)] = {};
@@ -110,7 +110,7 @@ void FixedPointTests() {
             throw std::runtime_error("fixed point error");
     }
 
-    const double TEST_VALUES_88[] = {-128, -100, -10.0, -5.0, -1.0, -0.5, 0.0, 0.5, 1.0, 5.0, 10.0, 100, 127.75}; // range [-128, +127)
+    const double TEST_VALUES_88[] = {-128, -100, -10.0, -5.0, -1.0, -0.5, 0.0, 0.5, 1.0, 5.0, 10.0, 100, 127.75}; // range [-128, +128)
     for (double val1 : TEST_VALUES_88) {
         // 8+8 bits
         char buffer[2 * sizeof(uint8_t)] = {};
