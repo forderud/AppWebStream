@@ -110,6 +110,15 @@ void FixedPointTests() {
             throw std::runtime_error("fixed point error");
     }
 
+    for (double val1 : TEST_VALUES_1616) {
+        // 8+8 bits
+        char buffer[2 * sizeof(uint8_t)] = {};
+        WriteFixed88(buffer, val1);
+        double val2 = ReadFixed88(buffer);
+
+        if (std::fabs(val2 - val1) > 1e-12)
+            throw std::runtime_error("fixed point error");
+    }
 
     const double TEST_VALUES_0230[] = {-1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5};
     for (double val1 : TEST_VALUES_0230) {

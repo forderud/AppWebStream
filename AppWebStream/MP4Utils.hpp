@@ -56,6 +56,14 @@ inline double ReadFixed88(const char* buf) {
 
     return ((double)val) / (1 << 8);
 }
+/** Write big-endian fixed-point 8+8 float. */
+inline char* WriteFixed88(char* buf, double in) {
+    int16_t val = (int16_t)(in * (1 << 8));
+
+    buf[0] = (val & 0xFF00) >> 8;
+    buf[1] = (val & 0x00FF);
+    return buf + 2;
+}
 
 /** Read big-endian fixed-point 16+16 float.
     REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/tools/IsoTypeReader.java */
