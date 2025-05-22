@@ -98,12 +98,25 @@ void SerializationTests() {
     }
 }
 
+void FixedPointTests() {
+    {
+        // 16+16 bits
+        char buffer[2 * sizeof(uint16_t)] = {};
+        double val1 = 1.0;
+        WriteFixed1616(buffer, val1);
+        double val2 = ReadFixed1616(buffer);
+
+        if (std::fabs(val2 - val1) > 1e-9)
+            throw std::runtime_error("fixed point error");
+    }
+}
 
 int main() {
     printf("Running unit tests:\n");
 
     SerializationTests();
     TimeConvTests();
+    FixedPointTests();
 
     printf("[success]\n");
 }
