@@ -56,6 +56,7 @@ inline double ReadFixed88(const char* buf) {
 
     return ((double)val) / (1 << 8);
 }
+
 /** Read big-endian fixed-point 16+16 float.
     REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/tools/IsoTypeReader.java */
 inline double ReadFixed1616(const char* buf) {
@@ -67,18 +68,6 @@ inline double ReadFixed1616(const char* buf) {
 
     return ((double)val) / (1 << 16);
 }
-/** Read big-endian fixed-point 2+30 float.
-    REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/tools/IsoTypeReader.java */
-inline double ReadFixed0230(const char* buf) {
-    int32_t val = 0;
-    val |= (unsigned char)buf[0] << 24;
-    val |= (unsigned char)buf[1] << 16;
-    val |= (unsigned char)buf[2] << 8;
-    val |= (unsigned char)buf[3] << 0;
-
-    return ((double)val) / (1 << 30);
-}
-
 /** Write big-endian fixed-point 16+16 float.
     REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/tools/IsoTypeWriter.java */
 inline char* WriteFixed1616(char* buf, double in) {
@@ -89,6 +78,18 @@ inline char* WriteFixed1616(char* buf, double in) {
     buf[2] = (val & 0x0000FF00) >> 8;
     buf[3] = (val & 0x000000FF);
     return buf + 4;
+}
+
+/** Read big-endian fixed-point 2+30 float.
+    REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/tools/IsoTypeReader.java */
+inline double ReadFixed0230(const char* buf) {
+    int32_t val = 0;
+    val |= (unsigned char)buf[0] << 24;
+    val |= (unsigned char)buf[1] << 16;
+    val |= (unsigned char)buf[2] << 8;
+    val |= (unsigned char)buf[3] << 0;
+
+    return ((double)val) / (1 << 30);
 }
 /** Write big-endian fixed-point 2+30 float.
     REF: https://github.com/sannies/mp4parser/blob/master/isoparser/src/main/java/org/mp4parser/tools/IsoTypeWriter.java */
