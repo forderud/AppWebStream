@@ -56,8 +56,11 @@ HRESULT StreamWrapper::EndRead(/*in*/IMFAsyncResult* result, /*out*/ULONG* cbRea
     if (SUCCEEDED(hr)) {
         // inspect MPEG4 bitstream
         bool updated = m_stream_editor.ParseStream(m_read_buf.substr(0, *cbRead));
-        if (m_notifier && updated)
-            m_notifier(m_stream_editor.GetStartTime(), m_stream_editor.GetDPI());
+        if (m_notifier && updated) {
+            double xform[6]{};
+            m_stream_editor.GetXform(xform);
+            m_notifier(m_stream_editor.GetStartTime(), m_stream_editor.GetDPI(), xform);
+        }
     }
     return hr;
 }

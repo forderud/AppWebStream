@@ -102,7 +102,7 @@ Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, NewFrameCb frame_cb) : m_frame_cb(fram
         // wrap innerStream om byteStream-wrapper to allow parsing of the underlying MPEG4 bitstream
         auto wrapper = CreateLocalInstance<StreamWrapper>();
         using namespace std::placeholders;
-        wrapper->Initialize(innerStream, std::bind(&Mpeg4Receiver::OnStartTimeDpiChanged, this, _1, _2));
+        wrapper->Initialize(innerStream, std::bind(&Mpeg4Receiver::OnStartTimeDpiChanged, this, _1, _2, _3));
         COM_CHECK(wrapper.QueryInterface(&byteStream));
     }
     COM_CHECK(MFCreateSourceReaderFromByteStream(byteStream, attribs, &m_reader));
@@ -199,6 +199,11 @@ HRESULT Mpeg4Receiver::ReceiveFrame() {
     return S_OK;
 }
 
+void Mpeg4Receiver::GetXform(double xform[6]) const {
+    for (size_t i = 0; i < 6; i++)
+        xform[i] = m_xform[i];
+}
+
 std::array<uint32_t, 2> Mpeg4Receiver::GetResolution() const {
     // return resolution of output buffer, that's a multiple of MPEG4 16x16 macroblocks 
     std::array<uint32_t, 2> result;
@@ -207,7 +212,7 @@ std::array<uint32_t, 2> Mpeg4Receiver::GetResolution() const {
     return result;
 }
 
-void Mpeg4Receiver::OnStartTimeDpiChanged(uint64_t startTime, double dpi) {
+void Mpeg4Receiver::OnStartTimeDpiChanged(uint64_t startTime, double dpi, double xform[6]) {
     if (startTime != m_startTime)
         m_metadata_changed = true;
     if (dpi != m_dpi)
@@ -215,6 +220,9 @@ void Mpeg4Receiver::OnStartTimeDpiChanged(uint64_t startTime, double dpi) {
 
     m_startTime = startTime;
     m_dpi = dpi;
+
+    for (size_t i = 0; i < 6; i++)
+        m_xform[i] = xform[i];
 }
 
 HRESULT Mpeg4Receiver::ConfigureOutputType(IMFSourceReader& reader, DWORD dwStreamIndex) {

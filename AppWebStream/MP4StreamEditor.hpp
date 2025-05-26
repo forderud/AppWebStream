@@ -173,6 +173,15 @@ public:
         m_xform.w = 1;
     }
 
+    void GetXform(double xform[6]) const {
+        xform[0] = m_xform.a;
+        xform[1] = m_xform.b;
+        xform[2] = m_xform.c;
+        xform[3] = m_xform.d;
+        xform[4] = m_xform.tx;
+        xform[5] = m_xform.ty;
+    }
+
 private:
     bool ParseMoov(const std::string_view buffer) {
         const char* ptr = (char*)buffer.data();

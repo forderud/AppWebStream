@@ -32,15 +32,22 @@ public:
         return m_dpi;
     }
 
+    /** Get coordinate system mapping for transferring pixel coordinates in [0,W) x [0,H) to (x,y) world coordinates.
+        x' = a*x + c*y + tx
+        y' = b*x + d*y + ty
+        where xform = [a,b, c, d, tx, ty] */
+    void GetXform(double xform[6]) const;
+
     std::array<uint32_t, 2> GetResolution() const;
 
 private:
-    void OnStartTimeDpiChanged(uint64_t startTime, double dpi);
+    void OnStartTimeDpiChanged(uint64_t startTime, double dpi, double xform[6]);
     HRESULT ConfigureOutputType(IMFSourceReader& reader, DWORD dwStreamIndex);
 
     CComPtr<IMFSourceReader> m_reader = nullptr;
     uint64_t                 m_startTime = 0;   // SECONDS since midnight, Jan. 1, 1904
     double                   m_dpi = 0;         // pixel spacing
+    double                   m_xform[6] = { 1, 0, 0, 1, 0, 0 }; // initialize with default identity transform
     std::array<uint32_t, 2>  m_resolution; // horizontal & vertical pixel count
     NewFrameCb               m_frame_cb = nullptr;
     bool                     m_metadata_changed = false; // metadata changed since previous frame

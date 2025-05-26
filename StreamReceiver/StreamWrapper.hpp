@@ -9,7 +9,7 @@
 
 _COM_SMARTPTR_TYPEDEF(IMFByteStream, __uuidof(IMFByteStream));
 
-typedef std::function<void(uint64_t startTime, double dpi)> StartTimeDpiChangedCb;
+typedef std::function<void(uint64_t startTime, double dpi, double xform[6])> StartTimeDpiChangedCb;
 
 
 /** IMFByteStream wrapper to allow parsing of the underlying MPEG4 bitstream.
