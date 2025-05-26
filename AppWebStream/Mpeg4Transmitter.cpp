@@ -26,7 +26,7 @@ void Mpeg4Transmitter::SetDPI(double dpi) {
         m_encoder->StartNewStream(m_stream);
 }
 
-void Mpeg4Transmitter::SetXform(double xform[6]) {
+void Mpeg4Transmitter::SetXform(const double xform[6]) {
     m_stream->SetXform(xform);
 }
 

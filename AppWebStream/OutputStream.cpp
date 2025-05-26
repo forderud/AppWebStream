@@ -163,7 +163,7 @@ double OutputStream::SetNextFrameDPI(double dpi) {
     return prevDpi;
 }
 
-void OutputStream::SetXform(double xform[6]) {
+void OutputStream::SetXform(const double xform[6]) {
     m_stream_editor->SetXform(xform);
 }
 

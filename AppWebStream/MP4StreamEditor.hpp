@@ -161,7 +161,7 @@ public:
         return m_time.timeScale;
     }
 
-    void SetXform(double xform[6]) {
+    void SetXform(const double xform[6]) {
         m_xform.a = xform[0];
         m_xform.b = xform[1];
         m_xform.c = xform[2];

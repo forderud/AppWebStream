@@ -42,7 +42,7 @@ public:
         x' = a*x + c*y + tx
         y' = b*x + d*y + ty
         where xform = [a,b, c, d, tx, ty] */
-    void SetXform(double xform[6]);
+    void SetXform(const double xform[6]);
 
     R8G8B8A8* WriteFrameBegin(FILETIME curTime = {});
     HRESULT   WriteFrameEnd();

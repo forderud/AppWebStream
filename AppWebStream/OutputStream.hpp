@@ -36,7 +36,7 @@ public:
 
     double SetNextFrameDPI(double dpi);
 
-    void SetXform(double xform[6]);
+    void SetXform(const double xform[6]);
 
     HRESULT GetCapabilities(/*out*/DWORD *capabilities) override;
 
