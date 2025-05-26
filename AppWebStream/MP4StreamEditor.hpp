@@ -64,17 +64,18 @@ public:
 
         const char* ptr = buffer.data();
 
-        {
-            // Jump to MPEG4 type header, which might be in the middle of the buffer if restarting the stream after a DPI change.
+        if (!IsAtomType(ptr, "ftyp")) {
+            // Check if MPEG4 type header can be found in the middle of the buffer. This can happen if restarting the stream after a DPI change.
             // TODO: Figure out how to avoid this sequential search.
             constexpr char FTYP_ATOM[] = {0, 0, 0, 24, 'f', 't', 'y', 'p', 'm', 'p', '4', '2', 0, 0, 0, 0, 'm', 'p', '4', '1', 'i', 's', 'o', 'm'};
             size_t ftyp_idx = buffer.find(std::string_view(FTYP_ATOM, std::size(FTYP_ATOM)));
-            if (ftyp_idx != buffer.npos)
-                ptr += ftyp_idx;
+            if (ftyp_idx == buffer.npos)
+                return false;
+            
+            ptr += ftyp_idx;
         }
+        // ptr now points to a "ftyp" atom
 
-        if (!IsAtomType(ptr, "ftyp"))
-            return false;
         {
             // "ftyp" atom
             uint32_t ftyp_size = GetAtomSize(ptr);
