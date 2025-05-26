@@ -210,7 +210,7 @@ private:
             ptr += sizeof(uint32_t) * 2; // reserved
 
             // matrix to map points from one coordinate space into another
-            //matrix mat(ptr);
+            m_xform.Read(ptr);
             ptr += matrix::SIZE;
 
             ptr += sizeof(uint32_t) * 6; // reserved
@@ -409,7 +409,8 @@ private:
             ptr += sizeof(uint32_t) * 2; // reserved
 
             // matrix to map points from one coordinate space into another
-            //matrix mat(ptr);
+            // TODO: Serialize m_xform matrix instead of reading it
+            m_xform.Read(ptr);
             ptr += matrix::SIZE;
 
             ptr += sizeof(uint32_t) * 6; // reserved
@@ -885,5 +886,6 @@ private:
 private:
     double            m_dpi = 0;
     TimeHandler       m_time;
+    matrix            m_xform;    ///< pixel-to-world coordinate system mapping
     std::vector<char> m_moof_buf; ///< "moof" atom modification buffer
 };
