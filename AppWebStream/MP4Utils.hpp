@@ -118,12 +118,13 @@ u,v,w;       divided as 2.30 bits.    y' = b*x + d*y + ty
 struct matrix {
     static constexpr uint32_t SIZE = 9 * sizeof(int32_t); // serialization size
 
-    double a, b, u;
-    double c, d, v;
-    double tx, ty, w;
+    double a=0, b=0, u=0;
+    double c=0, d=0, v=0;
+    double tx=0, ty=0, w=0;
 
-    matrix(const char* buf) {
-        // TOOD: Implement fixed-point parsing
+    matrix() = default;
+
+    void Read(const char* buf) {
         a = ReadFixed1616(buf); buf += sizeof(int32_t);
         b = ReadFixed1616(buf); buf += sizeof(int32_t);
         u = ReadFixed0230(buf); buf += sizeof(int32_t);
