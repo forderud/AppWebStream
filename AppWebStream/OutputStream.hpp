@@ -36,6 +36,8 @@ public:
 
     double SetNextFrameDPI(double dpi);
 
+    void SetXform(double xform[6]);
+
     HRESULT GetCapabilities(/*out*/DWORD *capabilities) override;
 
     HRESULT GetLength(/*out*/QWORD* length) override;

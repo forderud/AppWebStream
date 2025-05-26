@@ -161,6 +161,18 @@ public:
         return m_time.timeScale;
     }
 
+    void SetXform(double xform[6]) {
+        m_xform.a = xform[0];
+        m_xform.b = xform[1];
+        m_xform.c = xform[2];
+        m_xform.d = xform[3];
+        m_xform.tx = xform[4];
+        m_xform.ty = xform[5];
+        m_xform.u = 0;
+        m_xform.v = 0;
+        m_xform.w = 1;
+    }
+
 private:
     bool ParseMoov(const std::string_view buffer) {
         const char* ptr = (char*)buffer.data();
@@ -409,9 +421,7 @@ private:
             ptr += sizeof(uint32_t) * 2; // reserved
 
             // matrix to map points from one coordinate space into another
-            // TODO: Serialize m_xform matrix instead of reading it
-            m_xform.Read(ptr);
-            ptr += matrix::SIZE;
+            ptr = m_xform.Write(ptr);
 
             ptr += sizeof(uint32_t) * 6; // reserved
 

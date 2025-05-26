@@ -163,6 +163,10 @@ double OutputStream::SetNextFrameDPI(double dpi) {
     return prevDpi;
 }
 
+void OutputStream::SetXform(double xform[6]) {
+    m_stream_editor->SetXform(xform);
+}
+
 HRESULT OutputStream::GetCapabilities(/*out*/DWORD *capabilities) {
     *capabilities = MFBYTESTREAM_IS_WRITABLE | MFBYTESTREAM_IS_REMOTE;
     return S_OK;

@@ -26,6 +26,10 @@ void Mpeg4Transmitter::SetDPI(double dpi) {
         m_encoder->StartNewStream(m_stream);
 }
 
+void Mpeg4Transmitter::SetXform(double xform[6]) {
+    m_stream->SetXform(xform);
+}
+
 R8G8B8A8* Mpeg4Transmitter::WriteFrameBegin(FILETIME curTime) {
     if (curTime.dwHighDateTime || curTime.dwLowDateTime)
         m_stream->SetNextFrameTime(curTime);
