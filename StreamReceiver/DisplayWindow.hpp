@@ -73,6 +73,10 @@ public:
             wprintf(L"  Start time: %hs (UTC)\n", TimeString1904(startTime).c_str());
             wprintf(L"  Frame DPI:  %f\n", dpi);
             wprintf(L"  Frame resolution: %u x %u\n", resolution[0], resolution[1]);
+
+            double xform[6]{};
+            receiver.GetXform(xform);
+            wprintf(L"  Xform: a=%f, b=%f, c=%f, d=%f, tx=%f, ty=%f\n", xform[0], xform[1], xform[2], xform[3], xform[4], xform[5]);
         }
 
         wprintf(L"  Frame time:     %f ms\n", frameTime * 0.1f / 1000); // convert to milliseconds
