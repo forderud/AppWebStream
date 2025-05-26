@@ -80,10 +80,12 @@ int main (int argc, char *argv[]) {
 
     constexpr unsigned int FPS = 25;
     constexpr double DPI = 96.0;
+    constexpr double XFORM[] = { 0.1, 0, 0.1, -0.05, 0 }; // 10cm width, 10cm height, top-left corner at (-0.05, 0)
 
     // create H.264/MPEG4 encoder
     Mpeg4Transmitter encoder(dims, FPS, CurrentTime(), port_filename);
     encoder.SetDPI(DPI);
+    encoder.SetXform(XFORM);
     printf("Connecting to client...\n");
 
     // encode & transmit frames
