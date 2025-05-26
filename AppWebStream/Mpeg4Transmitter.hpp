@@ -38,7 +38,7 @@ public:
         WARNING: DPI changes not yet implemented. */
     void SetDPI(double dpi);
 
-    /** Set coordinate system mapping for transferring pixel coordinates in [0,W) x [0,H) to (x,y) world coordinates.
+    /** Set coordinate system mapping for transferring pixel coordinates in [0,1) x [0,1) to (x,y) world coordinates.
         x' = a*x + c*y + tx
         y' = b*x + d*y + ty
         where xform = [a,b, c, d, tx, ty] */
