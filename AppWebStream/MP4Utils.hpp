@@ -118,9 +118,9 @@ u,v,w;       divided as 2.30 bits.    y' = b*x + d*y + ty
 struct matrix {
     static constexpr uint32_t SIZE = 9 * sizeof(int32_t); // serialization size
 
-    double a=0, b=0, u=0;
-    double c=0, d=0, v=0;
-    double tx=0, ty=0, w=0;
+    double a=1,  b=0,  u=0;
+    double c=0,  d=1,  v=0;
+    double tx=0, ty=0, w=1;
 
     matrix() = default;
 
