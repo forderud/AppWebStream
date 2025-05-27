@@ -28,8 +28,8 @@ To build with FFMPG, you first need to download & unzip [FFMPEG binaries](https:
 Metadata implementation status:
 * [x] Pixel spacing metadata
 * [x] All frames time-stamped with <0.1ms temporal accuracy against the MPEG4 1904 epoch
-* [ ] Stream restart to enable DPI changes ([issue #32](../../issues/32))
-* [ ] Video "origin" metadata ([issue #23](../../issues/23))
+* [x] Pixel-to-world coordinate transform and DPI
+* [x] Stream restart to enable coordinate transform and DPI changes
 * [ ] Freeze & resume frame time-stamps might lead to paused web browser playback ([issue #24](../../issues/24))
 
 #### HTTP and authentication
