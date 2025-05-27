@@ -13,10 +13,10 @@ inline FILETIME CurrentTime() {
     return now;
 }
 
-/** Convert samples per meters to DPI. */
-inline double ComputeDPI(unsigned int samples, double distance) {
+/** Convert samples per meter to DPI. */
+inline double ComputeDPI(unsigned int samples, double distance_m) {
     constexpr double INCH = 0.0254; // 2.54cm
-    double distance_inches = distance / INCH;
+    double distance_inches = distance_m / INCH;
     return samples / distance_inches;
 }
 
