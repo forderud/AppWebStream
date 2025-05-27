@@ -2,6 +2,8 @@
 #include <mfreadwrite.h>
 #include <mfapi.h>
 #include <mferror.h>
+#include <strmif.h>
+#include <codecapi.h>
 #include "Mpeg4Receiver.hpp"
 #include "StreamWrapper.hpp"
 #include "../AppWebStream/ComUtil.hpp"
@@ -10,6 +12,7 @@
 #pragma comment(lib, "Mfreadwrite.lib")
 #pragma comment(lib, "mfuuid.lib")
 #pragma comment(lib, "Propsys.lib")
+#pragma comment(lib, "Strmiids.lib")
 
 // define smart-pointers with "Ptr" suffix
 _COM_SMARTPTR_TYPEDEF(IMFAttributes, __uuidof(IMFAttributes));
@@ -136,6 +139,19 @@ HRESULT Mpeg4Receiver::ReceiveFrame() {
     PROPVARIANT val{};
     PropVariantClear(&val);
     COM_CHECK(reader.GetPresentationAttribute(streamIdx, MF_PD_LAST_MODIFIED_TIME, &val)); // fails with "The requested attribute was not found."
+#endif
+
+#if 0
+    if (frame) {
+        // access H.264 decoder directly (https://learn.microsoft.com/en-us/windows/win32/medfound/h-264-video-decoder)
+        CComPtr<ICodecAPI> codec;
+        COM_CHECK(m_reader->GetServiceForStream(streamIdx, GUID_NULL, IID_ICodecAPI, (void**)&codec));
+
+        // verify that low latency mode is enabled
+        CComVariant low_latency;
+        COM_CHECK(codec->GetValue(&CODECAPI_AVLowLatencyMode, &low_latency));
+        assert(low_latency.boolVal != FALSE);
+    }
 #endif
 
     if (flags & MF_SOURCE_READERF_ENDOFSTREAM) {
