@@ -4,7 +4,6 @@
 #include "ScreenCapture.hpp"
 
 
-static double G_DPI = 96;
 static double G_XFORM[] = { 0.10, 0.00, 0.00, 0.10, -0.05, 0.00 }; // 10cm width, 10cm height, top-left corner at (-0.05, 0)
 
 
@@ -12,6 +11,13 @@ inline FILETIME CurrentTime() {
     FILETIME now{};
     GetSystemTimeAsFileTime(&now);
     return now;
+}
+
+/** Convert samples per meters to DPI. */
+inline double ComputeDPI(unsigned int samples, double distance) {
+    constexpr double INCH = 0.0254; // 2.54cm
+    double distance_inches = distance / INCH;
+    return samples / distance_inches;
 }
 
 static HRESULT EncodeFrame (Mpeg4Transmitter& encoder, window_dc& wnd_dc, unsigned int dims[2]) {
@@ -33,14 +39,16 @@ static HRESULT EncodeFrame (Mpeg4Transmitter& encoder, window_dc& wnd_dc, unsign
     printf("f"); // log "f" to signal that a frame have been encoded
 #endif
 
-#ifdef SIMULATE_GEOM_CHANGES
+#if 1
     // simulate xform and DPI change every 100 frames
     static int s_counter = 0;
     if (++s_counter % 100 == 0) {
-        G_DPI += 10.0;
+        G_XFORM[0] *= 0.90; // zoom in 10%
+        G_XFORM[3] *= 0.90; // zoom in 10%
         G_XFORM[5] += +0.001; // move image view 1mm sideways
-        printf("New DPI: %f\n", G_DPI);
-        encoder.SetDPI(G_DPI);
+        double dpi = ComputeDPI(dims[0], G_XFORM[0]);
+        printf("New DPI: %f\n", dpi);
+        encoder.SetDPI(dpi);
         encoder.SetXform(G_XFORM);
     }
 #endif
@@ -87,7 +95,7 @@ int main (int argc, char *argv[]) {
 
     // create H.264/MPEG4 encoder
     Mpeg4Transmitter encoder(dims, FPS, CurrentTime(), port_filename);
-    encoder.SetDPI(G_DPI);
+    encoder.SetDPI(ComputeDPI(dims[0], G_XFORM[0]));
     encoder.SetXform(G_XFORM);
     printf("Connecting to client...\n");
 
