@@ -3,6 +3,11 @@
 #include "Mpeg4Transmitter.hpp"
 #include "ScreenCapture.hpp"
 
+
+static double G_DPI = 96;
+static double G_XFORM[] = { 0.10, 0.00, 0.00, 0.10, -0.05, 0.00 }; // 10cm width, 10cm height, top-left corner at (-0.05, 0)
+
+
 inline FILETIME CurrentTime() {
     FILETIME now{};
     GetSystemTimeAsFileTime(&now);
@@ -79,13 +84,11 @@ int main (int argc, char *argv[]) {
     }
 
     constexpr unsigned int FPS = 25;
-    constexpr double DPI = 96.0;
-    constexpr double XFORM[] = { 0.10, 0.00, 0.00, 0.10, -0.05, 0.00 }; // 10cm width, 10cm height, top-left corner at (-0.05, 0)
 
     // create H.264/MPEG4 encoder
     Mpeg4Transmitter encoder(dims, FPS, CurrentTime(), port_filename);
-    encoder.SetDPI(DPI);
-    encoder.SetXform(XFORM);
+    encoder.SetDPI(G_DPI);
+    encoder.SetXform(G_XFORM);
     printf("Connecting to client...\n");
 
     // encode & transmit frames
