@@ -33,15 +33,15 @@ static HRESULT EncodeFrame (Mpeg4Transmitter& encoder, window_dc& wnd_dc, unsign
     printf("f"); // log "f" to signal that a frame have been encoded
 #endif
 
-#ifdef SIMULATE_DPI_CHANGE
-    // simulate DPI change every 100 frames
-    static double s_dpi = 95;
+#ifdef SIMULATE_GEOM_CHANGES
+    // simulate xform and DPI change every 100 frames
     static int s_counter = 0;
-
     if (++s_counter % 100 == 0) {
-        s_dpi += 10.0;
-        printf("New DPI: %f\n", s_dpi);
-        encoder.SetDPI(s_dpi);
+        G_DPI += 10.0;
+        G_XFORM[5] += +0.001; // move image view 1mm sideways
+        printf("New DPI: %f\n", G_DPI);
+        encoder.SetDPI(G_DPI);
+        encoder.SetXform(G_XFORM);
     }
 #endif
 
