@@ -127,7 +127,7 @@ public:
 
         {
 #if 0
-            // access H.264 encoder directly (https://msdn.microsoft.com/en-us/library/windows/desktop/dd797816.aspx)
+            // access H.264 encoder directly (https://learn.microsoft.com/en-us/windows/win32/medfound/h-264-video-encoder)
             CComPtr<ICodecAPI> codec;
             COM_CHECK(m_sink_writer->GetServiceForStream(m_stream_index, GUID_NULL, IID_ICodecAPI, (void**)&codec));
             CComVariant quality;
