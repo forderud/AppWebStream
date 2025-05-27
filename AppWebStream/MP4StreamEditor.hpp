@@ -420,7 +420,10 @@ private:
                 ptr += 4;
             }
             
-            //double rate = ReadFixed1616(ptr); // preferred playback rate (16+16 fraction) (typ 1.0)
+#if 0
+            double rate = ReadFixed1616(ptr); // preferred playback rate (16+16 fraction) (typ 1.0)
+            WriteFixed1616(ptr, 2 * rate); // set 2x playback rate (doesn't seem to reduce latency)
+#endif
             ptr += 4;
 
             //double volume = ReadFixed88(ptr); // master volume of file (8+8 fraction) (typ 1.0)
