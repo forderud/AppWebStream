@@ -33,8 +33,16 @@ static unsigned int Align16(unsigned int size) {
         return size + 16 - (size % 16);
 }
 
-Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, NewFrameCb frame_cb) : m_frame_cb(frame_cb) {
+Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, NewFrameCb frame_cb, bool enableAsyncProcessing) 
+    : m_frame_cb(frame_cb), m_asyncProcessingEnabled(enableAsyncProcessing) {
     m_resolution.fill(0); // clear array
+
+    // Initialize async processing if enabled
+    if (m_asyncProcessingEnabled) {
+        m_asyncQueue = std::make_unique<AsyncFrameQueue>();
+        m_processingThread = std::make_unique<std::thread>(&Mpeg4Receiver::AsyncProcessingThread, this);
+        SetThreadDescription(m_processingThread->native_handle(), L"AsyncFrameProcessingThread");
+    }
 
     COM_CHECK(MFStartup(MF_VERSION));
 
@@ -62,7 +70,7 @@ Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, NewFrameCb frame_cb) : m_frame_cb(fram
 
             PROPVARIANT val{};
             val.vt = VT_I4;
-            val.lVal = 100; // 100 milliseconds (10,000 is default)
+            val.lVal = 0; // 100 milliseconds (10,000 is default)
 
             COM_CHECK(props->SetValue(key, val));
             //COM_CHECK(props->Commit());
@@ -75,7 +83,7 @@ Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, NewFrameCb frame_cb) : m_frame_cb(fram
 
             PROPVARIANT val{};
             val.vt = VT_I4;
-            val.lVal = 1; // 1 second (5 is default)
+            val.lVal = 0; // 1 second (5 is default)
 
             COM_CHECK(props->SetValue(key, val));
             //COM_CHECK(props->Commit());
@@ -88,7 +96,7 @@ Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, NewFrameCb frame_cb) : m_frame_cb(fram
 
             PROPVARIANT val{};
             val.vt = VT_I4;
-            val.lVal = 100; // 100ms (40,000 is default)
+            val.lVal = 0; // 100ms (40,000 is default)
 
             COM_CHECK(props->SetValue(key, val));
             //COM_CHECK(props->Commit());
@@ -114,13 +122,32 @@ Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, NewFrameCb frame_cb) : m_frame_cb(fram
 }
 
 Mpeg4Receiver::~Mpeg4Receiver() {
+    Stop();
+    
+    // Cleanup async processing
+    if (m_asyncProcessingEnabled && m_asyncQueue && m_processingThread) {
+        m_stopProcessing = true;
+        m_asyncQueue->Shutdown();
+        
+        if (m_processingThread->joinable()) {
+            m_processingThread->join();
+        }
+    }
+    
     m_reader.Release();
-
     COM_CHECK(MFShutdown());
 }
 
 void Mpeg4Receiver::Stop() {
     m_active = false;
+    
+    // Signal async processing to stop
+    if (m_asyncProcessingEnabled) {
+        m_stopProcessing = true;
+        if (m_asyncQueue) {
+            m_asyncQueue->Shutdown();
+        }
+    }
 }
 
 HRESULT Mpeg4Receiver::ReceiveFrame() {
@@ -203,13 +230,24 @@ HRESULT Mpeg4Receiver::ReceiveFrame() {
             COM_CHECK(buffer->Lock(&bufferPtr, nullptr, &bufferSize));
             assert(bufferSize == 4 * Align16(m_resolution[0]) * Align16(m_resolution[1])); // buffer size is a multiple of MPEG4 16x16 macroblocks
 
-            // call frame data callback function for client-side processing
-            m_frame_cb(*this, frameTime, frameDuration, std::string_view((char*)bufferPtr, bufferSize), m_metadata_changed);
+            if (m_asyncProcessingEnabled && m_asyncQueue) {
+                // Async processing: queue frame for processing
+                auto frameData = std::make_unique<FrameData>(
+                    frameTime, frameDuration, 
+                    std::string_view((char*)bufferPtr, bufferSize),
+                    m_metadata_changed, m_startTime, m_dpi, m_xform, m_resolution
+                );
+                
+                m_asyncQueue->Push(std::move(frameData));
+            } else {
+                // Sync processing: call callback immediately
+                m_frame_cb(*this, frameTime, frameDuration, std::string_view((char*)bufferPtr, bufferSize), m_metadata_changed);
+            }
 
             COM_CHECK(buffer->Unlock());
         }
 
-        m_metadata_changed = false; // clear flag after m_frame_cb have been called
+        m_metadata_changed = false; // clear flag after frame has been processed
     }
 
     return S_OK;
@@ -278,4 +316,88 @@ HRESULT Mpeg4Receiver::ConfigureOutputType(IMFSourceReader& reader, DWORD dwStre
 
     COM_CHECK(reader.SetCurrentMediaType(dwStreamIndex, NULL, mediaType));
     return S_OK;
+}
+
+void Mpeg4Receiver::SetAsyncProcessing(bool enable) {
+    if (enable == m_asyncProcessingEnabled) {
+        return; // No change needed
+    }
+    
+    if (enable) {
+        // Enable async processing
+        if (!m_asyncQueue) {
+            m_asyncQueue = std::make_unique<AsyncFrameQueue>();
+        }
+        
+        if (!m_processingThread || !m_processingThread->joinable()) {
+            m_stopProcessing = false;
+            m_processingThread = std::make_unique<std::thread>(&Mpeg4Receiver::AsyncProcessingThread, this);
+            SetThreadDescription(m_processingThread->native_handle(), L"AsyncFrameProcessingThread");
+        }
+        
+        m_asyncProcessingEnabled = true;
+    } else {
+        // Disable async processing
+        m_asyncProcessingEnabled = false;
+        
+        if (m_asyncQueue && m_processingThread) {
+            m_stopProcessing = true;
+            m_asyncQueue->Shutdown();
+            
+            if (m_processingThread->joinable()) {
+                m_processingThread->join();
+            }
+        }
+    }
+}
+
+void Mpeg4Receiver::AsyncProcessingThread() {
+    SetThreadDescription(GetCurrentThread(), L"Mpeg4Receiver_AsyncProcessing");
+    
+    while (!m_stopProcessing && m_active) {
+        auto frameData = m_asyncQueue->Pop(true); // Blocking pop
+        
+        if (!frameData || m_stopProcessing) {
+            break;
+        }
+        
+        // Process the frame
+        ProcessFrame(*frameData);
+    }
+}
+
+void Mpeg4Receiver::ProcessFrame(const FrameData& frameData) {
+    if (!m_frame_cb || m_stopProcessing) {
+        return;
+    }
+    
+    // Temporarily update receiver state for callback
+    uint64_t oldStartTime = m_startTime;
+    double oldDpi = m_dpi;
+    double oldXform[6];
+    std::array<uint32_t, 2> oldResolution = m_resolution;
+    
+    for (int i = 0; i < 6; i++) {
+        oldXform[i] = m_xform[i];
+    }
+    
+    // Update state with frame data
+    m_startTime = frameData.startTime;
+    m_dpi = frameData.dpi;
+    m_resolution = frameData.resolution;
+    for (int i = 0; i < 6; i++) {
+        m_xform[i] = frameData.xform[i];
+    }
+    
+    // Call the frame callback
+    std::string_view bufferView(reinterpret_cast<const char*>(frameData.buffer.data()), frameData.buffer.size());
+    m_frame_cb(*this, frameData.frameTime, frameData.frameDuration, bufferView, frameData.metadataChanged);
+    
+    // Restore original state (in case callback modified it)
+    m_startTime = oldStartTime;
+    m_dpi = oldDpi;
+    m_resolution = oldResolution;
+    for (int i = 0; i < 6; i++) {
+        m_xform[i] = oldXform[i];
+    }
 }
