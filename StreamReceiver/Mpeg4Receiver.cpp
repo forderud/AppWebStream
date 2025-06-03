@@ -62,7 +62,7 @@ Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, NewFrameCb frame_cb) : m_frame_cb(fram
 
             PROPVARIANT val{};
             val.vt = VT_I4;
-            val.lVal = 100; // 100 milliseconds (10,000 is default)
+            val.lVal = 0; // 0 milliseconds (10,000 is default)
 
             COM_CHECK(props->SetValue(key, val));
             //COM_CHECK(props->Commit());
@@ -75,7 +75,7 @@ Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, NewFrameCb frame_cb) : m_frame_cb(fram
 
             PROPVARIANT val{};
             val.vt = VT_I4;
-            val.lVal = 1; // 1 second (5 is default)
+            val.lVal = 0; // 0 second (5 is default)
 
             COM_CHECK(props->SetValue(key, val));
             //COM_CHECK(props->Commit());
@@ -88,7 +88,7 @@ Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, NewFrameCb frame_cb) : m_frame_cb(fram
 
             PROPVARIANT val{};
             val.vt = VT_I4;
-            val.lVal = 100; // 100ms (40,000 is default)
+            val.lVal = 0; // 0ms (40,000 is default)
 
             COM_CHECK(props->SetValue(key, val));
             //COM_CHECK(props->Commit());
