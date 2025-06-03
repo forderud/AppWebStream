@@ -2,17 +2,22 @@
 #include <array>
 #include <functional>
 #include <string_view>
+
+#ifdef ASYNC_FRAME_PROCESSING
 #include <queue>
 #include <mutex>
 #include <condition_variable>
 #include <thread>
 #include <atomic>
 #include <memory>
+#endif // ASYNC_FRAME_PROCESSING
+
 #include <atlbase.h> // for CComPtr
 #include <comdef.h>  // for __uuidof, _bstr_t
 
 struct IMFSourceReader; // forward decl.
 
+#ifdef ASYNC_FRAME_PROCESSING
 /** Frame data structure for async processing */
 struct FrameData {
     int64_t frameTime;
@@ -82,6 +87,7 @@ private:
     std::queue<std::unique_ptr<FrameData>> m_queue;
     std::atomic<bool> m_shutdown{false};
 };
+#endif
 
 /** Receiver for fragmented MPEG4 streams over a network.
     Does internally use the Media Foundation API, but that can change in the future. */
@@ -91,7 +97,11 @@ public:
     typedef std::function<void(Mpeg4Receiver& receiver, int64_t frameTime, int64_t frameDuration, std::string_view buffer, bool metadataChanged)> NewFrameCb;
 
     /** Connect to requested MPEG4 URL. */
+#ifdef ASYNC_FRAME_PROCESSING
     Mpeg4Receiver(_bstr_t url, NewFrameCb frame_cb, bool enableAsyncProcessing = true);
+#else
+    Mpeg4Receiver(_bstr_t url, NewFrameCb frame_cb);
+#endif
 
     ~Mpeg4Receiver();
 
@@ -99,7 +109,8 @@ public:
 
     /** Receive frames. In async mode, frames are queued for processing. In sync mode, callback is called immediately. */
     HRESULT ReceiveFrame();
-    
+
+#ifdef ASYNC_FRAME_PROCESSING
     /** Get current queue size (for monitoring) */
     size_t GetQueueSize() const {
         return m_asyncQueue ? m_asyncQueue->Size() : 0;
@@ -112,6 +123,7 @@ public:
     bool IsAsyncProcessingEnabled() const {
         return m_asyncProcessingEnabled;
     }
+#endif
 
     uint64_t GetStartTime() const {
         return m_startTime;
@@ -133,11 +145,13 @@ private:
     void OnStartTimeDpiChanged(uint64_t startTime, double dpi, double xform[6]);
     HRESULT ConfigureOutputType(IMFSourceReader& reader, DWORD dwStreamIndex);
     
+#ifdef ASYNC_FRAME_PROCESSING
     /** Async frame processing thread function */
     void AsyncProcessingThread();
     
     /** Process a single frame (called from async thread or directly) */
     void ProcessFrame(const FrameData& frameData);
+#endif
 
     CComPtr<IMFSourceReader> m_reader = nullptr;
     uint64_t                 m_startTime = 0;   // SECONDS since midnight, Jan. 1, 1904
@@ -148,9 +162,12 @@ private:
     bool                     m_metadata_changed = false; // metadata changed since previous frame
     bool                     m_active = true;
     
+
+#ifdef ASYNC_FRAME_PROCESSING
     // Async processing components
     bool                     m_asyncProcessingEnabled = true;
     std::unique_ptr<AsyncFrameQueue> m_asyncQueue;
     std::unique_ptr<std::thread> m_processingThread;
     std::atomic<bool>        m_stopProcessing{false};
+#endif
 };

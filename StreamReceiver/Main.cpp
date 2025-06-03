@@ -31,7 +31,12 @@ int main(int argc, char* argv[]) {
     // connect to MPEG4 H.264 stream
     _bstr_t url = argv[1];
     using namespace std::placeholders;
+
+#ifdef ASYNC_FRAME_PROCESSING
     Mpeg4Receiver receiver(url, std::bind(&DisplayWindow::OnNewFrame, &wnd, _1, _2, _3, _4, _5), true); // Enable async processing
+#else
+    Mpeg4Receiver receiver(url, std::bind(&DisplayWindow::OnNewFrame, &wnd, _1, _2, _3, _4, _5));
+#endif // ASYNC_FRAME_PROCESSING
 
     // start MPEG4 stream receive thread
     std::thread receiveThread(ReceiveMovieThread, &receiver);

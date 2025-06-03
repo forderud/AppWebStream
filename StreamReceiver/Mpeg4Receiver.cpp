@@ -33,17 +33,21 @@ static unsigned int Align16(unsigned int size) {
         return size + 16 - (size % 16);
 }
 
+
+#ifdef ASYNC_FRAME_PROCESSING
 Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, NewFrameCb frame_cb, bool enableAsyncProcessing) 
     : m_frame_cb(frame_cb), m_asyncProcessingEnabled(enableAsyncProcessing) {
-    m_resolution.fill(0); // clear array
-
     // Initialize async processing if enabled
     if (m_asyncProcessingEnabled) {
         m_asyncQueue = std::make_unique<AsyncFrameQueue>();
         m_processingThread = std::make_unique<std::thread>(&Mpeg4Receiver::AsyncProcessingThread, this);
         SetThreadDescription(m_processingThread->native_handle(), L"AsyncFrameProcessingThread");
     }
+#else
+Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, NewFrameCb frame_cb) : m_frame_cb(frame_cb) {
+#endif
 
+    m_resolution.fill(0); // clear array
     COM_CHECK(MFStartup(MF_VERSION));
 
     IMFAttributesPtr attribs;
@@ -122,8 +126,9 @@ Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, NewFrameCb frame_cb, bool enableAsyncP
 }
 
 Mpeg4Receiver::~Mpeg4Receiver() {
+#ifdef ASYNC_FRAME_PROCESSING
     Stop();
-    
+
     // Cleanup async processing
     if (m_asyncProcessingEnabled && m_asyncQueue && m_processingThread) {
         m_stopProcessing = true;
@@ -133,7 +138,8 @@ Mpeg4Receiver::~Mpeg4Receiver() {
             m_processingThread->join();
         }
     }
-    
+#endif
+
     m_reader.Release();
     COM_CHECK(MFShutdown());
 }
@@ -141,6 +147,7 @@ Mpeg4Receiver::~Mpeg4Receiver() {
 void Mpeg4Receiver::Stop() {
     m_active = false;
     
+#ifdef ASYNC_FRAME_PROCESSING
     // Signal async processing to stop
     if (m_asyncProcessingEnabled) {
         m_stopProcessing = true;
@@ -148,6 +155,7 @@ void Mpeg4Receiver::Stop() {
             m_asyncQueue->Shutdown();
         }
     }
+#endif
 }
 
 HRESULT Mpeg4Receiver::ReceiveFrame() {
@@ -230,19 +238,25 @@ HRESULT Mpeg4Receiver::ReceiveFrame() {
             COM_CHECK(buffer->Lock(&bufferPtr, nullptr, &bufferSize));
             assert(bufferSize == 4 * Align16(m_resolution[0]) * Align16(m_resolution[1])); // buffer size is a multiple of MPEG4 16x16 macroblocks
 
+#ifdef ASYNC_FRAME_PROCESSING
             if (m_asyncProcessingEnabled && m_asyncQueue) {
                 // Async processing: queue frame for processing
                 auto frameData = std::make_unique<FrameData>(
-                    frameTime, frameDuration, 
+                    frameTime, frameDuration,
                     std::string_view((char*)bufferPtr, bufferSize),
                     m_metadata_changed, m_startTime, m_dpi, m_xform, m_resolution
                 );
-                
+
                 m_asyncQueue->Push(std::move(frameData));
-            } else {
+            }
+            else {
                 // Sync processing: call callback immediately
                 m_frame_cb(*this, frameTime, frameDuration, std::string_view((char*)bufferPtr, bufferSize), m_metadata_changed);
             }
+#else
+            // call frame data callback function for client-side processing
+            m_frame_cb(*this, frameTime, frameDuration, std::string_view((char*)bufferPtr, bufferSize), m_metadata_changed);
+#endif // ASYNC_FRAME_PROCESSING
 
             COM_CHECK(buffer->Unlock());
         }
@@ -318,6 +332,7 @@ HRESULT Mpeg4Receiver::ConfigureOutputType(IMFSourceReader& reader, DWORD dwStre
     return S_OK;
 }
 
+#ifdef ASYNC_FRAME_PROCESSING
 void Mpeg4Receiver::SetAsyncProcessing(bool enable) {
     if (enable == m_asyncProcessingEnabled) {
         return; // No change needed
@@ -401,3 +416,4 @@ void Mpeg4Receiver::ProcessFrame(const FrameData& frameData) {
         m_xform[i] = oldXform[i];
     }
 }
+#endif
