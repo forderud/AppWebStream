@@ -55,6 +55,7 @@ The video stream adheres to the MPEG4 standard, so it should be supported by all
 Unsupported clients:
 * Doesn't yet work on iOS, due to incomplete `ManagedMediaSource` support ([issue #25](../../issues/25)).
 
-Metadata tools:
+### Metadata tools
+Tools for inspecting MPEG metadata:
 * [MP4Box.js / ISOBMFF Box Structure Viewer](https://gpac.github.io/mp4box.js/test/filereader.html)
 * [ExifTool](https://exiftool.org/) can be used for extracting metadata if saving the stream to file.
