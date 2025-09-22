@@ -59,7 +59,7 @@
      inkscape:groupmode="layer"
      id="layer1">
     <rect
-       style="fill:#800000;stroke-width:0.264999;stroke-dasharray:none"
+       style="fill:#0000af;stroke-width:0.264999;stroke-dasharray:none;fill-opacity:1"
        id="rect2"
        width="50.805958"
        height="20.726809"
@@ -131,7 +131,7 @@
          x="98.420403"
          y="27.285547">Web browsers</tspan></text>
     <rect
-       style="fill:#800000;stroke-width:0.264999;stroke-dasharray:none"
+       style="fill:#0000af;stroke-width:0.264999;stroke-dasharray:none;fill-opacity:1"
        id="rect2-2"
        width="50.805958"
        height="20.726809"
