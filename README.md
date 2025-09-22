@@ -3,7 +3,7 @@
 ### Scope
 This repo contains a _reference implementation_ that demonstrates how MPEG4 transmit and receive _can_ be implemented in a product.
 
-Intended usage:
+#### Intended usage
 * Lightweight environment for experimenting with video encoding settings.
 * Starting point for developing product implementations.
 * Independent implementation for compatibility testing.
