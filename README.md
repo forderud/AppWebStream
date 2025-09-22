@@ -45,9 +45,9 @@ The project is currently using the GDI [`BitBlt`](https://learn.microsoft.com/en
 
 ### Client support
 The video stream adheres to the MPEG4 standard, so it should be supported by all client SW supporting H.264 encoded MPEG4 streams. The following clients have already been verified to work:
-* Google [Chrome](https://www.google.com/chrome)
-* Microsoft [Edge](https://www.microsoft.com/edge/)
-* Mozilla [Firefox](https://www.mozilla.org/firefox)
+* [Google Chrome](https://www.google.com/chrome)
+* [Microsoft Edge](https://www.microsoft.com/edge/)
+* [Mozilla Firefox](https://www.mozilla.org/firefox)
 * [VLC media player](https://www.videolan.org/vlc/): Open stream as `http://localhost:port/movie.mp4`
 * [ffplay](https://ffmpeg.org/ffplay.html): `ffplay.exe -flags low_delay -i "http://localhost:port/movie.mp4"`
 * StreamReceiver project in this repo (latency [issue #31](../../issues/31))
