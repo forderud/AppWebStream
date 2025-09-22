@@ -32,13 +32,13 @@ Metadata implementation status:
 * [x] Stream restart to enable coordinate transform and DPI changes
 * [ ] Freeze & resume frame time-stamps might lead to paused web browser playback ([issue #24](../../issues/24))
 
-#### HTTP and authentication
-* Authentication is currently missing.
-* The handcrafted HTTP communication should be replaced by a HTTP library ([issue #33](../../issues/33)).
-
 #### Media Foundation details
 * **0 frame latency**, except for the first 4 frames (frame N in, frame N out, frame N+1 in, frame N+1 out, frame N+2 in, frame N+2 out, ...)
 * The MPEG4 container is manually modified as suggested in [MFCreateFMPEG4MediaSink does not generate MSE-compatible MP4](https://stackoverflow.com/questions/49429954/mfcreatefmpeg4mediasink-does-not-generate-mse-compatible-mp4) to make it Media Source Extensions (MSE) compatible for streaming. The FFMPEG-based encoder is not affected by this issue.
+
+#### HTTP and authentication
+* Authentication is currently missing.
+* The handcrafted HTTP communication should be replaced by a HTTP library ([issue #33](../../issues/33)).
 
 #### Frame grabbing method
 The project is currently using the GDI [`BitBlt`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-bitblt) function to copy the content of the specified window handle to an offscreen `HBITMAP` object. This works fine for many applications, but single window capture doesn't work for apps that use GPU-accelerated drawing of the parent window. It would therefore probably be better to switch to the newer [Desktop Duplication API](https://learn.microsoft.com/en-us/windows/win32/direct3ddxgi/desktop-dup-api) for frame grabbing ([sample](https://github.com/microsoft/Windows-classic-samples/tree/main/Samples/DXGIDesktopDuplication)).
