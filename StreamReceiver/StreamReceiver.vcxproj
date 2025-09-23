@@ -78,6 +78,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DisplayWindow.hpp" />
+    <ClInclude Include="Mpeg4Receiver.hpp" />
     <ClInclude Include="Mpeg4ReceiverSR.hpp" />
     <ClInclude Include="StreamWrapper.hpp" />
   </ItemGroup>

@@ -9,5 +9,6 @@
     <ClInclude Include="StreamWrapper.hpp" />
     <ClInclude Include="Mpeg4ReceiverSR.hpp" />
     <ClInclude Include="DisplayWindow.hpp" />
+    <ClInclude Include="Mpeg4Receiver.hpp" />
   </ItemGroup>
 </Project>
