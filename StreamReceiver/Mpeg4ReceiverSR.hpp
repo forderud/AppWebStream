@@ -7,9 +7,6 @@ struct IMFSourceReader; // forward decl.
     Does internally use the Media Foundation Source Reader API, but that can change in the future. */
 class Mpeg4ReceiverSR : public Mpeg4Receiver {
 public:
-    /** frameTime is in 100-nanosecond units since startTime. frameDuration is also in 100-nanosecond units. */
-    typedef std::function<void(Mpeg4ReceiverSR& receiver, int64_t frameTime, int64_t frameDuration, std::string_view buffer, bool metadataChanged)> NewFrameCb;
-
     /** Connect to requested MPEG4 URL. */
     Mpeg4ReceiverSR(_bstr_t url, NewFrameCb frame_cb);
 

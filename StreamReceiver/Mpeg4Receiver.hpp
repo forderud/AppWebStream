@@ -15,6 +15,9 @@ static unsigned int Align16(unsigned int size) {
 /** Base-class for receiving for fragmented MPEG4 streams over a network. */
 class Mpeg4Receiver {
 public:
+    /** frameTime is in 100-nanosecond units since startTime. frameDuration is also in 100-nanosecond units. */
+    typedef std::function<void(Mpeg4Receiver& receiver, int64_t frameTime, int64_t frameDuration, std::string_view buffer, bool metadataChanged)> NewFrameCb;
+
     Mpeg4Receiver() = default;
 
     virtual ~Mpeg4Receiver() = default;
