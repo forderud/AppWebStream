@@ -23,7 +23,7 @@ public:
     };
 
     /** frameTime is in 100-nanosecond units since startTime. frameDuration is also in 100-nanosecond units. */
-    typedef std::function<void(Mpeg4Receiver& receiver, int64_t frameTime, int64_t frameDuration, std::string_view buffer, bool metadataChanged)> NewFrameCb;
+    typedef std::function<void(Mpeg4Receiver& receiver, double frameTime, double frameDuration, std::string_view buffer, bool metadataChanged)> NewFrameCb;
 
     /** Factory function. */
     static std::unique_ptr< Mpeg4Receiver> Create(DecoderType type, _bstr_t url, NewFrameCb frame_cb);

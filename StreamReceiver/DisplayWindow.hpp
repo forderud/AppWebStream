@@ -49,7 +49,7 @@ public:
 
     /** Called when a new frame have been received.
         Typically called from a non-main thread, so access need to be serialized. */
-    void OnNewFrame(Mpeg4Receiver& receiver, int64_t frameTime, int64_t frameDuration, std::string_view buffer, bool metadataChanged) {
+    void OnNewFrame(Mpeg4Receiver& receiver, double frameTime, double frameDuration, std::string_view buffer, bool metadataChanged) {
         std::lock_guard<std::mutex> guard(m_mutex);
         if (!m_active)
             return;
@@ -77,8 +77,8 @@ public:
             wprintf(L"  Xform: a=%f, b=%f, c=%f, d=%f, tx=%f, ty=%f\n", xform[0], xform[1], xform[2], xform[3], xform[4], xform[5]);
         }
 
-        wprintf(L"  Frame time:     %f ms\n", frameTime * 0.1f / 1000); // convert to milliseconds
-        wprintf(L"  Frame duration: %f ms\n", frameDuration * 0.1f / 1000); // convert to milliseconds
+        wprintf(L"  Frame time:     %f s\n", frameTime);
+        wprintf(L"  Frame duration: %f s\n", frameDuration);
 
         if (buffer.size() > 0)
             DrawBitmap(resolution, buffer);

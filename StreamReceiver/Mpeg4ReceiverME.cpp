@@ -153,17 +153,9 @@ void Mpeg4ReceiverME::OnFrameArrived() {
         m_resolution[1] = height;
     }
 
-    int64_t time_100ns = 0;
-    int64_t duration_100ns = 0;
-    {
-        // get frame time & duration
-        double time = m_engine->GetCurrentTime(); // in seconds
-        time_100ns = (int64_t)(time * 10 * 1000 * 1000);
-
-        double duration = m_engine->GetDuration(); // in  seconds
-        if (!std::isinf(duration) && !std::isnan(duration))
-            duration_100ns = (int64_t)(duration * 10 * 1000 * 1000);
-    }
+    // get frame time & duration
+    double time = m_engine->GetCurrentTime(); // in seconds
+    double duration = m_engine->GetDuration(); // in seconds (might be inf or nan)
 
     if (!m_bitmap || m_metadata_changed) {
         m_bitmap.Release();
@@ -201,7 +193,7 @@ void Mpeg4ReceiverME::OnFrameArrived() {
         frame_buffer = std::string_view((char*)ptr, size);
     }
 
-    m_frame_cb(*this, time_100ns, duration_100ns, frame_buffer, m_metadata_changed);
+    m_frame_cb(*this, time, duration, frame_buffer, m_metadata_changed);
 
     m_metadata_changed = false; // clear flag after m_frame_cb have been called
 }
