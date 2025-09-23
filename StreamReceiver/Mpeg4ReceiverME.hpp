@@ -8,6 +8,7 @@ struct IMFMediaEngine; // forward decl.
 /** Receiver for fragmented MPEG4 streams over a network.
     Does internally use the Media Foundation Media Engine API. */
 class Mpeg4ReceiverME : public Mpeg4Receiver {
+    friend struct MediaEngineNotify;
 public:
     /** Connect to requested MPEG4 URL. */
     Mpeg4ReceiverME(_bstr_t url, NewFrameCb frame_cb);

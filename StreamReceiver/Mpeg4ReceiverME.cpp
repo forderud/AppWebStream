@@ -6,12 +6,22 @@
 
 
 struct MediaEngineNotify : public IMFMediaEngineNotify {
-    MediaEngineNotify() = default;
+    MediaEngineNotify(Mpeg4ReceiverME* parent) : m_parent(parent) {
+    }
+
     ~MediaEngineNotify() = default;
 
-    HRESULT EventNotify(DWORD event_, uint64_t /*param1*/, DWORD /*param2*/) override {
+    HRESULT EventNotify(DWORD event_, uint64_t param1, DWORD param2) override {
         auto event = (MF_MEDIA_ENGINE_EVENT)event_;
         event;
+
+        if (event == MF_MEDIA_ENGINE_EVENT_TIMEUPDATE) {
+            assert(!param1);
+            assert(!param2);
+            double time = m_parent->m_engine->GetCurrentTime();
+            wprintf(L"Current time: %f\n", time);
+        }
+
         return E_NOTIMPL;
     }
 
@@ -47,7 +57,8 @@ struct MediaEngineNotify : public IMFMediaEngineNotify {
 
 
 private:
-    unsigned int m_ref_cnt = 0;
+    unsigned int     m_ref_cnt = 0;
+    Mpeg4ReceiverME* m_parent = nullptr;
 };
 
 
@@ -55,7 +66,7 @@ private:
 Mpeg4ReceiverME::Mpeg4ReceiverME(_bstr_t url, NewFrameCb frame_cb) :Mpeg4Receiver(frame_cb) {
     MFStartup(MF_VERSION);
 
-    m_frame_cb = new MediaEngineNotify;
+    m_frame_cb = new MediaEngineNotify(this);
 
     CComPtr<IMFMediaEngineClassFactory> factory;
     HRESULT hr = factory.CoCreateInstance(CLSID_MFMediaEngineClassFactory, nullptr, CLSCTX_INPROC_SERVER);
