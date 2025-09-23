@@ -19,9 +19,15 @@ struct MediaEngineNotify : public IMFMediaEngineNotify {
         if (event == MF_MEDIA_ENGINE_EVENT_TIMEUPDATE) {
             assert(!param1);
             assert(!param2);
-            double time = m_parent->m_engine->GetCurrentTime();
-            wprintf(L"Current time: %f\n", time);
+            double time = m_parent->m_engine->GetCurrentTime(); // in seconds
+            int64_t time_100ns = (int64_t)(time * 10 * 1000 * 1000);
 
+            double duration = m_parent->m_engine->GetDuration(); // in  seconds
+            int64_t duration_100ns = 0;
+            if (!std::isinf(duration) && !std::isnan(duration))
+                duration_100ns = (int64_t)(duration * 10 * 1000 * 1000);
+
+            std::string_view buffer;
 #if 0
             // copy frame to DXGI surface or WIC bitmap
             LONG width = 0;
@@ -34,6 +40,8 @@ struct MediaEngineNotify : public IMFMediaEngineNotify {
             if (FAILED(hr))
                 throw std::runtime_error("TransferVideoFrame failed");
 #endif
+
+            m_parent->m_frame_cb(*m_parent, time_100ns, duration_100ns, buffer, m_parent->m_metadata_changed);
         }
 
         return E_NOTIMPL;
