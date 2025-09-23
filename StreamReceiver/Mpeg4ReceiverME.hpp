@@ -21,5 +21,7 @@ public:
     HRESULT ReceiveFrame() override;
 
 private:
-    CComPtr<IMFMediaEngine>       m_engine;
+    void OnFrameArrived();
+
+    CComPtr<IMFMediaEngine> m_engine;
 };

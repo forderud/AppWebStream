@@ -19,29 +19,7 @@ struct MediaEngineNotify : public IMFMediaEngineNotify {
         if (event == MF_MEDIA_ENGINE_EVENT_TIMEUPDATE) {
             assert(!param1);
             assert(!param2);
-            double time = m_parent->m_engine->GetCurrentTime(); // in seconds
-            int64_t time_100ns = (int64_t)(time * 10 * 1000 * 1000);
-
-            double duration = m_parent->m_engine->GetDuration(); // in  seconds
-            int64_t duration_100ns = 0;
-            if (!std::isinf(duration) && !std::isnan(duration))
-                duration_100ns = (int64_t)(duration * 10 * 1000 * 1000);
-
-            std::string_view buffer;
-#if 0
-            // copy frame to DXGI surface or WIC bitmap
-            LONG width = 0;
-            LONG height = 0;
-            IUnknown* dst_surf = nullptr;
-            MFVideoNormalizedRect src_rect = { 0, 0, 1.0f, 1.0f};
-            RECT                  dst_rect = { 0 ,0, width, height };
-            MFARGB                border_color = {0, 0, 0, 0};
-            HRESULT hr = m_parent->m_engine->TransferVideoFrame(dst_surf, &src_rect, &dst_rect, &border_color);
-            if (FAILED(hr))
-                throw std::runtime_error("TransferVideoFrame failed");
-#endif
-
-            m_parent->m_frame_cb(*m_parent, time_100ns, duration_100ns, buffer, m_parent->m_metadata_changed);
+            m_parent->OnFrameArrived();
         }
 
         return E_NOTIMPL;
@@ -162,4 +140,30 @@ void Mpeg4ReceiverME::Stop() {
 /** Receive frames. The "frame_cb" callback will be called from the same thread when new frames are received. */
 HRESULT Mpeg4ReceiverME::ReceiveFrame() {
     return E_NOTIMPL;
+}
+
+void Mpeg4ReceiverME::OnFrameArrived() {
+    double time = m_engine->GetCurrentTime(); // in seconds
+    int64_t time_100ns = (int64_t)(time * 10 * 1000 * 1000);
+
+    double duration = m_engine->GetDuration(); // in  seconds
+    int64_t duration_100ns = 0;
+    if (!std::isinf(duration) && !std::isnan(duration))
+        duration_100ns = (int64_t)(duration * 10 * 1000 * 1000);
+
+    std::string_view buffer;
+#if 0
+    // copy frame to DXGI surface or WIC bitmap
+    LONG width = 0;
+    LONG height = 0;
+    IUnknown* dst_surf = nullptr;
+    MFVideoNormalizedRect src_rect = { 0, 0, 1.0f, 1.0f };
+    RECT                  dst_rect = { 0 ,0, width, height };
+    MFARGB                border_color = { 0, 0, 0, 0 };
+    HRESULT hr = m_engine->TransferVideoFrame(dst_surf, &src_rect, &dst_rect, &border_color);
+    if (FAILED(hr))
+        throw std::runtime_error("TransferVideoFrame failed");
+#endif
+
+    m_frame_cb(*this, time_100ns, duration_100ns, buffer, m_metadata_changed);
 }
