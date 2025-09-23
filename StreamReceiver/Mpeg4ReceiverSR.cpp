@@ -1,8 +1,5 @@
-#include <mfidl.h>
-#include <mfreadwrite.h>
 #include <mfapi.h>
 #include <mferror.h>
-#include <strmif.h>
 #include <codecapi.h>
 #include "Mpeg4ReceiverSR.hpp"
 #include "StreamWrapper.hpp"
@@ -19,10 +16,8 @@ _COM_SMARTPTR_TYPEDEF(IMFAttributes, __uuidof(IMFAttributes));
 _COM_SMARTPTR_TYPEDEF(IMFMediaType, __uuidof(IMFMediaType));
 _COM_SMARTPTR_TYPEDEF(IMFSample, __uuidof(IMFSample));
 _COM_SMARTPTR_TYPEDEF(IMFByteStream, __uuidof(IMFByteStream));
-_COM_SMARTPTR_TYPEDEF(IMFSourceResolver, __uuidof(IMFSourceResolver));
 _COM_SMARTPTR_TYPEDEF(IMFMediaBuffer, __uuidof(IMFMediaBuffer));
 _COM_SMARTPTR_TYPEDEF(IMFSourceReader, __uuidof(IMFSourceReader));
-_COM_SMARTPTR_TYPEDEF(IPropertyStore, __uuidof(IPropertyStore));
 _COM_SMARTPTR_TYPEDEF(IMFMediaSource, __uuidof(IMFMediaSource));
 
 
@@ -42,58 +37,7 @@ Mpeg4ReceiverSR::Mpeg4ReceiverSR(_bstr_t url, NewFrameCb frame_cb) : Mpeg4Receiv
 
     IMFByteStreamPtr byteStream;
     {
-        IMFSourceResolverPtr resolver;
-        COM_CHECK(MFCreateSourceResolver(&resolver));
-
-        IPropertyStorePtr props;
-        COM_CHECK(PSCreateMemoryPropertyStore(__uuidof(IPropertyStore), (void**)&props));
-        {
-            // reduce startup latency
-            PROPERTYKEY key{};
-            key.fmtid = MFNETSOURCE_ACCELERATEDSTREAMINGDURATION;
-            key.pid = 0;
-
-            PROPVARIANT val{};
-            val.vt = VT_I4;
-            val.lVal = 100; // 100 milliseconds (10,000 is default)
-
-            COM_CHECK(props->SetValue(key, val));
-            //COM_CHECK(props->Commit());
-        }
-        {
-            // reduce network buffering
-            PROPERTYKEY key{};
-            key.fmtid = MFNETSOURCE_BUFFERINGTIME;
-            key.pid = 0;
-
-            PROPVARIANT val{};
-            val.vt = VT_I4;
-            val.lVal = 1; // 1 second (5 is default)
-
-            COM_CHECK(props->SetValue(key, val));
-            //COM_CHECK(props->Commit());
-        }
-        {
-            // reduce max buffering
-            PROPERTYKEY key{};
-            key.fmtid = MFNETSOURCE_MAXBUFFERTIMEMS;
-            key.pid = 0;
-
-            PROPVARIANT val{};
-            val.vt = VT_I4;
-            val.lVal = 100; // 100ms (40,000 is default)
-
-            COM_CHECK(props->SetValue(key, val));
-            //COM_CHECK(props->Commit());
-        }
-
-        // create innerStream that connects to the URL
-        DWORD createObjFlags = MF_RESOLUTION_BYTESTREAM; // MF_RESOLUTION_BYTESTREAM for IMFByteStream and MF_RESOLUTION_MEDIASOURCE for IMFMediaSource
-        MF_OBJECT_TYPE objectType = MF_OBJECT_INVALID;
-        IUnknownPtr obj;
-        COM_CHECK(resolver->CreateObjectFromURL(url, createObjFlags, props, &objectType, &obj));
-        assert(objectType == MF_OBJECT_BYTESTREAM);
-        IMFByteStreamPtr innerStream = obj;
+        IMFByteStreamPtr innerStream = CreateByteStreamFromUrl(url);
 
         // wrap innerStream om byteStream-wrapper to allow parsing of the underlying MPEG4 bitstream
         auto wrapper = CreateLocalInstance<StreamWrapper>();

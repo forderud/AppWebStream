@@ -64,3 +64,5 @@ private:
     std::string_view      m_read_buf; // set by BeginRead
     StartTimeDpiChangedCb m_notifier;
 };
+
+IMFByteStreamPtr CreateByteStreamFromUrl(_bstr_t url);
