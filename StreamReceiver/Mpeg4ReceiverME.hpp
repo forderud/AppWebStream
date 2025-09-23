@@ -20,6 +20,4 @@ public:
 
 private:
     CComPtr<IMFMediaEngine> m_engine;
-    bool                    m_metadata_changed = false; // metadata changed since previous frame
-    bool                    m_active = true;
 };
