@@ -4,7 +4,7 @@
 struct IMFSourceReader; // forward decl.
 
 /** Receiver for fragmented MPEG4 streams over a network.
-    Does internally use the Media Foundation Source Reader API, but that can change in the future. */
+    Does internally use the Media Foundation Source Reader API. */
 class Mpeg4ReceiverSR : public Mpeg4Receiver {
 public:
     /** Connect to requested MPEG4 URL. */
