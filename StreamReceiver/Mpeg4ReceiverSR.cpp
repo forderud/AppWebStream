@@ -121,11 +121,11 @@ HRESULT Mpeg4ReceiverSR::ReceiveFrame() {
     if (m_frame_cb) {
         int64_t frameTime_100ns = 0; // in 100-nanosecond units since startTime
         COM_CHECK(frame->GetSampleTime(&frameTime_100ns));
-        double frameTime = (double)frameTime_100ns/(10 * 1000 * 1000);
+        double frameTime = ((double)frameTime_100ns)/(10 * 1000 * 1000);
 
         int64_t frameDuration_100ns = 0; // in 100-nanosecond units
         COM_CHECK(frame->GetSampleDuration(&frameDuration_100ns));
-        double frameDuration = (double)frameDuration_100ns/(10 * 1000 * 1000);
+        double frameDuration = ((double)frameDuration_100ns)/(10 * 1000 * 1000);
 
         {
             DWORD bufferCount = 0;
