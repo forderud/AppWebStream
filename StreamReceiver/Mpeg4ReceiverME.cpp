@@ -141,6 +141,7 @@ Mpeg4ReceiverME::Mpeg4ReceiverME(_bstr_t url, NewFrameCb frame_cb) :Mpeg4Receive
     if (FAILED(hr))
         throw std::runtime_error("Play failed");
 
+    // TODO: Populate m_resolution
 #if 0
     DWORD width = 0, height = 0;
     hr = m_engine->GetNativeVideoSize(&width, &height);
