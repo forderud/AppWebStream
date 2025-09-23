@@ -215,11 +215,6 @@ HRESULT Mpeg4ReceiverSR::ReceiveFrame() {
     return S_OK;
 }
 
-void Mpeg4ReceiverSR::GetXform(double xform[6]) const {
-    for (size_t i = 0; i < 6; i++)
-        xform[i] = m_xform[i];
-}
-
 std::array<uint32_t, 2> Mpeg4ReceiverSR::GetResolution() const {
     // return resolution of output buffer, that's a multiple of MPEG4 16x16 macroblocks 
     std::array<uint32_t, 2> result;

@@ -36,7 +36,10 @@ public:
         x' = a*x + c*y + tx
         y' = b*x + d*y + ty
         where xform = [a,b, c, d, tx, ty] */
-    void GetXform(double xform[6]) const;
+    void GetXform(double xform[6]) const {
+        for (size_t i = 0; i < 6; i++)
+            xform[i] = m_xform[i];
+    }
 
     std::array<uint32_t, 2> GetResolution() const;
 
