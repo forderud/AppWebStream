@@ -16,11 +16,16 @@ static unsigned int Align16(unsigned int size) {
 /** Base-class for receiving for fragmented MPEG4 streams over a network. */
 class Mpeg4Receiver {
 public:
+    enum DecoderType {
+        MediaFoundation_MediaEngine,
+        MediaFoundation_SourceReader,
+    };
+
     /** frameTime is in 100-nanosecond units since startTime. frameDuration is also in 100-nanosecond units. */
     typedef std::function<void(Mpeg4Receiver& receiver, int64_t frameTime, int64_t frameDuration, std::string_view buffer, bool metadataChanged)> NewFrameCb;
 
     /** Factory function. */
-    static std::unique_ptr< Mpeg4Receiver> Create(_bstr_t url, NewFrameCb frame_cb);
+    static std::unique_ptr< Mpeg4Receiver> Create(DecoderType type, _bstr_t url, NewFrameCb frame_cb);
 
     Mpeg4Receiver(NewFrameCb frame_cb) : m_frame_cb(frame_cb) {
     }

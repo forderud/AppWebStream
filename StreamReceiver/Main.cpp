@@ -28,8 +28,9 @@ int main(int argc, char* argv[]) {
 
     // connect to MPEG4 H.264 stream
     _bstr_t url = argv[1];
+    Mpeg4Receiver::DecoderType type = Mpeg4Receiver::MediaFoundation_MediaEngine; // or Mpeg4Receiver::MediaFoundation_SourceReader
     using namespace std::placeholders;
-    std::unique_ptr<Mpeg4Receiver> receiver = Mpeg4Receiver::Create(url, std::bind(&DisplayWindow::OnNewFrame, &wnd, _1, _2, _3, _4, _5));
+    std::unique_ptr<Mpeg4Receiver> receiver = Mpeg4Receiver::Create(type, url, std::bind(&DisplayWindow::OnNewFrame, &wnd, _1, _2, _3, _4, _5));
 
     // start MPEG4 stream receive thread
     std::thread receiveThread(ReceiveMovieThread, receiver.get());
