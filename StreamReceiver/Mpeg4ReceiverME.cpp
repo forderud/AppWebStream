@@ -94,10 +94,12 @@ Mpeg4ReceiverME::Mpeg4ReceiverME(_bstr_t url, NewFrameCb frame_cb) :Mpeg4Receive
         assert(SUCCEEDED(hr));
 
         // TODO: Investigate the following attributes from https://github.com/chromium/chromium/blob/main/media/renderers/win/media_foundation_renderer.cc
+        // MF_MEDIA_ENGINE_CONTENT_PROTECTION_FLAGS
         // MF_MEDIA_ENGINE_AUDIO_CATEGORY
-        // MF_MEDIA_ENGINE_OPM_HWND for output protection
+        // MF_MEDIA_ENGINE_OPM_HWND output protection window handle
         // MF_MEDIA_ENGINE_DXGI_MANAGER for GPU acceleration
         // MF_MEDIA_ENGINE_EXTENSION to load custom media resources
+        // MF_MEDIA_ENGINE_PLAYBACK_HWND legacy window handle
     }
 
     hr = factory->CreateInstance(MF_MEDIA_ENGINE_REAL_TIME_MODE, attribs, &m_engine);
