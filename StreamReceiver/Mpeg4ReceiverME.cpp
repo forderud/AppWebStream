@@ -93,7 +93,12 @@ Mpeg4ReceiverME::Mpeg4ReceiverME(_bstr_t url, NewFrameCb frame_cb) :Mpeg4Receive
     hr = factory->CreateInstance(MF_MEDIA_ENGINE_REAL_TIME_MODE, attribs, &m_engine);
     assert(SUCCEEDED(hr));
 
-    //m_engine->SetDefaultPlaybackRate(0.0);
+#if 0
+    hr = m_engine->SetDefaultPlaybackRate(0.0);
+    assert(SUCCEEDED(hr));
+    hr = m_engine->SetPlaybackRate(1.0);
+    assert(SUCCEEDED(hr));
+#endif
 
 #if 1
     {
