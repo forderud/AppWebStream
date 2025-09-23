@@ -20,6 +20,19 @@ struct MediaEngineNotify : public IMFMediaEngineNotify {
             assert(!param2);
             double time = m_parent->m_engine->GetCurrentTime();
             wprintf(L"Current time: %f\n", time);
+
+#if 0
+            // copy frame to DXGI surface or WIC bitmap
+            LONG width = 0;
+            LONG height = 0;
+            IUnknown* dst_surf = nullptr;
+            MFVideoNormalizedRect src_rect = { 0, 0, 1.0, 1.0};
+            RECT                  dst_rect = { 0 ,0, width, height };
+            MFARGB                border = {0, 0, 0, 0};
+            HRESULT hr = m_parent->m_engine->TransferVideoFrame(dst_surf, &src_rect, &dst_rect, &border);
+            if (FAILED(hr))
+                throw std::runtime_error("TransferVideoFrame failed");
+#endif
         }
 
         return E_NOTIMPL;
