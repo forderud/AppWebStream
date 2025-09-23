@@ -1,6 +1,7 @@
 #pragma once
 #include "Mpeg4Receiver.hpp"
 
+struct IMFMediaEngineNotify; // forward decl.
 struct IMFMediaEngine; // forward decl.
 
 
@@ -19,5 +20,6 @@ public:
     HRESULT ReceiveFrame() override;
 
 private:
-    CComPtr<IMFMediaEngine> m_engine;
+    CComPtr<IMFMediaEngineNotify> m_frame_cb;
+    CComPtr<IMFMediaEngine>       m_engine;
 };
