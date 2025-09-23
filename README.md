@@ -61,5 +61,5 @@ Tools for inspecting MPEG metadata:
 * [ExifTool](https://exiftool.org/) can be used for extracting metadata if saving the stream to file.
 
 External links:
-* Windows [Media Foundation samples](https://github.com/microsoft/media-foundation)
+* Windows [Media Foundation samples](https://github.com/microsoft/media-foundation) on GitHub
 
