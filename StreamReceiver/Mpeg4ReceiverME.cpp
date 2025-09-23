@@ -9,9 +9,9 @@ struct MediaEngineNotify : public IMFMediaEngineNotify {
     MediaEngineNotify() = default;
     ~MediaEngineNotify() = default;
 
-    HRESULT EventNotify(DWORD event, uint64_t /*param1*/, DWORD /*param2*/) override {
-        auto type = (MF_MEDIA_ENGINE_EVENT)event;
-        type;
+    HRESULT EventNotify(DWORD event_, uint64_t /*param1*/, DWORD /*param2*/) override {
+        auto event = (MF_MEDIA_ENGINE_EVENT)event_;
+        event;
         return E_NOTIMPL;
     }
 
@@ -53,6 +53,8 @@ private:
 
 /** Connect to requested MPEG4 URL. */
 Mpeg4ReceiverME::Mpeg4ReceiverME(_bstr_t url, NewFrameCb frame_cb) :Mpeg4Receiver(frame_cb) {
+    MFStartup(MF_VERSION);
+
     m_frame_cb = new MediaEngineNotify;
 
     CComPtr<IMFMediaEngineClassFactory> factory;
