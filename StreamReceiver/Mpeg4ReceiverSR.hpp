@@ -9,15 +9,15 @@ struct IMFSourceReader; // forward decl.
 
 /** Receiver for fragmented MPEG4 streams over a network.
     Does internally use the Media Foundation API, but that can change in the future. */
-class Mpeg4Receiver {
+class Mpeg4ReceiverSR {
 public:
     /** frameTime is in 100-nanosecond units since startTime. frameDuration is also in 100-nanosecond units. */
-    typedef std::function<void(Mpeg4Receiver& receiver, int64_t frameTime, int64_t frameDuration, std::string_view buffer, bool metadataChanged)> NewFrameCb;
+    typedef std::function<void(Mpeg4ReceiverSR& receiver, int64_t frameTime, int64_t frameDuration, std::string_view buffer, bool metadataChanged)> NewFrameCb;
 
     /** Connect to requested MPEG4 URL. */
-    Mpeg4Receiver(_bstr_t url, NewFrameCb frame_cb);
+    Mpeg4ReceiverSR(_bstr_t url, NewFrameCb frame_cb);
 
-    ~Mpeg4Receiver();
+    ~Mpeg4ReceiverSR();
 
     void Stop();
 

@@ -4,7 +4,7 @@
 #include <mferror.h>
 #include <strmif.h>
 #include <codecapi.h>
-#include "Mpeg4Receiver.hpp"
+#include "Mpeg4ReceiverSR.hpp"
 #include "StreamWrapper.hpp"
 #include "../AppWebStream/ComUtil.hpp"
 
@@ -33,7 +33,7 @@ static unsigned int Align16(unsigned int size) {
         return size + 16 - (size % 16);
 }
 
-Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, NewFrameCb frame_cb) : m_frame_cb(frame_cb) {
+Mpeg4ReceiverSR::Mpeg4ReceiverSR(_bstr_t url, NewFrameCb frame_cb) : m_frame_cb(frame_cb) {
     m_resolution.fill(0); // clear array
 
     COM_CHECK(MFStartup(MF_VERSION));
@@ -105,7 +105,7 @@ Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, NewFrameCb frame_cb) : m_frame_cb(fram
         // wrap innerStream om byteStream-wrapper to allow parsing of the underlying MPEG4 bitstream
         auto wrapper = CreateLocalInstance<StreamWrapper>();
         using namespace std::placeholders;
-        wrapper->Initialize(innerStream, std::bind(&Mpeg4Receiver::OnStartTimeDpiChanged, this, _1, _2, _3));
+        wrapper->Initialize(innerStream, std::bind(&Mpeg4ReceiverSR::OnStartTimeDpiChanged, this, _1, _2, _3));
         COM_CHECK(wrapper.QueryInterface(&byteStream));
     }
     COM_CHECK(MFCreateSourceReaderFromByteStream(byteStream, attribs, &m_reader));
@@ -113,17 +113,17 @@ Mpeg4Receiver::Mpeg4Receiver(_bstr_t url, NewFrameCb frame_cb) : m_frame_cb(fram
     COM_CHECK(ConfigureOutputType(*m_reader, (DWORD)MF_SOURCE_READER_FIRST_VIDEO_STREAM));
 }
 
-Mpeg4Receiver::~Mpeg4Receiver() {
+Mpeg4ReceiverSR::~Mpeg4ReceiverSR() {
     m_reader.Release();
 
     COM_CHECK(MFShutdown());
 }
 
-void Mpeg4Receiver::Stop() {
+void Mpeg4ReceiverSR::Stop() {
     m_active = false;
 }
 
-HRESULT Mpeg4Receiver::ReceiveFrame() {
+HRESULT Mpeg4ReceiverSR::ReceiveFrame() {
     if (!m_active)
         return E_FAIL;
 
@@ -215,12 +215,12 @@ HRESULT Mpeg4Receiver::ReceiveFrame() {
     return S_OK;
 }
 
-void Mpeg4Receiver::GetXform(double xform[6]) const {
+void Mpeg4ReceiverSR::GetXform(double xform[6]) const {
     for (size_t i = 0; i < 6; i++)
         xform[i] = m_xform[i];
 }
 
-std::array<uint32_t, 2> Mpeg4Receiver::GetResolution() const {
+std::array<uint32_t, 2> Mpeg4ReceiverSR::GetResolution() const {
     // return resolution of output buffer, that's a multiple of MPEG4 16x16 macroblocks 
     std::array<uint32_t, 2> result;
     result[0] = Align16(m_resolution[0]);
@@ -228,7 +228,7 @@ std::array<uint32_t, 2> Mpeg4Receiver::GetResolution() const {
     return result;
 }
 
-void Mpeg4Receiver::OnStartTimeDpiChanged(uint64_t startTime, double dpi, double xform[6]) {
+void Mpeg4ReceiverSR::OnStartTimeDpiChanged(uint64_t startTime, double dpi, double xform[6]) {
     if (startTime != m_startTime)
         m_metadata_changed = true;
     if (dpi != m_dpi)
@@ -241,7 +241,7 @@ void Mpeg4Receiver::OnStartTimeDpiChanged(uint64_t startTime, double dpi, double
         m_xform[i] = xform[i];
 }
 
-HRESULT Mpeg4Receiver::ConfigureOutputType(IMFSourceReader& reader, DWORD dwStreamIndex) {
+HRESULT Mpeg4ReceiverSR::ConfigureOutputType(IMFSourceReader& reader, DWORD dwStreamIndex) {
     GUID majorType{};
     GUID subType{};
     {

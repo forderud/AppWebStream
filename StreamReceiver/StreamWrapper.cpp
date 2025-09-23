@@ -3,7 +3,7 @@
 #include <comdef.h> // for _com_error
 #include <Mfapi.h>
 #include "StreamWrapper.hpp"
-#include "Mpeg4Receiver.hpp"
+#include "Mpeg4ReceiverSR.hpp"
 
 
 StreamWrapper::StreamWrapper() {

@@ -3,13 +3,13 @@
 #include <atlbase.h>
 #include <stdio.h>
 #include <thread>
-#include "Mpeg4Receiver.hpp"
+#include "Mpeg4ReceiverSR.hpp"
 #include "../AppWebStream/ComUtil.hpp"
 #include "../AppWebStream/MP4Utils.hpp"
 #include "DisplayWindow.hpp"
 
 
-void ReceiveMovieThread(Mpeg4Receiver* receiver) {
+void ReceiveMovieThread(Mpeg4ReceiverSR* receiver) {
     SetThreadDescription(GetCurrentThread(), L"ReceiveMovieThread");
 
     HRESULT hr = S_OK;
@@ -31,7 +31,7 @@ int main(int argc, char* argv[]) {
     // connect to MPEG4 H.264 stream
     _bstr_t url = argv[1];
     using namespace std::placeholders;
-    Mpeg4Receiver receiver(url, std::bind(&DisplayWindow::OnNewFrame, &wnd, _1, _2, _3, _4, _5));
+    Mpeg4ReceiverSR receiver(url, std::bind(&DisplayWindow::OnNewFrame, &wnd, _1, _2, _3, _4, _5));
 
     // start MPEG4 stream receive thread
     std::thread receiveThread(ReceiveMovieThread, &receiver);

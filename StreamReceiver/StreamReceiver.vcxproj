@@ -73,12 +73,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Mpeg4Receiver.cpp" />
+    <ClCompile Include="Mpeg4ReceiverSR.cpp" />
     <ClCompile Include="StreamWrapper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DisplayWindow.hpp" />
-    <ClInclude Include="Mpeg4Receiver.hpp" />
+    <ClInclude Include="Mpeg4ReceiverSR.hpp" />
     <ClInclude Include="StreamWrapper.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
