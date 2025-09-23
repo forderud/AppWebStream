@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include <functional>
+#include <memory>
 #include <string_view>
 #include <atlbase.h> // for CComPtr
 #include <comdef.h>  // for __uuidof, _bstr_t
@@ -17,6 +18,9 @@ class Mpeg4Receiver {
 public:
     /** frameTime is in 100-nanosecond units since startTime. frameDuration is also in 100-nanosecond units. */
     typedef std::function<void(Mpeg4Receiver& receiver, int64_t frameTime, int64_t frameDuration, std::string_view buffer, bool metadataChanged)> NewFrameCb;
+
+    /** Factory function. */
+    static std::unique_ptr< Mpeg4Receiver> Create(_bstr_t url, NewFrameCb frame_cb);
 
     Mpeg4Receiver() = default;
 

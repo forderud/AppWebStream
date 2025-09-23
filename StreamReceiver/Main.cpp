@@ -3,7 +3,7 @@
 #include <atlbase.h>
 #include <stdio.h>
 #include <thread>
-#include "Mpeg4ReceiverSR.hpp"
+#include "Mpeg4Receiver.hpp"
 #include "../AppWebStream/ComUtil.hpp"
 #include "../AppWebStream/MP4Utils.hpp"
 #include "DisplayWindow.hpp"
@@ -31,10 +31,10 @@ int main(int argc, char* argv[]) {
     // connect to MPEG4 H.264 stream
     _bstr_t url = argv[1];
     using namespace std::placeholders;
-    Mpeg4ReceiverSR receiver(url, std::bind(&DisplayWindow::OnNewFrame, &wnd, _1, _2, _3, _4, _5));
+    std::unique_ptr<Mpeg4Receiver> receiver = Mpeg4Receiver::Create(url, std::bind(&DisplayWindow::OnNewFrame, &wnd, _1, _2, _3, _4, _5));
 
     // start MPEG4 stream receive thread
-    std::thread receiveThread(ReceiveMovieThread, &receiver);
+    std::thread receiveThread(ReceiveMovieThread, receiver.get());
 
     // message loop
     MSG msg{};
@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
         DispatchMessageW(&msg);
     }
 
-    receiver.Stop();
+    receiver->Stop();
     receiveThread.join();
 }
 
