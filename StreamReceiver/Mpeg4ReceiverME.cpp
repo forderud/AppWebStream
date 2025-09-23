@@ -2,6 +2,8 @@
 #include <stdexcept>
 #include <mfapi.h>
 #include <mfmediaengine.h>
+#include "../AppWebStream/ComUtil.hpp"
+#include "StreamWrapper.hpp"
 #include "Mpeg4ReceiverME.hpp"
 
 
@@ -107,9 +109,24 @@ Mpeg4ReceiverME::Mpeg4ReceiverME(_bstr_t url, NewFrameCb frame_cb) :Mpeg4Receive
 
     //m_engine->SetDefaultPlaybackRate(0.0);
 
+#if 1
+    {
+        IMFByteStreamPtr innerStream = CreateByteStreamFromUrl(url);
+
+        // wrap innerStream om byteStream-wrapper to allow parsing of the underlying MPEG4 bitstream
+        auto wrapper = CreateLocalInstance<StreamWrapper>();
+        using namespace std::placeholders;
+        wrapper->Initialize(innerStream, std::bind(&Mpeg4ReceiverME::OnStartTimeDpiChanged, this, _1, _2, _3));
+
+        CComPtr<IMFMediaEngineEx> engine_ex;
+        engine_ex = m_engine;
+        engine_ex->SetSourceFromByteStream(wrapper, url);
+    }
+#else
     hr = m_engine->SetSource(url);
     if (FAILED(hr))
         throw std::runtime_error("SetSource failed");
+#endif
 
     //m_engine->SetCurrentTime(current_time);
 
