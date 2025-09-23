@@ -125,7 +125,7 @@ IMFByteStreamPtr CreateByteStreamFromUrl(_bstr_t url) {
 
         PROPVARIANT val{};
         val.vt = VT_I4;
-        val.lVal = 1; // 1 second (5 is default)
+        val.lVal = 0; // 0 second (5 is default)
 
         COM_CHECK(props->SetValue(key, val));
         //COM_CHECK(props->Commit());
