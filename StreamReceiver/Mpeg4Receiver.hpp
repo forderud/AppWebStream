@@ -17,8 +17,8 @@ static unsigned int Align16(unsigned int size) {
 class Mpeg4Receiver {
 public:
     enum DecoderType {
-        MediaFoundation_MediaEngine,
-        MediaFoundation_SourceReader,
+        MediaEngine,
+        SourceReader,
     };
 
     /** frameTime is in 100-nanosecond units since startTime. frameDuration is also in 100-nanosecond units. */

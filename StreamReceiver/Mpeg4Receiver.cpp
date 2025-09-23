@@ -4,9 +4,9 @@
 
 
 std::unique_ptr<Mpeg4Receiver> Mpeg4Receiver::Create(DecoderType type, _bstr_t url, NewFrameCb frame_cb) {
-    if (type == MediaFoundation_MediaEngine)
+    if (type == MediaEngine)
         return std::make_unique<Mpeg4ReceiverME>(url, frame_cb);
-    else if (type == MediaFoundation_SourceReader)
+    else if (type == SourceReader)
         return std::make_unique<Mpeg4ReceiverSR>(url, frame_cb);
 
     abort();
