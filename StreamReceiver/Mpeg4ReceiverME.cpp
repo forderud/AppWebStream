@@ -80,7 +80,7 @@ private:
 Mpeg4ReceiverME::Mpeg4ReceiverME(_bstr_t url, NewFrameCb frame_cb) :Mpeg4Receiver(frame_cb) {
     MFStartup(MF_VERSION);
 
-    m_frame_cb = new MediaEngineNotify(this);
+    CComPtr<IMFMediaEngineNotify> engine_cb = new MediaEngineNotify(this);
 
     CComPtr<IMFMediaEngineClassFactory> factory;
     HRESULT hr = factory.CoCreateInstance(CLSID_MFMediaEngineClassFactory, nullptr, CLSCTX_INPROC_SERVER);
@@ -91,7 +91,7 @@ Mpeg4ReceiverME::Mpeg4ReceiverME(_bstr_t url, NewFrameCb frame_cb) :Mpeg4Receive
         hr = MFCreateAttributes(&attribs, 0);
         assert(SUCCEEDED(hr));
 
-        hr = attribs->SetUnknown(MF_MEDIA_ENGINE_CALLBACK, m_frame_cb);
+        hr = attribs->SetUnknown(MF_MEDIA_ENGINE_CALLBACK, engine_cb);
         assert(SUCCEEDED(hr));
 
         // TODO: Investigate the following attributes from https://github.com/chromium/chromium/blob/main/media/renderers/win/media_foundation_renderer.cc

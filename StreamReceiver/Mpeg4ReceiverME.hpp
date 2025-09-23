@@ -21,6 +21,5 @@ public:
     HRESULT ReceiveFrame() override;
 
 private:
-    CComPtr<IMFMediaEngineNotify> m_frame_cb;
     CComPtr<IMFMediaEngine>       m_engine;
 };
