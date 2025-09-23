@@ -15,17 +15,21 @@ struct MediaEngineNotify : public IMFMediaEngineNotify {
         return E_NOTIMPL;
     }
 
-    HRESULT QueryInterface(const IID& riid, void** ppvObj) override {
-        if (!ppvObj)
+    HRESULT QueryInterface(const IID& iid, void** ptr) override {
+        if (!ptr)
             return E_INVALIDARG;
 
-        *ppvObj = NULL;
-        if (riid == IID_IUnknown || riid == IID_IMFMediaEngineNotify) {
-            // Increment the reference count and return the pointer.
-            *ppvObj = (void*)this;
+        *ptr = NULL;
+        if (iid == IID_IUnknown) {
+            *ptr = static_cast<IUnknown*>(this);
             AddRef();
-            return NOERROR;
+            return S_OK;
+        } else if (iid == IID_IMFMediaEngineNotify) {
+            *ptr = static_cast<IMFMediaEngineNotify*>(this);
+            AddRef();
+            return S_OK;
         }
+
         return E_NOINTERFACE;
     }
 
