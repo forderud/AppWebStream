@@ -44,6 +44,11 @@ public:
         return result;
     }
 
+    virtual void Stop() = 0;
+
+    /** Receive frames. The "frame_cb" callback will be called from the same thread when new frames are received. */
+    virtual HRESULT ReceiveFrame() = 0;
+
 protected:
     uint64_t                 m_startTime = 0;   // SECONDS since midnight, Jan. 1, 1904
     double                   m_dpi = 0;         // pixel spacing

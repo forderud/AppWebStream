@@ -15,10 +15,10 @@ public:
 
     ~Mpeg4ReceiverSR() override;
 
-    void Stop();
+    void Stop() override;
 
     /** Receive frames. The "frame_cb" callback will be called from the same thread when new frames are received. */
-    HRESULT ReceiveFrame();
+    HRESULT ReceiveFrame() override;
 
 private:
     void OnStartTimeDpiChanged(uint64_t startTime, double dpi, double xform[6]);
