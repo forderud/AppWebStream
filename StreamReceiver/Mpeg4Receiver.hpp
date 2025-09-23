@@ -16,9 +16,10 @@ static unsigned int Align16(unsigned int size) {
 /** Base-class for receiving for fragmented MPEG4 streams over a network. */
 class Mpeg4Receiver {
 public:
+    /** MediaFoundation decoder types. */
     enum DecoderType {
-        MediaEngine,
-        SourceReader,
+        MediaEngine,  ///< IMFMediaEngine
+        SourceReader, ///< IMFSourceReader
     };
 
     /** frameTime is in 100-nanosecond units since startTime. frameDuration is also in 100-nanosecond units. */
