@@ -4,6 +4,7 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="StreamWrapper.cpp" />
     <ClCompile Include="Mpeg4ReceiverSR.cpp" />
+    <ClCompile Include="Mpeg4Receiver.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StreamWrapper.hpp" />
