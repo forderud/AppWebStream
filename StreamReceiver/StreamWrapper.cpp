@@ -143,6 +143,19 @@ IMFByteStreamPtr CreateByteStreamFromUrl(_bstr_t url) {
         COM_CHECK(props->SetValue(key, val));
         //COM_CHECK(props->Commit());
     }
+    {
+        // disable network source content cache
+        PROPERTYKEY key{};
+        key.fmtid = MFNETSOURCE_CACHEENABLED;
+        key.pid = 0;
+
+        PROPVARIANT val{};
+        val.vt = VT_I4;
+        val.lVal = 0; // false (true is default)
+
+        COM_CHECK(props->SetValue(key, val));
+        //COM_CHECK(props->Commit());
+    }
 
     // create innerStream that connects to the URL
     DWORD createObjFlags = MF_RESOLUTION_BYTESTREAM; // MF_RESOLUTION_BYTESTREAM for IMFByteStream and MF_RESOLUTION_MEDIASOURCE for IMFMediaSource
