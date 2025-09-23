@@ -9,7 +9,7 @@
 #include "DisplayWindow.hpp"
 
 
-void ReceiveMovieThread(Mpeg4ReceiverSR* receiver) {
+void ReceiveMovieThread(Mpeg4Receiver* receiver) {
     SetThreadDescription(GetCurrentThread(), L"ReceiveMovieThread");
 
     HRESULT hr = S_OK;
