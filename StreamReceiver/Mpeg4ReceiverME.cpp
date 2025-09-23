@@ -118,14 +118,6 @@ Mpeg4ReceiverME::Mpeg4ReceiverME(_bstr_t url, NewFrameCb frame_cb) :Mpeg4Receive
     hr = m_engine->Play();
     if (FAILED(hr))
         throw std::runtime_error("Play failed");
-
-    // TODO: Populate m_resolution
-#if 0
-    DWORD width = 0, height = 0;
-    hr = m_engine->GetNativeVideoSize(&width, &height);
-    if (FAILED(hr))
-        throw std::runtime_error("GetNativeVideoSize failed");
-#endif
 }
 
 Mpeg4ReceiverME::~Mpeg4ReceiverME() {
@@ -143,6 +135,20 @@ HRESULT Mpeg4ReceiverME::ReceiveFrame() {
 }
 
 void Mpeg4ReceiverME::OnFrameArrived() {
+    {
+        // Update m_resolution
+        DWORD width = 0, height = 0;
+        HRESULT hr = m_engine->GetNativeVideoSize(&width, &height);
+        if (FAILED(hr))
+            abort();
+
+        if ((width != m_resolution[0]) || (height != m_resolution[1]))
+            m_metadata_changed = true;
+
+        m_resolution[0] = width;
+        m_resolution[1] = height;
+    }
+
     double time = m_engine->GetCurrentTime(); // in seconds
     int64_t time_100ns = (int64_t)(time * 10 * 1000 * 1000);
 
