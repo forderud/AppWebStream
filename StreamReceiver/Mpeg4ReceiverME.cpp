@@ -1,4 +1,5 @@
 #pragma once
+#include <stdexcept>
 #include <mfapi.h>
 #include <mfmediaengine.h>
 #include "Mpeg4ReceiverME.hpp"
@@ -22,6 +23,11 @@ Mpeg4ReceiverME::Mpeg4ReceiverME(_bstr_t url, NewFrameCb frame_cb) :Mpeg4Receive
 
     hr = factory->CreateInstance(MF_MEDIA_ENGINE_REAL_TIME_MODE, attribs, &m_engine);
     assert(SUCCEEDED(hr));
+
+    hr = m_engine->SetSource(url);
+    if (FAILED(hr)) {
+        throw std::runtime_error("SetSource failed");
+    }
 }
 
 Mpeg4ReceiverME::~Mpeg4ReceiverME() {
