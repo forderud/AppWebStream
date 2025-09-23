@@ -22,7 +22,8 @@ public:
     /** Factory function. */
     static std::unique_ptr< Mpeg4Receiver> Create(_bstr_t url, NewFrameCb frame_cb);
 
-    Mpeg4Receiver() = default;
+    Mpeg4Receiver(NewFrameCb frame_cb) : m_frame_cb(frame_cb) {
+    }
 
     virtual ~Mpeg4Receiver() = default;
 
@@ -61,4 +62,5 @@ protected:
     double                   m_dpi = 0;         // pixel spacing
     double                   m_xform[6] = { 1, 0, 0, 1, 0, 0 }; // initialize with default identity transform
     std::array<uint32_t, 2>  m_resolution; // horizontal & vertical pixel count
+    NewFrameCb               m_frame_cb = nullptr;
 };

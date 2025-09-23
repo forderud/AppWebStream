@@ -4,7 +4,7 @@
 
 
 /** Connect to requested MPEG4 URL. */
-Mpeg4ReceiverME::Mpeg4ReceiverME(_bstr_t url, NewFrameCb frame_cb) {
+Mpeg4ReceiverME::Mpeg4ReceiverME(_bstr_t url, NewFrameCb frame_cb) :Mpeg4Receiver(frame_cb) {
 
 }
 

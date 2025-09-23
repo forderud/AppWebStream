@@ -22,7 +22,6 @@ private:
     HRESULT ConfigureOutputType(IMFSourceReader& reader, DWORD dwStreamIndex);
 
     CComPtr<IMFSourceReader> m_reader;
-    NewFrameCb               m_frame_cb = nullptr;
     bool                     m_metadata_changed = false; // metadata changed since previous frame
     bool                     m_active = true;
 };

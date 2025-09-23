@@ -26,7 +26,7 @@ _COM_SMARTPTR_TYPEDEF(IPropertyStore, __uuidof(IPropertyStore));
 _COM_SMARTPTR_TYPEDEF(IMFMediaSource, __uuidof(IMFMediaSource));
 
 
-Mpeg4ReceiverSR::Mpeg4ReceiverSR(_bstr_t url, NewFrameCb frame_cb) : m_frame_cb(frame_cb) {
+Mpeg4ReceiverSR::Mpeg4ReceiverSR(_bstr_t url, NewFrameCb frame_cb) : Mpeg4Receiver(frame_cb) {
     m_resolution.fill(0); // clear array
 
     COM_CHECK(MFStartup(MF_VERSION));
