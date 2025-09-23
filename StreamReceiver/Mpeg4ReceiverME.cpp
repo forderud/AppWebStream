@@ -121,12 +121,10 @@ Mpeg4ReceiverME::Mpeg4ReceiverME(_bstr_t url, NewFrameCb frame_cb) :Mpeg4Receive
 }
 
 Mpeg4ReceiverME::~Mpeg4ReceiverME() {
-    m_engine->Shutdown();
-
 }
 
 void Mpeg4ReceiverME::Stop() {
-
+    m_engine->Shutdown();
 }
 
 /** Receive frames. The "frame_cb" callback will be called from the same thread when new frames are received. */
