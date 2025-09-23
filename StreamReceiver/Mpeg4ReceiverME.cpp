@@ -172,10 +172,8 @@ void Mpeg4ReceiverME::OnFrameArrived() {
     }
 
     // copy frame to DXGI surface or WIC bitmap
-    MFVideoNormalizedRect src_rect = { 0, 0, 1.0f, 1.0f };
-    RECT                  dst_rect = { 0 ,0, (LONG)m_resolution[0], (LONG)m_resolution[1] };
-    MFARGB                border_color = { 0, 0, 0, 0 };
-    HRESULT hr = m_engine->TransferVideoFrame(m_bitmap, &src_rect, &dst_rect, &border_color);
+    RECT dst_rect = { 0 ,0, (LONG)m_resolution[0], (LONG)m_resolution[1] };
+    HRESULT hr = m_engine->TransferVideoFrame(m_bitmap, nullptr, &dst_rect, nullptr);
     if (FAILED(hr))
         throw std::runtime_error("TransferVideoFrame failed");
 
