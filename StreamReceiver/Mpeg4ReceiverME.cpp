@@ -24,13 +24,26 @@ Mpeg4ReceiverME::Mpeg4ReceiverME(_bstr_t url, NewFrameCb frame_cb) :Mpeg4Receive
     hr = factory->CreateInstance(MF_MEDIA_ENGINE_REAL_TIME_MODE, attribs, &m_engine);
     assert(SUCCEEDED(hr));
 
+    //m_engine->SetDefaultPlaybackRate(0.0);
+
     hr = m_engine->SetSource(url);
-    if (FAILED(hr)) {
+    if (FAILED(hr))
         throw std::runtime_error("SetSource failed");
-    }
+
+    DWORD width = 0, height = 0;
+    hr = m_engine->GetNativeVideoSize(&width, &height);
+    if (FAILED(hr))
+        throw std::runtime_error("GetNativeVideoSize failed");
+
+    //m_engine->SetCurrentTime(current_time);
+
+    hr = m_engine->Play();
+    if (FAILED(hr))
+        throw std::runtime_error("Play failed");
 }
 
 Mpeg4ReceiverME::~Mpeg4ReceiverME() {
+    m_engine->Shutdown();
 
 }
 
