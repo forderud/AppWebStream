@@ -2,6 +2,7 @@
 #include <stdexcept>
 #include <mfapi.h>
 #include <mfmediaengine.h>
+#include <wincodec.h> // IWICImagingFactory2
 #include "../AppWebStream/ComUtil.hpp"
 #include "StreamWrapper.hpp"
 #include "Mpeg4ReceiverME.hpp"
@@ -159,17 +160,27 @@ void Mpeg4ReceiverME::OnFrameArrived() {
             duration_100ns = (int64_t)(duration * 10 * 1000 * 1000);
     }
 
-    std::string_view buffer;
-#if 0
+    if (!m_bitmap || m_metadata_changed) {
+        m_bitmap.Release();
+
+        CComPtr<IWICImagingFactory2> factory;
+        HRESULT hr = factory.CoCreateInstance(CLSID_WICImagingFactory2);
+        assert(SUCCEEDED(hr));
+
+        hr = factory->CreateBitmap(m_resolution[0], m_resolution[1], GUID_WICPixelFormat32bppBGR, WICBitmapCacheOnDemand, &m_bitmap);
+        assert(SUCCEEDED(hr));
+    }
+
     // copy frame to DXGI surface or WIC bitmap
-    IUnknown* dst_surf = nullptr;
     MFVideoNormalizedRect src_rect = { 0, 0, 1.0f, 1.0f };
     RECT                  dst_rect = { 0 ,0, (LONG)m_resolution[0], (LONG)m_resolution[1] };
     MFARGB                border_color = { 0, 0, 0, 0 };
-    HRESULT hr = m_engine->TransferVideoFrame(dst_surf, &src_rect, &dst_rect, &border_color);
+    HRESULT hr = m_engine->TransferVideoFrame(m_bitmap, &src_rect, &dst_rect, &border_color);
     if (FAILED(hr))
         throw std::runtime_error("TransferVideoFrame failed");
-#endif
 
+    std::string_view buffer; // TODO: Extract RGB pixels from bitmap
     m_frame_cb(*this, time_100ns, duration_100ns, buffer, m_metadata_changed);
+
+    m_metadata_changed = false; // clear flag after m_frame_cb have been called
 }

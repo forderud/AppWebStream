@@ -3,7 +3,7 @@
 
 struct IMFMediaEngineNotify; // forward decl.
 struct IMFMediaEngine; // forward decl.
-
+struct IWICBitmap; // forward decl.
 
 /** Receiver for fragmented MPEG4 streams over a network.
     Does internally use the Media Foundation Media Engine API. */
@@ -24,4 +24,5 @@ private:
     void OnFrameArrived();
 
     CComPtr<IMFMediaEngine> m_engine;
+    CComPtr<IWICBitmap>     m_bitmap;
 };
