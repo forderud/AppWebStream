@@ -15,7 +15,6 @@ struct MediaEngineNotify : public IMFMediaEngineNotify {
 
     HRESULT EventNotify(DWORD event_, uint64_t param1, DWORD param2) override {
         auto event = (MF_MEDIA_ENGINE_EVENT)event_;
-        event;
 
         if (event == MF_MEDIA_ENGINE_EVENT_TIMEUPDATE) {
             assert(!param1);
