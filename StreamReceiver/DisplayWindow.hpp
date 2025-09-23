@@ -36,10 +36,8 @@ public:
         // make object accessible from window procedure
         SetWindowLongPtrW(m_wnd, GWLP_USERDATA, (LONG_PTR)this);
 
-#ifdef ENABLE_SCREEN_DISPLAY
         // show window
         ShowWindow(m_wnd, SW_SHOW);
-#endif
     }
 
     ~DisplayWindow() {
@@ -82,11 +80,8 @@ public:
         wprintf(L"  Frame time:     %f ms\n", frameTime * 0.1f / 1000); // convert to milliseconds
         wprintf(L"  Frame duration: %f ms\n", frameDuration * 0.1f / 1000); // convert to milliseconds
 
-#ifdef ENABLE_SCREEN_DISPLAY
-        DrawBitmap(resolution, buffer);
-#else
-        buffer;
-#endif
+        if (buffer.size() > 0)
+            DrawBitmap(resolution, buffer);
     }
 
 private:

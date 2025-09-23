@@ -1,5 +1,3 @@
-#define ENABLE_SCREEN_DISPLAY
-
 #include <atlbase.h>
 #include <stdio.h>
 #include <thread>
