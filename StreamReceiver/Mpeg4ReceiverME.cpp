@@ -171,9 +171,13 @@ void Mpeg4ReceiverME::OnFrameArrived() {
         assert(SUCCEEDED(hr));
     }
 
+    LONGLONG presentation_time = 0;
+    HRESULT hr = m_engine->OnVideoStreamTick(&presentation_time);
+    assert(SUCCEEDED(hr));
+
     // copy frame to DXGI surface or WIC bitmap
     RECT dst_rect = { 0 ,0, (LONG)m_resolution[0], (LONG)m_resolution[1] };
-    HRESULT hr = m_engine->TransferVideoFrame(m_bitmap, nullptr, &dst_rect, nullptr);
+    hr = m_engine->TransferVideoFrame(m_bitmap, nullptr, &dst_rect, nullptr);
     if (FAILED(hr))
         throw std::runtime_error("TransferVideoFrame failed");
 
