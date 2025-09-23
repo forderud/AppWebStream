@@ -23,7 +23,7 @@ struct MediaEngineNotify : public IMFMediaEngineNotify {
             m_parent->OnFrameArrived();
         }
 
-        return E_NOTIMPL;
+        return S_OK;
     }
 
     HRESULT QueryInterface(const IID& iid, void** ptr) override {
