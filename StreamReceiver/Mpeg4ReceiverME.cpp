@@ -134,7 +134,7 @@ HRESULT Mpeg4ReceiverME::ReceiveFrame() {
 
 void Mpeg4ReceiverME::OnFrameArrived() {
     {
-        // Update m_resolution
+        // update m_resolution
         DWORD width = 0, height = 0;
         HRESULT hr = m_engine->GetNativeVideoSize(&width, &height);
         if (FAILED(hr))
@@ -147,13 +147,17 @@ void Mpeg4ReceiverME::OnFrameArrived() {
         m_resolution[1] = height;
     }
 
-    double time = m_engine->GetCurrentTime(); // in seconds
-    int64_t time_100ns = (int64_t)(time * 10 * 1000 * 1000);
-
-    double duration = m_engine->GetDuration(); // in  seconds
+    int64_t time_100ns = 0;
     int64_t duration_100ns = 0;
-    if (!std::isinf(duration) && !std::isnan(duration))
-        duration_100ns = (int64_t)(duration * 10 * 1000 * 1000);
+    {
+        // get frame time & duration
+        double time = m_engine->GetCurrentTime(); // in seconds
+        time_100ns = (int64_t)(time * 10 * 1000 * 1000);
+
+        double duration = m_engine->GetDuration(); // in  seconds
+        if (!std::isinf(duration) && !std::isnan(duration))
+            duration_100ns = (int64_t)(duration * 10 * 1000 * 1000);
+    }
 
     std::string_view buffer;
 #if 0
