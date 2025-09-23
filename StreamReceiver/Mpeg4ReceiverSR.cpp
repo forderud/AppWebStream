@@ -208,19 +208,6 @@ HRESULT Mpeg4ReceiverSR::ReceiveFrame() {
     return S_OK;
 }
 
-void Mpeg4ReceiverSR::OnStartTimeDpiChanged(uint64_t startTime, double dpi, double xform[6]) {
-    if (startTime != m_startTime)
-        m_metadata_changed = true;
-    if (dpi != m_dpi)
-        m_metadata_changed = true;
-
-    m_startTime = startTime;
-    m_dpi = dpi;
-
-    for (size_t i = 0; i < 6; i++)
-        m_xform[i] = xform[i];
-}
-
 HRESULT Mpeg4ReceiverSR::ConfigureOutputType(IMFSourceReader& reader, DWORD dwStreamIndex) {
     GUID majorType{};
     GUID subType{};

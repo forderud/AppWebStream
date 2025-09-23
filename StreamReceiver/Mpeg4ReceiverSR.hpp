@@ -18,10 +18,8 @@ public:
     HRESULT ReceiveFrame() override;
 
 private:
-    void OnStartTimeDpiChanged(uint64_t startTime, double dpi, double xform[6]);
     HRESULT ConfigureOutputType(IMFSourceReader& reader, DWORD dwStreamIndex);
 
     CComPtr<IMFSourceReader> m_reader;
-    bool                     m_metadata_changed = false; // metadata changed since previous frame
     bool                     m_active = true;
 };

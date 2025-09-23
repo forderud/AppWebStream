@@ -58,9 +58,12 @@ public:
     virtual HRESULT ReceiveFrame() = 0;
 
 protected:
+    void OnStartTimeDpiChanged(uint64_t startTime, double dpi, double xform[6]);
+
     uint64_t                 m_startTime = 0;   // SECONDS since midnight, Jan. 1, 1904
     double                   m_dpi = 0;         // pixel spacing
     double                   m_xform[6] = { 1, 0, 0, 1, 0, 0 }; // initialize with default identity transform
     std::array<uint32_t, 2>  m_resolution; // horizontal & vertical pixel count
+    bool                     m_metadata_changed = false; // metadata changed since previous frame
     NewFrameCb               m_frame_cb = nullptr;
 };
