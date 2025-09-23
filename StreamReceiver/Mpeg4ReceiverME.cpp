@@ -162,11 +162,9 @@ void Mpeg4ReceiverME::OnFrameArrived() {
     std::string_view buffer;
 #if 0
     // copy frame to DXGI surface or WIC bitmap
-    LONG width = 0;
-    LONG height = 0;
     IUnknown* dst_surf = nullptr;
     MFVideoNormalizedRect src_rect = { 0, 0, 1.0f, 1.0f };
-    RECT                  dst_rect = { 0 ,0, width, height };
+    RECT                  dst_rect = { 0 ,0, (LONG)m_resolution[0], (LONG)m_resolution[1] };
     MFARGB                border_color = { 0, 0, 0, 0 };
     HRESULT hr = m_engine->TransferVideoFrame(dst_surf, &src_rect, &dst_rect, &border_color);
     if (FAILED(hr))
