@@ -85,16 +85,18 @@ Mpeg4ReceiverME::Mpeg4ReceiverME(_bstr_t url, NewFrameCb frame_cb) :Mpeg4Receive
     if (FAILED(hr))
         throw std::runtime_error("SetSource failed");
 
-    DWORD width = 0, height = 0;
-    hr = m_engine->GetNativeVideoSize(&width, &height);
-    if (FAILED(hr))
-        throw std::runtime_error("GetNativeVideoSize failed");
-
     //m_engine->SetCurrentTime(current_time);
 
     hr = m_engine->Play();
     if (FAILED(hr))
         throw std::runtime_error("Play failed");
+
+#if 0
+    DWORD width = 0, height = 0;
+    hr = m_engine->GetNativeVideoSize(&width, &height);
+    if (FAILED(hr))
+        throw std::runtime_error("GetNativeVideoSize failed");
+#endif
 }
 
 Mpeg4ReceiverME::~Mpeg4ReceiverME() {
