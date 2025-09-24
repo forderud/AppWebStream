@@ -17,7 +17,7 @@ The `AppWebStream` and `StreamReceiver` projects in this repo can be used togeth
 ![screenshot](screenshot.jpg)
 * Open project in Visual Studio
 * Build project
-* Start `WebAppStream.exe port [window handle]`. You can use Spy++ (included with Visual Studio) to determine window handles.
+* Start `WebAppStream.exe port [window handle]`. You can use Spy++ (`spyxx.exe` distributed with Visual Studio) to determine window handles.
 * Open `http://localhost:port` in web browser.
 
 To build with FFMPG, you first need to download & unzip [FFMPEG binaries](https://www.ffmpeg.org/download.html) to a folder pointed to by the `FFMPEG_ROOT` environment variable. Then, set the `ENABLE_FFMPEG` preprocessor define before building.
