@@ -178,22 +178,22 @@ void Mpeg4ReceiverME::OnFrameArrived() {
     if (FAILED(hr))
         throw std::runtime_error("TransferVideoFrame failed");
 
-    CComPtr<IWICBitmapLock> frame_lock; // lock for frame_buffer content
-    std::string_view frame_buffer;
     {
         WICRect rect = { 0, 0, (INT)m_resolution[0], (INT)m_resolution[1] };
-        hr = m_bitmap->Lock(&rect, WICBitmapLockRead, &frame_lock);
+        CComPtr<IWICBitmapLock> lock; // pixel data lock
+        hr = m_bitmap->Lock(&rect, WICBitmapLockRead, &lock);
         assert(SUCCEEDED(hr));
 
         UINT size = 0;
         WICInProcPointer ptr = nullptr;
-        hr = frame_lock->GetDataPointer(&size, &ptr);
+        hr = lock->GetDataPointer(&size, &ptr);
         assert(SUCCEEDED(hr));
 
-        frame_buffer = std::string_view((char*)ptr, size);
-    }
+        // call frame data callback function for client-side processing
+        m_frame_cb(*this, time, duration, std::string_view((char*)ptr, size), m_metadata_changed);
 
-    m_frame_cb(*this, time, duration, frame_buffer, m_metadata_changed);
+        // "lock" automatically unlocked when ref-count drops
+    }
 
     m_metadata_changed = false; // clear flag after m_frame_cb have been called
 }
