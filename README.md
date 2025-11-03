@@ -28,7 +28,7 @@ To build with FFMPG, you first need to download & unzip [FFMPEG binaries](https:
 Metadata implementation status:
 * [x] All frames time-stamped with <0.1ms temporal accuracy against the MPEG4 1904 epoch
 * [x] Pixel-to-world coordinate transform metadata in [`mvhd` atom](https://developer.apple.com/documentation/quicktime-file-format/movie_header_atom)
-* [x] Pixel spacing (DPI) metadata
+* [x] Pixel spacing (DPI) metadata in [`stsd` atom](https://developer.apple.com/documentation/quicktime-file-format/video_sample_description)
 * [x] Stream restart to enable coordinate transform and DPI changes
 * [ ] Freeze & resume frame time-stamps might lead to paused web browser playback ([issue #24](../../issues/24))
 
