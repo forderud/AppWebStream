@@ -24,8 +24,7 @@ To build with FFMPG, you first need to download & unzip [FFMPEG binaries](https:
 
 ### AppWebStream implementation details
 
-#### Video metadata
-Metadata implementation status:
+#### Video metadata status
 * [x] All frames time-stamped with <0.1ms temporal accuracy against the MPEG4 1904 epoch
 * [x] Pixel-to-world coordinate transform metadata in [`mvhd` atom](https://developer.apple.com/documentation/quicktime-file-format/movie_header_atom)
 * [x] Pixel spacing (DPI) metadata in [`stsd` atom](https://developer.apple.com/documentation/quicktime-file-format/video_sample_description)
