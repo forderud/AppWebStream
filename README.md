@@ -15,8 +15,8 @@ The `AppWebStream` and `StreamReceiver` projects in this repo can be used togeth
 
 ### Getting started
 ![screenshot](screenshot.jpg)
-* Open project in Visual Studio
-* Build project
+* Open project in Visual Studio.
+* Build project.
 * Start `WebAppStream.exe port [window handle]`. You can use Spy++ (`spyxx.exe` distributed with Visual Studio) to determine window handles.
 * Open `http://localhost:port` in web browser.
 
