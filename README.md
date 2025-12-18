@@ -51,7 +51,7 @@ The video stream adheres to the MPEG4 standard, so it should be supported by all
 * [ffplay](https://ffmpeg.org/ffplay.html): `ffplay.exe -flags low_delay -i "http://localhost:port/movie.mp4"`
 * `StreamReceiver` project in this repo (latency [issue #31](../../issues/31))
 
-Unsupported clients:
+#### Unsupported clients
 * Doesn't yet work on iOS, due to incomplete `ManagedMediaSource` support ([issue #25](../../issues/25)).
 
 ### External resources
