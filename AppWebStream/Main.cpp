@@ -3,9 +3,6 @@
 #include "Mpeg4Transmitter.hpp"
 #include "ScreenCapture.hpp"
 
-#pragma comment(lib, "winmm.lib") // for timeGetTime()
-
-
 static double G_XFORM[] = { 0.10, 0.00, 0.00, 0.10, -0.05, 0.00 }; // 10cm width, 10cm height, top-left corner at (-0.05, 0)
 
 
@@ -13,6 +10,14 @@ inline FILETIME CurrentTime() {
     FILETIME now{};
     GetSystemTimeAsFileTime(&now);
     return now;
+}
+inline uint32_t ToMilliseconds(FILETIME winTime) {
+    ULARGE_INTEGER res{};
+    res.HighPart = winTime.dwHighDateTime;
+    res.LowPart = winTime.dwLowDateTime;
+
+    constexpr uint64_t FILETIME_PER_MILLISECONDS = 10000;
+    return (uint32_t)(res.QuadPart / FILETIME_PER_MILLISECONDS);
 }
 
 /** Convert samples per meter to DPI. */
@@ -102,7 +107,7 @@ int main (int argc, char *argv[]) {
     printf("Connecting to client...\n");
 
     // encode & transmit frames
-    uint32_t next_deadline = timeGetTime(); // milliseconds since startup
+    uint32_t next_deadline = ToMilliseconds(CurrentTime());
     for (;;) {
         HRESULT hr = EncodeFrame(encoder, wnd_dc, dims);
         if (FAILED(hr))
@@ -110,7 +115,7 @@ int main (int argc, char *argv[]) {
 
         // synchronize framerate
         next_deadline += 1000/FPS;
-        auto now = timeGetTime();
+        auto now = ToMilliseconds(CurrentTime());
         if (next_deadline < now) {
             next_deadline = now; // missed deadline, reset to avoid burst of frames
             printf("M"); // log missed frame
