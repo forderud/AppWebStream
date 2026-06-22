@@ -113,6 +113,7 @@ int main (int argc, char *argv[]) {
         auto now = std::chrono::steady_clock::now();
         if (next_deadline < now) {
             next_deadline = now; // missed deadline, reset to avoid burst of frames
+            printf("M"); // log missed frame
         } else {
             std::this_thread::sleep_until(next_deadline);
         }
