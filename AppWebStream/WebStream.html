@@ -31,7 +31,10 @@ if (window.ManagedMediaSource && ManagedMediaSource.isTypeSupported(mimeCodec)) 
 }
 
 if (mediaSource) {
-    video.src = URL.createObjectURL(mediaSource);
+    var source = document.createElement("source");
+    source.type = mimeCodec;
+    source.src = URL.createObjectURL(mediaSource);
+    video.appendChild(source);
 }
 
 function ConcatenateQueue(queue) {
