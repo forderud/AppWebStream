@@ -117,6 +117,10 @@ int main (int argc, char *argv[]) {
         } else {
             Sleep(next_deadline - now);
         }
+
+#if 0
+        printf("%u\n", next_deadline); // log frame time
+#endif
     }
 
     return 0;
