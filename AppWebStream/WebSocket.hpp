@@ -168,7 +168,8 @@ public:
         addrinfo* result = nullptr;
         {
             addrinfo hints{};
-            hints.ai_family = AF_UNSPEC; // allow both IPv4 & IPv6
+            hints.ai_family = AF_INET; // IPv4 only
+            // Can also use ai_family=AF_UNSPEC to allow both IPv4 & IPv6, but will then need to listen to 2 sockets.
             hints.ai_socktype = SOCK_STREAM;
             hints.ai_protocol = IPPROTO_TCP;
             hints.ai_flags = AI_PASSIVE; // server socket
