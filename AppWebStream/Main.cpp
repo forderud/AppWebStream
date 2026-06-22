@@ -1,5 +1,7 @@
 #include <sstream>
 #include <iostream>
+#include <chrono>
+#include <thread>
 #include "Mpeg4Transmitter.hpp"
 #include "ScreenCapture.hpp"
 
@@ -100,13 +102,20 @@ int main (int argc, char *argv[]) {
     printf("Connecting to client...\n");
 
     // encode & transmit frames
+    const auto frame_period = std::chrono::milliseconds(std::chrono::seconds(1)) / FPS;
+    auto next_deadline = std::chrono::steady_clock::now();
     for (;;) {
         HRESULT hr = EncodeFrame(encoder, wnd_dc, dims);
         if (FAILED(hr))
             break;
 
         // synchronize framerate
-        Sleep(1000/FPS);
+        next_deadline += frame_period;
+        auto now = std::chrono::steady_clock::now();
+        if (next_deadline < now)
+            next_deadline = now; // missed deadline, reset to avoid burst of frames
+        else
+            std::this_thread::sleep_until(next_deadline);
     }
 
     return 0;
