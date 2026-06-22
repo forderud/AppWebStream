@@ -179,17 +179,19 @@ public:
                 throw std::runtime_error("getaddrinfo failure");
         }
 
-        m_sock = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-        if (m_sock == INVALID_SOCKET)
-            throw std::runtime_error("socket failure");
+        {
+            m_sock = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+            if (m_sock == INVALID_SOCKET)
+                throw std::runtime_error("socket failure");
 
-        res = bind(m_sock, result->ai_addr, static_cast<int>(result->ai_addrlen));
-        if (res == SOCKET_ERROR)
-            throw std::runtime_error("bind failure");
+            res = bind(m_sock, result->ai_addr, static_cast<int>(result->ai_addrlen));
+            if (res == SOCKET_ERROR)
+                throw std::runtime_error("bind failure");
 
-        res = listen(m_sock, SOMAXCONN);
-        if (res == SOCKET_ERROR)
-            throw std::runtime_error("listen failure");
+            res = listen(m_sock, SOMAXCONN);
+            if (res == SOCKET_ERROR)
+                throw std::runtime_error("listen failure");
+        }
 
         freeaddrinfo(result);
         result = nullptr;
