@@ -187,12 +187,12 @@ public:
         if (res == SOCKET_ERROR)
             throw std::runtime_error("bind failure");
 
-        freeaddrinfo(result);
-        result = nullptr;
-
         res = listen(m_sock, SOMAXCONN);
         if (res == SOCKET_ERROR)
             throw std::runtime_error("listen failure");
+
+        freeaddrinfo(result);
+        result = nullptr;
     }
 
     // non-assignable class (only movable)
