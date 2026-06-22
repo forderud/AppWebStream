@@ -30,7 +30,7 @@ if (window.ManagedMediaSource && ManagedMediaSource.isTypeSupported(mimeCodec)) 
     console.error("Media Source Extensions (MSE) not supported.")
 }
 
-if (mediaSource) {
+{
     var source = document.createElement("source");
     source.type = mimeCodec;
     source.src = URL.createObjectURL(mediaSource);
