@@ -18,8 +18,8 @@ struct MediaEngineNotify : public IMFMediaEngineNotify {
         auto event = (MF_MEDIA_ENGINE_EVENT)event_;
 
         if (event == MF_MEDIA_ENGINE_EVENT_TIMEUPDATE) {
-            assert(!param1);
-            assert(!param2);
+            assert(!param1); param1;
+            assert(!param2); param2;
             m_parent->OnFrameArrived();
         }
 
