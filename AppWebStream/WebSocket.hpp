@@ -171,7 +171,7 @@ public:
             hints.ai_family = AF_UNSPEC; // allow both IPv4 & IPv6
             hints.ai_socktype = SOCK_STREAM;
             hints.ai_protocol = IPPROTO_TCP;
-            hints.ai_flags = AI_PASSIVE;
+            hints.ai_flags = AI_PASSIVE; // server socket
 
             // resolve port
             res = getaddrinfo(NULL, port_str, &hints, &result);
