@@ -57,53 +57,121 @@ function ConcatenateQueue(queue) {
     return concatArray;
 }
 
+// Shared streaming state. Hoisted here so the ManagedMediaSource lifecycle
+// handlers (onstartstreaming / onendstreaming) can drive fetch start/abort
+// without having to reach into the onsourceopen closure.
+var sourceBuffer = null;
+var fetchController = null; // AbortController for the currently active fetch
+var fetchActive = false;    // true while a fetch is in flight
+var pendingQueue = [];      // chunks waiting to be fed to the SourceBuffer
+var sourceUrl = "movie.mp4";
+
+function tryAppend() {
+    if (!sourceBuffer || sourceBuffer.updating || pendingQueue.length === 0)
+        return;
+    try {
+        sourceBuffer.appendBuffer(ConcatenateQueue(pendingQueue));
+        pendingQueue = [];
+    } catch (e) {
+        // QuotaExceededError: SourceBuffer is full. Drop the oldest data
+        // already played out and try again on the next updateend.
+        console.warn("appendBuffer failed: "+e);
+    }
+}
+
+function trimPlayedBuffer() {
+    // ManagedMediaSource fires endstreaming when memory pressure is high;
+    // proactively evict already-played data to lower the chance of being
+    // throttled in the first place.
+    if (!isManaged || !sourceBuffer || sourceBuffer.updating)
+        return;
+    if (sourceBuffer.buffered.length === 0)
+        return;
+    var start = sourceBuffer.buffered.start(0);
+    var keepFrom = Math.max(start, video.currentTime - 5); // keep last 5s
+    if (keepFrom > start + 1) {
+        try {
+            sourceBuffer.remove(start, keepFrom);
+        } catch (e) {
+            // ignore: removal will be retried on subsequent updateend
+        }
+    }
+}
+
 function startFetch() {
-}
+    if (fetchActive || !sourceBuffer)
+        return;
+    fetchActive = true;
+    fetchController = new AbortController();
+    console.log("Starting fetch from "+sourceUrl);
 
-function stopFetch() {
-}
-
-mediaSource.onsourceopen = (e) => {
-    var mediaSource = e.target;
-    console.log("MSE: onsourceopen: "+mediaSource.readyState); // open
-    URL.revokeObjectURL(video.src);
-
-    var sourceBuffer = mediaSource.addSourceBuffer(mimeCodec);
-    sourceBuffer.mode = "sequence";
-    sourceBuffer.onerror = (e) => {
-        console.error("sourceBuffer error: "+parent.mediaSource.readyState+", "+e);
-    };
-    sourceBuffer.onabort = (e) => {
-        console.error("sourceBuffer abort: "+parent.mediaSource.readyState+", "+e);
-    };
-    sourceBuffer.onupdateend = (e) => {
-        //console.log("sourceBuffer updateend");
-    };
-
-    var url = "movie.mp4";
-    console.log("streaming URL: "+url);
-    fetch(url).then(function(response) {
+    fetch(sourceUrl, { signal: fetchController.signal }).then(function(response) {
         var reader = response.body.getReader();
-        var queue = [];
 
         function pump() {
             return reader.read().then(({done, value}) => {
-                if (done)
+                if (done) {
+                    fetchActive = false;
                     return;
-
-                queue.push(value);
-                if (!sourceBuffer.updating) {
-                    sourceBuffer.appendBuffer(ConcatenateQueue(queue));
-                    queue = [];
                 }
+                if (!fetchActive) {
+                    // aborted while a read was in flight
+                    try { reader.cancel(); } catch (e) {}
+                    return;
+                }
+                pendingQueue.push(value);
+                tryAppend();
                 return pump();
-            })
+            });
         }
-        // call recursive function to stream received data
         return pump();
     }).catch(function(e) {
-        console.error("fetch error: "+e);
+        fetchActive = false;
+        if (e && e.name === "AbortError") {
+            console.log("fetch aborted (endstreaming)");
+        } else {
+            console.error("fetch error: "+e);
+        }
     });
+}
+
+function stopFetch() {
+    if (!fetchActive)
+        return;
+    fetchActive = false;
+    if (fetchController) {
+        fetchController.abort();
+        fetchController = null;
+    }
+}
+
+mediaSource.onsourceopen = (e) => {
+    var ms = e.target;
+    console.log("MSE: onsourceopen: "+ms.readyState); // open
+    // Revoke the object URL now that the MediaSource has latched onto it.
+    if (source && source.src) {
+        URL.revokeObjectURL(source.src);
+    }
+
+    sourceBuffer = ms.addSourceBuffer(mimeCodec);
+    sourceBuffer.mode = "sequence";
+    sourceBuffer.onerror = (e) => {
+        console.error("sourceBuffer error: "+ms.readyState+", "+e);
+    };
+    sourceBuffer.onabort = (e) => {
+        console.error("sourceBuffer abort: "+ms.readyState+", "+e);
+    };
+    sourceBuffer.onupdateend = (e) => {
+        // Drain any pending data that arrived while the buffer was updating.
+        tryAppend();
+        trimPlayedBuffer();
+    };
+
+    // For plain MediaSource the UA gives no flow-control signal, so we start
+    // streaming immediately. For ManagedMediaSource we instead wait for the
+    // onstartstreaming event below (the UA will fire it shortly).
+    if (!isManaged)
+        startFetch();
 };
 mediaSource.onsourceended = (e) => {
     console.log("MSE: onsourceended.");
