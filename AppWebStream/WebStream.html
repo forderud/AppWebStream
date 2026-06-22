@@ -6,6 +6,8 @@
     <video id="movie" muted autoplay>Video not shown</video>
 
 <script>
+"use strict";
+
 var video = document.getElementById("movie");
 video.onerror = (e) => {
     console.error("Video tag error: "+e);
