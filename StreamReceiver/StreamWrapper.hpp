@@ -54,8 +54,14 @@ public:
 
     HRESULT Close() override;
 
+    /** Forward IMFAttributes QueryInterface to the inner byte stream so that
+        attribute hints (e.g. MF_LOW_LATENCY) set on the inner stream are
+        visible to the Media Foundation source resolver via this wrapper. */
+    static HRESULT WINAPI ForwardAttributesQI(void* pv, REFIID riid, LPVOID* ppv, DWORD_PTR dw);
+
     BEGIN_COM_MAP(StreamWrapper)
         COM_INTERFACE_ENTRY(IMFByteStream)
+        COM_INTERFACE_ENTRY_FUNC(__uuidof(IMFAttributes), 0, ForwardAttributesQI) // intercept QueryInterface(IMFAttributes) calls
     END_COM_MAP()
 
 private:

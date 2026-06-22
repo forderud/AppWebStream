@@ -12,6 +12,7 @@
 // define smart-pointers with "Ptr" suffix
 _COM_SMARTPTR_TYPEDEF(IMFSourceResolver, __uuidof(IMFSourceResolver));
 _COM_SMARTPTR_TYPEDEF(IPropertyStore, __uuidof(IPropertyStore));
+_COM_SMARTPTR_TYPEDEF(IMFAttributes, __uuidof(IMFAttributes));
 
 
 StreamWrapper::StreamWrapper() {
@@ -97,6 +98,16 @@ HRESULT StreamWrapper::Close() {
     return m_socket->Close();
 }
 
+HRESULT WINAPI StreamWrapper::ForwardAttributesQI(void* pv, REFIID riid, LPVOID* ppv, DWORD_PTR /*dw*/) {
+    auto* self = static_cast<StreamWrapper*>(pv);
+    if (!self || !self->m_socket) {
+        if (ppv)
+            *ppv = nullptr;
+        return E_NOINTERFACE;
+    }
+    return self->m_socket->QueryInterface(riid, ppv);
+}
+
 
 IMFByteStreamPtr CreateByteStreamFromUrl(_bstr_t url) {
     IMFSourceResolverPtr resolver;
@@ -164,5 +175,15 @@ IMFByteStreamPtr CreateByteStreamFromUrl(_bstr_t url) {
     COM_CHECK(resolver->CreateObjectFromURL(url, createObjFlags, props, &objectType, &obj));
     assert(objectType == MF_OBJECT_BYTESTREAM);
     IMFByteStreamPtr byteStream = obj;
+
+    {
+        // Hint the source/parser to minimize internal buffering. The Media
+        // Foundation source resolver inspects IMFAttributes on the byte stream
+        // when SetSourceFromByteStream is called, so this propagates through
+        // StreamWrapper (which forwards IMFAttributes QI to this inner stream).
+        IMFAttributesPtr attribs = byteStream;
+        COM_CHECK(attribs->SetUINT32(MF_LOW_LATENCY, TRUE));
+    }
+
     return byteStream;
 }
