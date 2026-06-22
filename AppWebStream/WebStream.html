@@ -57,6 +57,12 @@ function ConcatenateQueue(queue) {
     return concatArray;
 }
 
+function startFetch() {
+}
+
+function stopFetch() {
+}
+
 mediaSource.onsourceopen = (e) => {
     var mediaSource = e.target;
     console.log("MSE: onsourceopen: "+mediaSource.readyState); // open
@@ -104,14 +110,17 @@ mediaSource.onsourceended = (e) => {
 };
 mediaSource.onsourceclose = (e) => {
     console.log("MSE: onsourceclose.");
+    stopFetch();
 };
 
 // Apple iOS ManagedMediaSource compatibility handlers
 mediaSource.onstartstreaming = (e) => {
     console.log("MMSE: onstartstreaming.");
+    startFetch();
 };
 mediaSource.onendstreaming = (e) => {
     console.log("MMSE: onendstreaming.");
+    stopFetch();
 };
 
 </script>
