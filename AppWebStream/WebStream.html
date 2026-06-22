@@ -22,14 +22,16 @@ video.onplay = (e) => {
 var mimeCodec = 'video/mp4; codecs="avc1.64001F"';
 
 var mediaSource = null;
+var isManaged = false;
 if (window.ManagedMediaSource && ManagedMediaSource.isTypeSupported(mimeCodec)) {
     mediaSource = new ManagedMediaSource(); // for iOS compatibility
+    isManaged = true;
     console.log("Using ManagedMediaSource extension.");
 } else if (window.MediaSource && MediaSource.isTypeSupported(mimeCodec)) {
     mediaSource = new MediaSource();
     console.log("Using MediaSource extension.");
 } else {
-    console.error("Media Source Extensions (MSE) not supported.")
+    console.error("Media Source Extensions (MSE) not supported, or codec '"+mimeCodec+"' not supported.");
 }
 
 {
@@ -99,18 +101,18 @@ mediaSource.onsourceopen = (e) => {
 }
 mediaSource.onsourceended = (e) => {
     console.log("MSE: onsourceended.");
-}
+};
 mediaSource.onsourceclose = (e) => {
     console.log("MSE: onsourceclose.");
-}
+};
 
 // Apple iOS ManagedMediaSource compatibility handlers
 mediaSource.onstartstreaming = (e) => {
     console.log("MMSE: onstartstreaming.");
-}
+};
 mediaSource.onendstreaming = (e) => {
     console.log("MMSE: onendstreaming.");
-}
+};
 
 </script>
 </body>
