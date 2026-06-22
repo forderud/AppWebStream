@@ -21,10 +21,10 @@ var mimeCodec = 'video/mp4; codecs="avc1.64001F"';
 
 var mediaSource = null;
 if (window.ManagedMediaSource && ManagedMediaSource.isTypeSupported(mimeCodec)) {
-    var mediaSource = new ManagedMediaSource(); // for iOS compatibility
+    mediaSource = new ManagedMediaSource(); // for iOS compatibility
     console.log("Using ManagedMediaSource extension.");
 } else if (window.MediaSource && MediaSource.isTypeSupported(mimeCodec)) {
-    var mediaSource = new MediaSource();
+    mediaSource = new MediaSource();
     console.log("Using MediaSource extension.");
 } else {
     console.error("Media Source Extensions (MSE) not supported.")
