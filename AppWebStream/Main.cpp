@@ -102,7 +102,6 @@ int main (int argc, char *argv[]) {
     printf("Connecting to client...\n");
 
     // encode & transmit frames
-    const auto frame_period = std::chrono::milliseconds(std::chrono::seconds(1)) / FPS;
     auto next_deadline = std::chrono::steady_clock::now();
     for (;;) {
         HRESULT hr = EncodeFrame(encoder, wnd_dc, dims);
@@ -110,7 +109,7 @@ int main (int argc, char *argv[]) {
             break;
 
         // synchronize framerate
-        next_deadline += frame_period;
+        next_deadline += std::chrono::milliseconds(std::chrono::seconds(1))/FPS;;
         auto now = std::chrono::steady_clock::now();
         if (next_deadline < now)
             next_deadline = now; // missed deadline, reset to avoid burst of frames
