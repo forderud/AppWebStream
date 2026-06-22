@@ -81,6 +81,9 @@ Mpeg4ReceiverME::Mpeg4ReceiverME(_bstr_t url, NewFrameCb frame_cb) :Mpeg4Receive
         hr = attribs->SetUnknown(MF_MEDIA_ENGINE_CALLBACK, engine_cb);
         assert(SUCCEEDED(hr));
 
+        hr = attribs->SetUINT32(MF_LOW_LATENCY, TRUE);
+        assert(SUCCEEDED(hr));
+
         // TODO: Investigate the following attributes from https://github.com/chromium/chromium/blob/main/media/renderers/win/media_foundation_renderer.cc
         // MF_MEDIA_ENGINE_CONTENT_PROTECTION_FLAGS
         // MF_MEDIA_ENGINE_AUDIO_CATEGORY
