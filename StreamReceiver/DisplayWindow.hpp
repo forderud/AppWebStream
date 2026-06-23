@@ -89,10 +89,9 @@ private:
         RECT rc{};
         GetClientRect(m_wnd, &rc);
 
-        InvalidateRect(m_wnd, &rc, false);
-
-        PAINTSTRUCT ps{};
-        HDC dc = BeginPaint(m_wnd, &ps);
+        // Use GetDC/ReleaseDC for immediate drawing instead of BeginPaint/EndPaint,
+        // which is intended for WM_PAINT handlers and incurs message-queue round-trips.
+        HDC dc = GetDC(m_wnd);
         {
             BITMAPINFO bmi = {};
             bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
@@ -106,8 +105,10 @@ private:
             // draw RGBA pixels from "buffer" to "m_wnd"
             int lines = StretchDIBits(dc, 0, 0, rc.right, rc.bottom, 0, 0, resolution[0], resolution[1], buffer.data(), &bmi, DIB_RGB_COLORS, SRCCOPY);
             assert(lines == (int)resolution[1]); lines;
+
+            GdiFlush(); // force GDI batch out before releasing the DC
         }
-        EndPaint(m_wnd, &ps);
+        ReleaseDC(m_wnd, dc);
     }
 
     /** Window procedure for processing messages. */
