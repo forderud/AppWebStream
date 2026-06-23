@@ -103,7 +103,8 @@ private:
             bmi.bmiHeader.biSizeImage = 0; // zero for uncompressed RGB bitmaps
 
             // draw RGBA pixels from "buffer" to "m_wnd"
-            int lines = StretchDIBits(dc, 0, 0, rc.right, rc.bottom, 0, 0, resolution[0], resolution[1], buffer.data(), &bmi, DIB_RGB_COLORS, SRCCOPY);
+            // No scaling needed: SetDIBitsToDevice is faster than StretchDIBits.
+            int lines = SetDIBitsToDevice(dc, 0, 0, resolution[0], resolution[1], 0, 0, 0, resolution[1], buffer.data(), &bmi, DIB_RGB_COLORS);
             assert(lines == (int)resolution[1]); lines;
 
             GdiFlush(); // force GDI batch out before releasing the DC
