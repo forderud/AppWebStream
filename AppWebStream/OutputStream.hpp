@@ -19,7 +19,7 @@ public:
 };
 
 
-class ATL_NO_VTABLE OutputStream :
+class OutputStream :
     public CComObjectRootEx<CComMultiThreadModel>,
     public CComCoClass<OutputStream>,
     public IMFByteStream {

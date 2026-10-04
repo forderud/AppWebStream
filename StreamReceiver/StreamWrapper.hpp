@@ -14,7 +14,7 @@ typedef std::function<void(uint64_t startTime, double dpi, double xform[6])> Sta
 
 /** IMFByteStream wrapper to allow parsing of the underlying MPEG4 bitstream.
     Used to access CreationTime & DPI parameters that doesn't seem to be exposed through the MediaFoundation API. */
-class ATL_NO_VTABLE StreamWrapper :
+class StreamWrapper :
     public CComObjectRootEx<CComMultiThreadModel>,
     public CComCoClass<StreamWrapper>,
     public IMFByteStream {
